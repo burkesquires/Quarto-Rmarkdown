@@ -1,0 +1,360 @@
+---
+title: "Quarto 3 — Figures & Visualizations"
+subtitle: "Publication-quality plots in .qmd"
+author: "R. Burke Squires"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+---
+
+## Goals for this 45-minute block
+
+- Move from a basic `ggplot2` plot to a publication-quality figure.
+- Control figure sizing and resolution with chunk options.
+- Combine multiple plots into one figure with `patchwork`.
+- Add interactive figures with `plotly` (HTML only).
+- Save figures to disk for manuscript submission.
+- Use Quarto's column layout for side-by-side figures.
+
+## Setup
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+#| include: false
+
+library(tidyverse)
+library(patchwork)
+library(plotly)
+
+# The workshop biomarker dataset
+set.seed(42)
+n <- 200
+biomarker_data <- data.frame(
+  participant_id = 1:n,
+  age = round(rnorm(n, 48, 14)),
+  sex = sample(c("Female", "Male"), n, replace = TRUE, prob = c(0.55, 0.45)),
+  pfoa_serum = round(rlnorm(n, meanlog = 0.8, sdlog = 0.9), 2),
+  cholesterol = round(rnorm(n, 210, 38)),
+  site = sample(c("Research Triangle Park", "Durham", "Chapel Hill"),
+                n, replace = TRUE)
+)
+```
+
+## From basic to publication-quality
+
+One of Quarto's strengths: figures are generated directly from your code. No saving PNGs and pasting into Word — the plot **is** the code.
+
+### A basic plot
+
+```{r}
+#| label: fig-basic
+#| fig-cap: "Basic ggplot scatter — functional but unfinished."
+
+ggplot(biomarker_data, aes(x = pfoa_serum, y = cholesterol)) +
+  geom_point() +
+  labs(title = "PFOA Serum vs Total Cholesterol",
+       x = "PFOA (ng/mL)",
+       y = "Total Cholesterol (mg/dL)")
+```
+
+### The same plot, publication-ready
+
+```{r}
+#| label: fig-publication
+#| fig-cap: "Publication-quality version: log-scale x, sex-stratified, with regression overlay."
+#| warning: false
+
+ggplot(biomarker_data, aes(x = pfoa_serum, y = cholesterol, color = sex)) +
+  geom_point(alpha = 0.6, size = 2) +
+  geom_smooth(method = "lm", se = TRUE, linewidth = 0.8) +
+  scale_x_log10() +
+  scale_color_manual(values = c("Female" = "#0D9488", "Male" = "#6366F1")) +
+  labs(
+    title = "Association Between Serum PFOA and Total Cholesterol",
+    subtitle = "Stratified by sex, N = 200",
+    x = "Serum PFOA (ng/mL, log scale)",
+    y = "Total Cholesterol (mg/dL)",
+    color = "Sex",
+    caption = "Simulated NIEHS biomonitoring data"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    legend.position = "bottom"
+  )
+```
+
+The transformations from basic to publication-ready:
+
+::: {.incremental}
+- **Log-scale x axis** — appropriate for the right-skewed PFOA distribution.
+- **Sex stratification** with deliberate color choices.
+- **Linear fit overlay** with confidence band.
+- **Informative labels** — title, subtitle, axis units, data caption.
+- **`theme_minimal`** with `base_size = 12` for readable text at reasonable sizes.
+:::
+
+## Controlling figure size and resolution
+
+In Quarto, figure dimensions are chunk options on `#|` lines:
+
+| Option | Purpose | Default | Example |
+|--------|---------|---------|---------|
+| `fig-width` | Width in inches | 7 | `fig-width: 8` |
+| `fig-height` | Height in inches | 5 | `fig-height: 4` |
+| `fig-align` | Alignment | `"default"` | `"center"`, `"left"`, `"right"` |
+| `dpi` | Resolution | 96 | `300` for publication |
+| `fig-cap` | Figure caption | — | `"Figure 1. My caption"` |
+| `out-width` | Rendered width (CSS) | — | `"80%"`, `"500px"` |
+
+::: {.callout-warning}
+## The R Markdown → Quarto naming gotcha
+R Markdown uses dot notation: `fig.width`, `fig.height`, `fig.cap`. Quarto uses hyphens: `fig-width`, `fig-height`, `fig-cap`. If you copy R Markdown chunks into Quarto and figures stop sizing right, this is almost always why.
+:::
+
+### Narrow vs wide
+
+A narrow, tall boxplot:
+
+```{r}
+#| label: fig-narrow
+#| fig-cap: "Narrow figure: PFOA by sex (fig-width 4, fig-height 6)."
+#| fig-width: 4
+#| fig-height: 6
+
+ggplot(biomarker_data, aes(x = sex, y = pfoa_serum, fill = sex)) +
+  geom_boxplot(alpha = 0.7) +
+  scale_fill_manual(values = c("#0D9488", "#6366F1")) +
+  scale_y_log10() +
+  labs(y = "Serum PFOA (ng/mL, log scale)", x = NULL) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+A wide, short panel of sites:
+
+```{r}
+#| label: fig-wide
+#| fig-cap: "Wide figure: age vs cholesterol faceted by site (fig-width 10, fig-height 3)."
+#| fig-width: 10
+#| fig-height: 3
+#| warning: false
+
+ggplot(biomarker_data, aes(x = age, y = cholesterol)) +
+  geom_point(alpha = 0.4, color = "#475569") +
+  geom_smooth(method = "loess", color = "#0D9488") +
+  facet_wrap(~site, nrow = 1) +
+  labs(x = "Age (years)", y = "Total Cholesterol (mg/dL)") +
+  theme_minimal()
+```
+
+### `out-width` for display scaling
+
+`fig-width` controls the *creation* size. `out-width` controls how big it *appears* in the rendered document:
+
+```{r}
+#| label: fig-scaled
+#| fig-cap: "Created at 8×6 inches, displayed at 60% width."
+#| fig-width: 8
+#| fig-height: 6
+#| out-width: "60%"
+
+ggplot(biomarker_data, aes(x = pfoa_serum)) +
+  geom_histogram(fill = "#0D9488", color = "white", bins = 30) +
+  scale_x_log10() +
+  labs(title = "Distribution of Serum PFOA",
+       x = "PFOA (ng/mL, log scale)", y = "Count") +
+  theme_minimal()
+```
+
+This pattern is useful for journals that want figures rendered at a specific aspect ratio but displayed smaller in the manuscript.
+
+## Multi-panel figures
+
+Two ways to combine plots in one figure: `patchwork` (for unrelated plots) and `facet_wrap` / `facet_grid` (for the same plot subset by variable).
+
+### `patchwork` — flexible composition
+
+```{r}
+#| label: fig-patchwork
+#| fig-cap: "Two-panel figure: distribution (A) and relationship (B)."
+#| fig-width: 10
+#| fig-height: 4
+#| warning: false
+
+p1 <- ggplot(biomarker_data, aes(x = pfoa_serum)) +
+  geom_histogram(fill = "#0D9488", color = "white", bins = 25) +
+  scale_x_log10() +
+  labs(title = "A", x = "PFOA (ng/mL)", y = "Count") +
+  theme_minimal()
+
+p2 <- ggplot(biomarker_data, aes(x = pfoa_serum, y = cholesterol)) +
+  geom_point(alpha = 0.4, color = "#475569") +
+  geom_smooth(method = "lm", color = "#DC2626") +
+  scale_x_log10() +
+  labs(title = "B", x = "PFOA (ng/mL)", y = "Cholesterol (mg/dL)") +
+  theme_minimal()
+
+p1 + p2
+```
+
+The magic is `p1 + p2`. `patchwork` overloads arithmetic operators:
+
+| Operator | Meaning |
+|----------|---------|
+| `p1 + p2` | Side by side |
+| `p1 / p2` | Stacked vertically |
+| `p1 + p2 + p3` | Three across |
+| `(p1 + p2) / p3` | Two on top, one below |
+| `p1 + p2 + plot_layout(ncol = 2)` | Explicit grid |
+| `p1 + p2 + plot_annotation(tag_levels = "A")` | Auto-tag panels A, B, C |
+
+### `facet_wrap` and `facet_grid` — small multiples
+
+```{r}
+#| label: fig-faceted
+#| fig-cap: "Age vs cholesterol faceted by site (columns) and sex (rows)."
+#| fig-width: 8
+#| fig-height: 5
+#| warning: false
+
+ggplot(biomarker_data, aes(x = age, y = cholesterol)) +
+  geom_point(alpha = 0.5, size = 1.5) +
+  geom_smooth(method = "lm", color = "#0D9488") +
+  facet_grid(sex ~ site) +
+  labs(x = "Age (years)", y = "Total Cholesterol (mg/dL)") +
+  theme_bw(base_size = 10)
+```
+
+`facet_wrap(~variable)` wraps panels in a single direction. `facet_grid(rowvar ~ colvar)` creates a 2D grid. Use facets when the panels show the *same plot* on subsets; use `patchwork` when the panels show *different plots*.
+
+## Side-by-side with Quarto columns
+
+Sometimes you want two plots side by side in your prose without bundling them into a single ggplot object. Quarto's column layout makes this easy:
+
+```markdown
+:::: {.columns}
+
+::: {.column width="50%"}
+```{r}
+#| label: fig-left
+#| fig-cap: "PFOA distribution."
+
+# plot code
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| label: fig-right
+#| fig-cap: "PFOS distribution."
+
+# plot code
+```
+:::
+
+::::
+```
+
+This is **Quarto-only** — R Markdown doesn't support this layout syntax natively. Each plot remains its own labeled, captioned figure, but the layout shows them side by side.
+
+## Interactive figures with `plotly`
+
+For HTML reports, `plotly` turns static ggplots into interactive figures where readers can hover, zoom, and pan:
+
+```{r}
+#| label: fig-plotly
+#| fig-cap: "Interactive scatter — hover over points to see age."
+
+p <- ggplot(biomarker_data,
+            aes(x = pfoa_serum, y = cholesterol, color = sex,
+                text = paste("Age:", age, "<br>Site:", site))) +
+  geom_point(alpha = 0.6) +
+  scale_x_log10() +
+  scale_color_manual(values = c("#0D9488", "#6366F1")) +
+  labs(x = "PFOA (ng/mL)", y = "Cholesterol (mg/dL)") +
+  theme_minimal()
+
+ggplotly(p, tooltip = c("text", "x", "y"))
+```
+
+::: {.callout-warning}
+## `plotly` is HTML-only
+Interactive widgets render as static images (or are dropped entirely) in Word and PDF output. For multi-format reports, use a conditional pattern:
+
+```r
+if (knitr::is_html_output()) {
+  ggplotly(p)
+} else {
+  p  # static ggplot fallback
+}
+```
+:::
+
+## Saving figures for manuscript submission
+
+For external use (journal submission, presentations), use `ggsave()`:
+
+```{r}
+#| label: save-figures-demo
+#| eval: false
+
+# Save the last plot in memory
+ggsave("output/figures/pfoa_cholesterol.png",
+       width = 7, height = 5, dpi = 300)
+
+# Save a specific plot object
+ggsave("output/figures/panel_figure.png",
+       plot = p1 + p2,
+       width = 10, height = 4, dpi = 300)
+
+# For journals that require TIFF
+ggsave("output/figures/figure1.tiff",
+       width = 7, height = 5, dpi = 300, compression = "lzw")
+
+# Vector format for crisp lines at any size
+ggsave("output/figures/figure1.svg",
+       width = 7, height = 5)
+```
+
+::: {.callout-tip}
+## Reproducibility tip
+If your manuscript figures are saved by `ggsave()` calls in your `.qmd` source, your figures and your analysis can never get out of sync. Every render regenerates the figure files. This catches bugs where someone "fixed the data" but forgot to update the figure.
+:::
+
+## Figure cross-references
+
+We've been using labeled figures throughout. From prose, refer to them with `@fig-label`:
+
+> The data show a positive linear association (@fig-publication), consistent across sites (@fig-faceted).
+
+Quarto generates "Figure 1" and "Figure 5" with clickable links. The numbering is automatic and updates when figures are added or reordered.
+
+## Exercises
+
+### Exercise 3.1 — Multi-panel figure
+
+Using `biomarker_data`, create a `patchwork` figure with two panels side by side:
+
+- **Panel A:** Histogram of `cholesterol`
+- **Panel B:** Scatter of `age` vs `cholesterol` colored by `sex`
+
+Set `fig-width: 10` and `fig-height: 4`. Add a `fig-cap`. Tag the panels A and B with `plot_annotation(tag_levels = "A")`.
+
+### Exercise 3.2 — Interactive figure
+
+Take your scatter from Exercise 3.1 (panel B) and wrap it in `ggplotly()`. Render. Hover over points. Confirm the tooltip shows useful information.
+
+### Exercise 3.3 — Side-by-side columns
+
+Using the `::: {.columns}` layout, place two histograms side by side: PFOA on the left, cholesterol on the right. Each gets its own caption and label.
+
+## What's next
+
+Quarto Module 4 — **Equations, Cross-References, and Citations**. Equations get the deep coverage they need for scientific reports; cross-references and citations are essentially identical to R Markdown but with one major improvement (built-in figure/table cross-refs without needing `bookdown`).
+
+Open [`04_equations_crossrefs_citations.qmd`](04_equations_crossrefs_citations.qmd).

@@ -1,0 +1,171 @@
+---
+title: "Quarto 3 — Figures & Visualizations"
+subtitle: "Publication-quality plots in .qmd"
+author: "R. Burke Squires"
+institute: "NIEHS"
+date: today
+format:
+  revealjs:
+    theme: [default, niehs-theme.scss]
+    logo: ../../images/niehs-logo.png
+    footer: "R Markdown + Quarto · NIEHS · 2026"
+    slide-number: true
+    chalkboard: true
+    code-overflow: wrap
+---
+
+## Goals — 45 minutes
+
+::: {.incremental}
+- Basic ggplot → publication-quality
+- Figure sizing with chunk options
+- Multi-panel via `patchwork`
+- Interactive via `plotly`
+- Side-by-side via Quarto columns
+- Save for manuscripts
+:::
+
+# Sizing — the R Markdown → Quarto gotcha {.section-divider}
+
+## Names changed
+
+| R Markdown | Quarto |
+|------------|--------|
+| `fig.width=8` | `fig-width: 8` |
+| `fig.height=4` | `fig-height: 4` |
+| `fig.cap="..."` | `fig-cap: "..."` |
+| `out.width="80%"` | `out-width: "80%"` |
+| `fig.align="center"` | `fig-align: "center"` |
+
+::: {.fragment}
+**Dot becomes hyphen.** That's the rule.
+:::
+
+## fig-width vs out-width
+
+::: {.incremental}
+- `fig-width` — *creation* dimensions in inches
+- `out-width` — *display* dimensions in the rendered doc
+- Use both for: "render at 8×6 inches but show at 60% width"
+:::
+
+# patchwork {.section-divider}
+
+## Combine plots
+
+```{.r}
+p1 <- ggplot(biomarker_data, aes(pfoa_serum)) +
+  geom_histogram()
+p2 <- ggplot(biomarker_data, aes(pfoa_serum, cholesterol)) +
+  geom_point()
+
+p1 + p2          # side by side
+p1 / p2          # stacked
+(p1 + p2) / p3   # two on top, one below
+```
+
+::: {.fragment}
+Arithmetic operators on plot objects. Easy.
+:::
+
+## Auto-tagged panels
+
+```{.r}
+p1 + p2 + p3 +
+  plot_annotation(tag_levels = "A")
+```
+
+::: {.fragment}
+Panels labeled A, B, C automatically.
+:::
+
+# Quarto columns {.section-divider}
+
+## Side-by-side plots in prose
+
+```markdown
+:::: {.columns}
+
+::: {.column width="50%"}
+[plot chunk 1]
+:::
+
+::: {.column width="50%"}
+[plot chunk 2]
+:::
+
+::::
+```
+
+::: {.fragment}
+Each plot retains its own caption and label. Quarto-only — R Markdown doesn't have this.
+:::
+
+# Interactive with plotly {.section-divider}
+
+## ggplot → plotly
+
+```{.r}
+p <- ggplot(biomarker_data,
+            aes(pfoa_serum, cholesterol, color = sex,
+                text = paste("Age:", age))) +
+  geom_point()
+
+ggplotly(p, tooltip = c("text", "x", "y"))
+```
+
+::: {.incremental}
+- Hover, zoom, pan
+- HTML only — degrades in Word/PDF
+- For multi-format: conditional with `knitr::is_html_output()`
+:::
+
+# Saving figures {.section-divider}
+
+## ggsave for manuscripts
+
+```{.r}
+# For journal submission
+ggsave("figures/figure1.png",
+       width = 7, height = 5, dpi = 300)
+
+# Or TIFF if required
+ggsave("figures/figure1.tiff",
+       width = 7, height = 5, dpi = 300,
+       compression = "lzw")
+
+# Or vector
+ggsave("figures/figure1.svg",
+       width = 7, height = 5)
+```
+
+# Cross-references {.section-divider}
+
+## Two requirements
+
+::: {.incremental}
+1. **Label with prefix** — `fig-`, `tbl-`, `eq-`, `sec-`, `lst-`
+2. **Caption** — `fig-cap:` or `tbl-cap:`
+:::
+
+## In prose
+
+```markdown
+The data are positively associated
+(@fig-pfoa-cholesterol), consistent
+across sites (@fig-faceted).
+```
+
+::: {.fragment}
+Renders as "Figure 1" and "Figure 5" with clickable links. Numbering automatic.
+:::
+
+# Hands-on {.section-divider}
+
+## Notebook Quarto 3
+
+::: {.callout-tip}
+Open `afternoon_quarto/03_figures_and_visualizations.qmd`. Exercises 3.1, 3.2, 3.3.
+:::
+
+45 minutes. Then equations + citations.

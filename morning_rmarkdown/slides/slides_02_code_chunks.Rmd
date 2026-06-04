@@ -1,0 +1,243 @@
+---
+title: "Module 2: Code Chunks & Inline Code"
+subtitle: "Controlling What Runs and What Readers See"
+author: "NIEHS Training"
+date: "`r Sys.Date()`"
+output:
+  ioslides_presentation:
+    widescreen: true
+    css: rmd_slides_style.css
+    self_contained: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
+                      comment = "", fig.height = 2.8, fig.width = 6)
+library(tidyverse)
+```
+
+# Code Chunks {.segue}
+
+## What is a Code Chunk?
+
+A fenced block of R code between `` ```{r} `` and `` ``` ``:
+
+````
+```{r chunk-name}`r ''`
+# Your R code here
+mean(c(1, 2, 3, 4, 5))
+```
+````
+
+**Three ways to insert a chunk:**
+
+1. Keyboard: `Ctrl+Alt+I` (Cmd+Option+I on Mac)
+2. Menu: Code → Insert Chunk
+3. Type the fences manually
+
+## Naming Chunks
+
+```
+```{r load-exposure-data}`r ''`
+exposure <- read.csv("data/exposure.csv")
+```
+```
+
+Good names help you:
+
+- **Navigate** via the document outline
+- **Find errors** ("Error in chunk 'load-exposure-data'")
+- **Cache** results efficiently
+
+> Chunk names must be **unique** within a document.
+
+## Running Chunks
+
+| Action | How |
+|--------|-----|
+| Run current chunk | Green ▶ button, or `Ctrl+Shift+Enter` |
+| Run all chunks above | ↓ arrow on chunk toolbar |
+| Run a single line | Cursor on line → `Ctrl+Enter` |
+| Knit entire document | Knit button or `Ctrl+Shift+K` |
+
+# Chunk Options {.segue}
+
+## The Most Important Options
+
+Options go inside `{r}`, separated by commas:
+
+````
+```{r my-chunk, echo=FALSE, fig.width=8}`r ''`
+```
+````
+
+## `echo` — Show or Hide Code
+
+**`echo=TRUE`** (default) — readers see code AND output:
+
+```{r echo-true-demo}
+result <- 2 + 2
+result
+```
+
+**`echo=FALSE`** — readers see ONLY the output:
+
+```{r echo-false-demo, echo=FALSE}
+cat("This result appeared without showing the code.")
+```
+
+> Use `echo=FALSE` for final reports where readers want results, not code.
+
+## `eval` — Run or Skip Code
+
+**`eval=FALSE`** — code is displayed but NOT executed:
+
+````
+```{r, eval=FALSE}`r ''`
+install.packages("some_package")  # Won't actually run
+```
+````
+
+Useful for showing example code that shouldn't execute during knitting.
+
+## `include` — Show Anything at All?
+
+**`include=FALSE`** — code runs silently, nothing shown:
+
+```{r include-demo, include=FALSE}
+secret_value <- 42
+```
+
+The chunk above ran silently. Proof: `secret_value` = `r secret_value`.
+
+> Perfect for setup steps like loading packages.
+
+## `message` and `warning`
+
+```r
+library(tidyverse)  # Normally prints startup messages
+```
+
+Set `message=FALSE` and `warning=FALSE` to keep output clean.
+
+This is why the **setup chunk** at the top of every `.Rmd` includes:
+
+```r
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
+
+## Common Combinations
+
+| Scenario | Options |
+|----------|---------|
+| Show code + output (default) | `echo=TRUE, eval=TRUE` |
+| Results only (reports) | `echo=FALSE` |
+| Show code, don't run | `eval=FALSE` |
+| Run silently (setup) | `include=FALSE` |
+| Clean figure | `echo=FALSE, warning=FALSE` |
+
+## Exercise 2.1: Practice Options
+
+Modify this chunk — change `echo=TRUE` to `echo=FALSE`, re-knit:
+
+```{r exercise-echo, echo=TRUE}
+chemicals <- c("PFOA", "PFOS", "PFNA", "PFHxS", "GenX")
+half_life <- c(3.8, 5.4, 2.5, 8.5, NA)
+data.frame(Chemical = chemicals, 
+           `Half-life (yr)` = half_life, check.names = FALSE)
+```
+
+# Global Options {.segue}
+
+## Set Defaults for the Whole Document
+
+Instead of setting options on every chunk, use a **setup chunk**:
+
+````
+```{r setup, include=FALSE}`r ''`
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  fig.width = 7,
+  fig.height = 5,
+  fig.align = "center"
+)
+```
+````
+
+Every `.Rmd` should start with this. Override on individual chunks when needed.
+
+# Inline Code {.segue}
+
+## Embed R Results in Text
+
+Syntax: `` `r knitr::inline_expr('expression')` ``
+
+```
+The mean was `r knitr::inline_expr('mean(c(2.3, 4.1, 3.7))')` µg/L.
+```
+
+Renders as: The mean was `r mean(c(2.3, 4.1, 3.7))` µg/L.
+
+## Why Inline Code Matters
+
+**Without inline code:**
+
+> "We observed 247 participants with a mean age of 43.2 years."
+
+Change the data → find and manually update every number. 😱
+
+**With inline code:**
+
+> "We observed `` `r knitr::inline_expr('n')` `` participants with a mean age of `` `r knitr::inline_expr('round(mean(ages), 1)')` `` years."
+
+Change the data → re-knit → **everything updates automatically**. ✅
+
+## Realistic Example
+
+```{r inline-data}
+set.seed(42)
+n <- 150
+ages <- round(rnorm(n, mean = 45, sd = 12))
+pfoa <- round(rlnorm(n, meanlog = 1.2, sdlog = 0.8), 2)
+```
+
+> Our study enrolled `r n` participants with a mean age of
+> `r round(mean(ages), 1)` years (SD = `r round(sd(ages), 1)`).
+> Median serum PFOA was `r round(median(pfoa), 2)` ng/mL
+> (IQR: `r round(quantile(pfoa, 0.25), 2)`–`r round(quantile(pfoa, 0.75), 2)`).
+
+**Every number came from R code.**
+
+## Formatting Inline Numbers
+
+```{r}
+big_number <- 1234567.89
+```
+
+Without formatting: `r big_number`
+
+With `formatC()`: `r formatC(big_number, format = "f", big.mark = ",", digits = 0)`
+
+```r
+formatC(big_number, format = "f", big.mark = ",", digits = 0)
+```
+
+## Exercise 2.2: Dynamic Paragraph
+
+Using this data, write a paragraph with inline code:
+
+```{r exercise-inline}
+set.seed(123)
+bpa <- round(rlnorm(80, meanlog = 0.5, sdlog = 0.9), 2)
+n_total <- length(bpa)
+mean_bpa <- round(mean(bpa), 2)
+pct_above <- round(mean(bpa > 5.0) * 100, 1)
+```
+
+Write: *"We measured BPA in `` `r knitr::inline_expr('n_total')` `` participants.
+Mean concentration was `` `r knitr::inline_expr('mean_bpa')` `` µg/L.
+`` `r knitr::inline_expr('pct_above')` ``% exceeded the reference dose."*
+
+**Time: 5 minutes**

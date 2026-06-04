@@ -1,0 +1,251 @@
+---
+title: "Quarto 5 — Revealjs Presentations"
+subtitle: "Build slide decks from .qmd"
+author: "R. Burke Squires"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+---
+
+## Goals for this module
+
+In the next 60 minutes you will:
+
+- Convert a Quarto document into a slide deck with one YAML change.
+- Use the level-2 heading rule to create new slides.
+- Add speaker notes, incremental reveals, columns, and code highlighting.
+- Customize the look with the built-in themes.
+
+You will end this module with a working presentation that you could give tomorrow.
+
+## The smallest possible deck
+
+Take this entire file:
+
+```yaml
+---
+title: "My talk"
+format: revealjs
+---
+
+## Slide 1
+
+Hello world.
+
+## Slide 2
+
+Goodbye world.
+```
+
+Render it. You have a slide deck. Press space to advance, `s` to open speaker notes, `f` for full screen, `?` for keyboard shortcuts.
+
+::: {.callout-tip}
+## The heading rule
+By default, each level-2 heading (`##`) starts a new slide. Anything between two `##` lines is the content of one slide. Level-1 headings (`#`) create **section dividers** (a big colored title slide).
+:::
+
+## Theme
+
+Revealjs ships with a dozen themes. Set one in YAML:
+
+```yaml
+format:
+  revealjs:
+    theme: simple
+```
+
+Built-in themes: `beige`, `blood`, `dark`, `default`, `league`, `moon`, `night`, `serif`, `simple`, `sky`, `solarized`, `white`.
+
+For corporate or institutional looks, define your own:
+
+```yaml
+format:
+  revealjs:
+    theme: [default, my-niehs-theme.scss]
+```
+
+A `.scss` theme file lets you override colors and fonts. The workshop slides use a custom NIEHS theme in `slides/niehs-theme.scss` — look at it for a working example.
+
+## Slide layout patterns
+
+Here are the patterns you will use 95% of the time. Each one is shown as it would appear in a `.qmd` source.
+
+### Title slide
+
+```markdown
+---
+title: "Title of the talk"
+subtitle: "A subtitle"
+author: "R. Burke Squires"
+institute: "NIEHS"
+date: "2026-05-19"
+format: revealjs
+---
+```
+
+Quarto auto-generates a title slide from the YAML.
+
+### Section divider
+
+```markdown
+# Part 1: Setup
+```
+
+A single `#` heading creates a full-screen section break.
+
+### Bullet slide with incremental reveal
+
+```markdown
+## Three things to know
+
+::: {.incremental}
+- Quarto generalizes R Markdown.
+- It speaks multiple languages.
+- It produces many output formats.
+:::
+```
+
+Each bullet appears on click. The `::: {.incremental}` div is the magic.
+
+### Two-column slide
+
+```markdown
+## Tradeoffs
+
+:::: {.columns}
+
+::: {.column width="50%"}
+**Pros**
+
+- Fast
+- Cheap
+- Reproducible
+:::
+
+::: {.column width="50%"}
+**Cons**
+
+- Learning curve
+- More files to track
+:::
+
+::::
+```
+
+### Slide with code that highlights
+
+```markdown
+## Loading data
+
+```{r}
+#| code-line-numbers: "1|2-3|4"
+
+library(dplyr)
+aq <- read.csv("airquality.csv")
+aq <- na.omit(aq)
+summary(aq)
+```
+```
+
+The `code-line-numbers` option steps through the code one line at a time as you click. The string is a sequence of line ranges separated by `|`. Each step highlights a different set of lines.
+
+### Slide with a figure that fills the screen
+
+```markdown
+## A picture
+
+![](path/to/figure.png){.r-stretch}
+```
+
+The `.r-stretch` class makes the figure expand to fill available space.
+
+### Speaker notes
+
+```markdown
+## A normal slide
+
+Visible content goes here.
+
+::: {.notes}
+These notes only appear in the speaker view (press `s` during the talk).
+:::
+```
+
+## Tasteful customization
+
+A few YAML options worth knowing:
+
+```yaml
+format:
+  revealjs:
+    theme: simple
+    slide-number: true        # show "5/24" in the corner
+    chalkboard: true          # press 'b' to draw on the slide
+    incremental: false        # default: bullets appear all at once
+    transition: slide         # how slides transition: none, fade, slide, convex, concave, zoom
+    code-overflow: wrap       # don't make code horizontally scroll
+    smaller: false            # set true for global smaller text on every slide
+    scrollable: false         # set true to allow per-slide scrolling
+    progress: true            # show a progress bar at the bottom
+    logo: niehs-logo.png      # small logo in corner
+    footer: "Quarto Workshop · NIEHS · 2026"
+```
+
+The `chalkboard` feature is genuinely useful in training — you can annotate slides live during the talk and even save the annotations.
+
+## Live demo
+
+::: {.callout-important}
+## Open the workshop slide deck now
+Open `slides/05_revealjs_demo.qmd` (we will create this together). This is a real, working slide deck rendered to revealjs. Look at the YAML at the top, then scroll through and notice how each `##` heading maps to a slide. The lecturer will demo this live.
+:::
+
+## Exercise 4.1 — Convert and customize
+
+Take the file you started in Module 1 and:
+
+1. Change the YAML to `format: revealjs` (delete the `html:` block).
+2. Render and step through the result.
+3. Pick a theme that you like.
+4. Find one bullet list in your file and wrap it in `::: {.incremental}` ... `:::`.
+5. Add a section divider using `#` somewhere.
+6. Add a speaker note using `::: {.notes}` ... `:::`.
+
+## Exercise 4.2 — Code highlighting
+
+Find any code chunk in your slides. Add `#| code-line-numbers: "1|2|3"` to it (or whatever line numbers you have). Render and step through the slide — each click should highlight the next line.
+
+## A subtle point about chunks in slides
+
+In a slide deck, **a single chunk lives on a single slide**. If your code is too long to fit on one slide, either:
+
+- Break it into multiple chunks across multiple slides, or
+- Add `scrollable: true` to that one slide:
+
+```markdown
+## A long script {.scrollable}
+
+```{r}
+# 50 lines of code...
+```
+```
+
+You will see `.scrollable` and `.smaller` used as per-slide modifiers attached to the heading. They are class names — Quarto picks them up and applies styles only to that slide.
+
+## Common revealjs problems
+
+| Symptom | Cause | Fix |
+|---|---|---|
+| Slides too crowded | Too much per slide | Break with more `##` headings |
+| Code overflows off-screen | Long lines | `code-overflow: wrap` in YAML |
+| Figure is tiny | No size set | `{.r-stretch}` or set `fig-width`/`fig-height` |
+| Bullets all appear at once | Forgot incremental | Wrap in `::: {.incremental}` |
+| Custom theme not loading | Wrong path | Use relative path from the `.qmd` file |
+
+## What's next
+
+The final teaching module covers **Quarto projects** — multi-document collections like websites and books — and **publishing** the things you've built.
+
+Open [`06_parameterized_reports.qmd`](06_parameterized_reports.qmd).

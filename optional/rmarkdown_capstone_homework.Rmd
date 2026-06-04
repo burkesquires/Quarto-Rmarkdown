@@ -1,0 +1,259 @@
+---
+title: "Module 7 — Capstone Exercise"
+subtitle: "Build a Complete Environmental Health Analysis Report"
+author: "YOUR NAME HERE"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output:
+  html_document:
+    theme: flatly
+    toc: true
+    toc_float: true
+    toc_depth: 3
+    number_sections: true
+    code_folding: hide
+    df_print: kable
+params:
+  seed: 42
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  fig.width = 7,
+  fig.height = 5,
+  fig.align = "center",
+  dpi = 150
+)
+```
+
+<!--
+=====================================================================
+CAPSTONE EXERCISE — 20 minutes
+
+In this exercise you will build a complete, reproducible analysis report
+by filling in the sections below. Each section has instructions in HTML
+comments (like this one) telling you what to add.
+
+Skills you will practice:
+  - YAML configuration
+  - Loading packages and data
+  - Inline code for dynamic reporting
+  - kable/kableExtra tables
+  - ggplot2 figures with chunk options
+  - LaTeX equations
+  - Tabbed sections
+
+START by changing the author field in the YAML header to your name!
+=====================================================================
+-->
+
+
+# Introduction
+
+<!-- 
+INSTRUCTIONS: Write 2-3 sentences describing the purpose of this analysis.
+Mention that you are examining the relationship between an environmental
+exposure (PM2.5 air pollution) and a health outcome (respiratory function
+measured as FEV1) in a cohort near Research Triangle Park.
+
+Use **bold** for the chemical name and *italics* for the study design.
+-->
+
+YOUR INTRODUCTION HERE
+
+
+# Methods
+
+## Study Population
+
+```{r load-data}
+# ---------------------------------------------------------------
+# DO NOT MODIFY THIS CHUNK — it generates the study data
+# ---------------------------------------------------------------
+set.seed(params$seed)
+n <- 250
+
+study_data <- data.frame(
+  participant_id = paste0("RTP-", sprintf("%04d", 1:n)),
+  age = round(rnorm(n, mean = 52, sd = 14)),
+  sex = sample(c("Female", "Male"), n, replace = TRUE, prob = c(0.54, 0.46)),
+  bmi = round(rnorm(n, mean = 28.1, sd = 5.2), 1),
+  smoking_status = sample(c("Never", "Former", "Current"), n, 
+                          replace = TRUE, prob = c(0.50, 0.30, 0.20)),
+  pm25_annual = round(rnorm(n, mean = 9.5, sd = 2.8), 1),
+  fev1_liters = NA
+)
+
+# Generate FEV1 with a true relationship to PM2.5, age, smoking
+study_data$fev1_liters <- round(
+  3.8 
+  - 0.025 * study_data$age 
+  - 0.04 * study_data$pm25_annual 
+  + ifelse(study_data$sex == "Male", 0.6, 0) 
+  - ifelse(study_data$smoking_status == "Current", 0.35, 
+           ifelse(study_data$smoking_status == "Former", 0.15, 0))
+  + rnorm(n, 0, 0.4),
+  2
+)
+
+# Ensure reasonable values
+study_data$fev1_liters <- pmax(study_data$fev1_liters, 1.0)
+study_data$age <- pmax(study_data$age, 25)
+```
+
+<!--
+INSTRUCTIONS: Write a sentence using INLINE CODE to report:
+  - The total number of participants (use `nrow(study_data)`)
+  - The percentage female
+  - The age range
+
+Example format:
+"The study enrolled `r knitr::inline_expr('nrow(study_data)')` participants..."
+-->
+
+YOUR STUDY POPULATION DESCRIPTION HERE
+
+## Statistical Analysis
+
+<!--
+INSTRUCTIONS: Describe the statistical approach. Include:
+  1. A sentence about using linear regression
+  2. The regression equation using LaTeX display math ($$...$$):
+     FEV1 = β₀ + β₁(PM2.5) + β₂(Age) + β₃(Sex) + β₄(Smoking) + ε
+  3. Mention that α = 0.05
+-->
+
+YOUR METHODS DESCRIPTION HERE
+
+
+# Results
+
+## Descriptive Statistics
+
+<!--
+INSTRUCTIONS: Create a summary table using kable() and kableExtra.
+  - Group by sex
+  - Show N, mean age, mean BMI, mean PM2.5, and mean FEV1
+  - Add a caption
+  - Use kable_styling with "striped" and "hover"
+  - Add a grouped header row
+-->
+
+```{r descriptive-table}
+library(knitr)
+library(kableExtra)
+library(tidyverse)
+
+# YOUR TABLE CODE HERE
+# Hint: Use group_by(sex) %>% summarise(...)
+```
+
+## Exposure Distribution {.tabset}
+
+<!--
+INSTRUCTIONS: Create a tabbed section with two tabs:
+  - Tab 1: "Histogram" — histogram of PM2.5 values
+  - Tab 2: "By Smoking Status" — boxplot of PM2.5 by smoking_status
+  
+Remember: tabs are created by putting content under ### headers
+when the parent ## header has {.tabset}
+-->
+
+### Histogram
+
+```{r pm25-histogram, fig.cap="**Figure 1.** Distribution of annual PM₂.₅ exposure (µg/m³)."}
+# YOUR HISTOGRAM CODE HERE
+# Hint: ggplot(study_data, aes(x = pm25_annual)) + geom_histogram(...)
+```
+
+### By Smoking Status
+
+```{r pm25-boxplot, fig.cap="**Figure 2.** PM₂.₅ exposure by smoking status."}
+# YOUR BOXPLOT CODE HERE
+```
+
+##
+
+## Primary Analysis
+
+<!--
+INSTRUCTIONS: 
+  1. Fit the linear model: fev1_liters ~ pm25_annual + age + sex + smoking_status
+  2. Use broom::tidy() to extract results
+  3. Display results in a kable table with proper column names
+  4. Write a sentence below the table using INLINE CODE to report:
+     - The PM2.5 coefficient (β₁)
+     - Its p-value
+     - Whether it is statistically significant
+-->
+
+```{r regression-model}
+library(broom)
+
+# YOUR MODEL CODE HERE
+# model <- lm(fev1_liters ~ pm25_annual + age + sex + smoking_status, 
+#              data = study_data)
+# results <- tidy(model, conf.int = TRUE)
+```
+
+## Visualization
+
+<!--
+INSTRUCTIONS: Create a scatterplot of pm25_annual vs fev1_liters
+  - Color by sex
+  - Add a regression line (geom_smooth with method = "lm")
+  - Use appropriate labels and a theme
+  - Set fig.width=8, fig.height=5
+  - Add a fig.cap
+-->
+
+```{r main-figure, fig.width=8, fig.height=5}
+# YOUR SCATTERPLOT CODE HERE
+```
+
+
+# Discussion
+
+<!--
+INSTRUCTIONS: Write 2-3 sentences interpreting the results.
+  - What direction was the PM2.5-FEV1 association?
+  - Was it statistically significant?
+  - What confounders were adjusted for?
+  - Mention one limitation (e.g., cross-sectional design)
+
+Use inline code to reference at least one number from the analysis.
+-->
+
+YOUR DISCUSSION HERE
+
+
+# Session Info
+
+This section documents the R environment used to produce this report, supporting
+reproducibility.
+
+```{r session-info}
+sessionInfo()
+```
+
+---
+
+<div style="padding: 15px; background-color: #F0FDF4; border-left: 4px solid #0D9488; margin-top: 20px;">
+
+**Congratulations!** If you completed this capstone, you have practiced:
+
+- ✅ Configuring the YAML header (title, author, output options, parameters)
+- ✅ Writing narrative text with Markdown formatting
+- ✅ Using code chunks with appropriate chunk options
+- ✅ Reporting statistics with inline R code
+- ✅ Creating publication-quality tables with `kable()` and `kableExtra`
+- ✅ Making figures with `ggplot2` and controlling their appearance
+- ✅ Writing LaTeX equations
+- ✅ Using tabbed sections
+- ✅ Hiding code with `code_folding`
+
+**You are now equipped to write reproducible analysis reports with R Markdown!**
+
+</div>

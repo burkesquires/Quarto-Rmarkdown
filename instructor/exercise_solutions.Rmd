@@ -1,0 +1,489 @@
+---
+title: "R Markdown Training — Exercise Solutions"
+subtitle: "NIEHS Workshop — Instructor Reference"
+author: "NIEHS Training"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    theme: flatly
+    toc: true
+    toc_float: true
+    toc_depth: 3
+    number_sections: true
+    code_folding: show
+    df_print: kable
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(broom)
+```
+
+> **Instructor-only document.** Do not distribute to participants before the
+> workshop. These are the completed solutions for all exercises.
+
+---
+
+# Exercise 1.1: Edit the YAML (Module 1)
+
+**Task:** Change the `author` field to your name, then knit.
+
+**Solution:** Simply change the YAML header line:
+
+```yaml
+---
+title: "Module 1: R Markdown Basics"
+author: "Jane Smith, NIEHS"    # ← changed from "NIEHS Training"
+date: "`r knitr::inline_expr('Sys.Date()')`"
+output: html_document
+---
+```
+
+No code to run — this exercises YAML editing and re-knitting.
+
+---
+
+# Exercise 1.2: Create Your First R Markdown Document (Module 1)
+
+**Task:** Create a new `.Rmd` via File → New → R Markdown, modify it with bold,
+italic, and a numbered list, then knit.
+
+**Solution:** After creating the default template, replace the body with
+something like:
+
+```markdown
+# About This Document
+
+This is my **first R Markdown document**. I created it during the
+*NIEHS R Markdown Workshop*.
+
+## What I Want to Learn Today
+
+1. How to create reproducible reports
+2. How to embed R output in documents
+3. How to make publication-quality tables and figures
+```
+
+Then knit to HTML.
+
+---
+
+# Exercise 2.1: Practice Chunk Options (Module 2)
+
+**Task:** Change `echo=TRUE` to `echo=FALSE` on the PFAS half-life chunk.
+
+**Solution:**
+
+```{r exercise-2-1, echo=FALSE}
+chemicals <- c("PFOA", "PFOS", "PFNA", "PFHxS", "GenX")
+half_life_years <- c(3.8, 5.4, 2.5, 8.5, NA)
+
+data.frame(
+  Chemical = chemicals,
+  `Half-life (years)` = half_life_years,
+  check.names = FALSE
+)
+```
+
+The table appears but the code is hidden. Participants should see only the
+output when they knit.
+
+---
+
+# Exercise 2.2: Write a Dynamic Paragraph (Module 2)
+
+**Task:** Using the BPA data, write a paragraph with inline R code.
+
+**Solution:**
+
+```{r exercise-2-2-data}
+set.seed(123)
+bpa_data <- data.frame(
+  participant_id = 1:80,
+  bpa_concentration = round(rlnorm(80, meanlog = 0.5, sdlog = 0.9), 2),
+  age_group = sample(c("18-39", "40-59", "60+"), 80, replace = TRUE)
+)
+
+reference_dose <- 5.0
+
+n_total <- nrow(bpa_data)
+mean_bpa <- round(mean(bpa_data$bpa_concentration), 2)
+median_bpa <- round(median(bpa_data$bpa_concentration), 2)
+pct_above <- round(mean(bpa_data$bpa_concentration > reference_dose) * 100, 1)
+max_bpa <- round(max(bpa_data$bpa_concentration), 2)
+```
+
+**The paragraph (written in the `.Rmd` source with inline code):**
+
+We measured urinary BPA concentrations in `r n_total` participants. The mean
+concentration was `r mean_bpa` µg/L (median: `r median_bpa` µg/L), with a
+maximum of `r max_bpa` µg/L. Of the participants, `r pct_above`% had
+concentrations exceeding the `r reference_dose` µg/L reference dose.
+
+**The raw Markdown for the above (what participants should type):**
+
+````
+We measured urinary BPA concentrations in `r knitr::inline_expr('n_total')` participants. The mean
+concentration was `r knitr::inline_expr('mean_bpa')` µg/L (median: `r knitr::inline_expr('median_bpa')` µg/L), with a
+maximum of `r knitr::inline_expr('max_bpa')` µg/L. Of the participants, `r knitr::inline_expr('pct_above')`% had
+concentrations exceeding the `r knitr::inline_expr('reference_dose')` µg/L reference dose.
+````
+
+---
+
+# Exercise 3.1: Build a Summary Table (Module 3)
+
+**Task:** Create a summary table of Age, BMI, PFOA, and PFOS grouped by Sex.
+
+**Solution:**
+
+```{r exercise-3-1}
+# Recreate the participants data from Module 3
+set.seed(42)
+participants <- data.frame(
+  ID = paste0("NIEHS-", sprintf("%04d", 1:50)),
+  Age = round(rnorm(50, 45, 12)),
+  Sex = sample(c("Female", "Male"), 50, replace = TRUE),
+  BMI = round(rnorm(50, 27, 4.5), 1),
+  PFOA_ng_mL = round(rlnorm(50, 1.2, 0.8), 2),
+  PFOS_ng_mL = round(rlnorm(50, 1.5, 0.7), 2),
+  Site = sample(c("RTP", "Durham", "Chapel Hill"), 50, replace = TRUE)
+)
+
+# Step 1: Summarize the data
+summary_table <- participants %>%
+  group_by(Sex) %>%
+  summarise(
+    N = n(),
+    `Mean Age` = round(mean(Age), 1),
+    `SD Age` = round(sd(Age), 1),
+    `Mean BMI` = round(mean(BMI), 1),
+    `SD BMI` = round(sd(BMI), 1),
+    `Mean PFOA (ng/mL)` = round(mean(PFOA_ng_mL), 2),
+    `SD PFOA` = round(sd(PFOA_ng_mL), 2),
+    `Mean PFOS (ng/mL)` = round(mean(PFOS_ng_mL), 2),
+    `SD PFOS` = round(sd(PFOS_ng_mL), 2)
+  )
+
+# Step 2: Display with kable
+summary_table %>%
+  kable(caption = "Table 1. Participant Characteristics by Sex") %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover"),
+    full_width = FALSE
+  ) %>%
+  add_header_above(c(" " = 2, "Age" = 2, "BMI" = 2, "PFOA" = 2, "PFOS" = 2))
+```
+
+---
+
+# Exercise 4.1: Create a Multi-Panel Figure (Module 4)
+
+**Task:** Two panels — histogram of cholesterol + scatterplot of age vs
+cholesterol colored by sex — combined with `patchwork`.
+
+**Solution:**
+
+```{r exercise-4-1, fig.width=10, fig.height=4, fig.cap="**Figure 1.** (A) Distribution of total cholesterol. (B) Age vs. cholesterol stratified by sex with linear regression lines."}
+library(patchwork)
+
+# Recreate biomarker data from Module 4
+set.seed(42)
+n <- 200
+biomarker_data <- data.frame(
+  age = round(rnorm(n, 48, 14)),
+  sex = sample(c("Female", "Male"), n, replace = TRUE, prob = c(0.55, 0.45)),
+  pfoa_serum = round(rlnorm(n, 0.8, 0.9), 2),
+  cholesterol = round(rnorm(n, 210, 38)),
+  site = sample(c("RTP", "Durham", "Chapel Hill"), n, replace = TRUE)
+)
+
+panel_a <- ggplot(biomarker_data, aes(x = cholesterol)) +
+  geom_histogram(fill = "#0D9488", color = "white", bins = 25) +
+  labs(title = "A",
+       x = "Total Cholesterol (mg/dL)",
+       y = "Count") +
+  theme_minimal()
+
+panel_b <- ggplot(biomarker_data, aes(x = age, y = cholesterol, color = sex)) +
+  geom_point(alpha = 0.5, size = 1.5) +
+  geom_smooth(method = "lm", se = TRUE) +
+  scale_color_manual(values = c("Female" = "#0D9488", "Male" = "#6366F1")) +
+  labs(title = "B",
+       x = "Age (years)",
+       y = "Total Cholesterol (mg/dL)",
+       color = "Sex") +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+panel_a + panel_b
+```
+
+---
+
+# Exercise 5.1: Write an Equation and Use Parameters (Module 5)
+
+**Task:** (1) Write the odds ratio equation. (2) Change parameters and re-knit.
+
+**Solution:**
+
+### Part 1: The equation
+
+```markdown
+$$OR = \frac{a / b}{c / d} = \frac{a \cdot d}{b \cdot c}$$
+```
+
+Renders as:
+
+$$OR = \frac{a / b}{c / d} = \frac{a \cdot d}{b \cdot c}$$
+
+### Part 2: Change parameters
+
+In the YAML header of `05_scientific_writing.Rmd`, change:
+
+```yaml
+params:
+  chemical: "PFOS"       # was "PFOA"
+  threshold: 6.0         # was 4.0
+  study_year: 2025       # was 2024
+```
+
+Re-knit — the title, histogram, threshold line, and all inline statistics
+update automatically.
+
+---
+
+# Exercise 6.1: Experiment with Output Options (Module 6)
+
+**Task:** Change theme and code_folding settings, knit to see differences.
+
+**Solution:** No code needed — this is a YAML editing exercise:
+
+```yaml
+# Try each of these one at a time and re-knit:
+
+# Change 1: Different theme
+output:
+  html_document:
+    theme: journal        # was flatly — serif font, different feel
+
+# Change 2: Show code by default
+    code_folding: show    # was hide
+
+# Change 3: Dark mode
+    theme: darkly         # dark background, light text
+
+# Remember to change back when done:
+    theme: flatly
+    code_folding: hide
+```
+
+---
+
+# Capstone Exercise Solutions (Module 7)
+
+This is the complete, filled-in version of `07_capstone_exercise.Rmd`.
+
+## YAML Header
+
+```yaml
+---
+title: "Module 7 — Capstone Exercise"
+subtitle: "Build a Complete Environmental Health Analysis Report"
+author: "Jane Smith, NIEHS"
+date: "`r knitr::inline_expr('format(Sys.Date(), \"%B %d, %Y\")')`"
+output:
+  html_document:
+    theme: flatly
+    toc: true
+    toc_float: true
+    code_folding: hide
+    df_print: kable
+params:
+  seed: 42
+---
+```
+
+## Introduction (Solution)
+
+This report examines the association between **PM₂.₅** air pollution exposure
+and respiratory function (measured as FEV₁) in a *cross-sectional cohort study*
+near Research Triangle Park, North Carolina. Ambient PM₂.₅ is a key pollutant
+of concern for the NIEHS, and understanding its health impacts supports
+evidence-based air quality standards.
+
+## Study Population (Solution)
+
+```{r capstone-data}
+set.seed(42)
+n <- 250
+
+study_data <- data.frame(
+  participant_id = paste0("RTP-", sprintf("%04d", 1:n)),
+  age = round(rnorm(n, mean = 52, sd = 14)),
+  sex = sample(c("Female", "Male"), n, replace = TRUE, prob = c(0.54, 0.46)),
+  bmi = round(rnorm(n, mean = 28.1, sd = 5.2), 1),
+  smoking_status = sample(c("Never", "Former", "Current"), n,
+                          replace = TRUE, prob = c(0.50, 0.30, 0.20)),
+  pm25_annual = round(rnorm(n, mean = 9.5, sd = 2.8), 1),
+  fev1_liters = NA
+)
+
+study_data$fev1_liters <- round(
+  3.8 - 0.025 * study_data$age - 0.04 * study_data$pm25_annual +
+    ifelse(study_data$sex == "Male", 0.6, 0) -
+    ifelse(study_data$smoking_status == "Current", 0.35,
+           ifelse(study_data$smoking_status == "Former", 0.15, 0)) +
+    rnorm(n, 0, 0.4), 2)
+study_data$fev1_liters <- pmax(study_data$fev1_liters, 1.0)
+study_data$age <- pmax(study_data$age, 25)
+
+# Pre-compute values for inline code
+n_total <- nrow(study_data)
+pct_female <- round(mean(study_data$sex == "Female") * 100, 1)
+age_range <- range(study_data$age)
+mean_age <- round(mean(study_data$age), 1)
+```
+
+The study enrolled `r n_total` participants (`r pct_female`% female) with ages
+ranging from `r age_range[1]` to `r age_range[2]` years (mean:
+`r mean_age` years).
+
+## Statistical Analysis (Solution)
+
+We used **multiple linear regression** to model the association between annual
+PM₂.₅ exposure and FEV₁, adjusting for age, sex, and smoking status. The
+model is specified as:
+
+$$\text{FEV}_1 = \beta_0 + \beta_1(\text{PM}_{2.5}) + \beta_2(\text{Age}) + \beta_3(\text{Sex}) + \beta_4(\text{Smoking}) + \epsilon$$
+
+Statistical significance was assessed at $\alpha = 0.05$.
+
+## Descriptive Statistics (Solution)
+
+```{r capstone-descriptive}
+desc_table <- study_data %>%
+  group_by(sex) %>%
+  summarise(
+    N = n(),
+    `Mean Age (yr)` = round(mean(age), 1),
+    `SD Age` = round(sd(age), 1),
+    `Mean BMI (kg/m²)` = round(mean(bmi), 1),
+    `SD BMI` = round(sd(bmi), 1),
+    `Mean PM₂.₅ (µg/m³)` = round(mean(pm25_annual), 1),
+    `SD PM₂.₅` = round(sd(pm25_annual), 1),
+    `Mean FEV₁ (L)` = round(mean(fev1_liters), 2),
+    `SD FEV₁` = round(sd(fev1_liters), 2)
+  )
+
+desc_table %>%
+  kable(caption = "Table 1. Participant Characteristics by Sex") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE) %>%
+  add_header_above(c(" " = 2, "Age" = 2, "BMI" = 2, "PM₂.₅" = 2, "FEV₁" = 2))
+```
+
+## Exposure Distribution (Solution) {.tabset}
+
+### Histogram
+
+```{r capstone-histogram, fig.cap="**Figure 1.** Distribution of annual PM₂.₅ exposure (µg/m³).", fig.width=7, fig.height=4}
+ggplot(study_data, aes(x = pm25_annual)) +
+  geom_histogram(fill = "#3182CE", color = "white", bins = 25) +
+  labs(title = "Distribution of Annual PM₂.₅ Exposure",
+       x = "PM₂.₅ (µg/m³)",
+       y = "Count") +
+  theme_minimal()
+```
+
+### By Smoking Status
+
+```{r capstone-boxplot, fig.cap="**Figure 2.** PM₂.₅ exposure by smoking status.", fig.width=7, fig.height=4}
+ggplot(study_data, aes(x = smoking_status, y = pm25_annual,
+                        fill = smoking_status)) +
+  geom_boxplot(alpha = 0.7) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(title = "PM₂.₅ Exposure by Smoking Status",
+       x = "Smoking Status",
+       y = "PM₂.₅ (µg/m³)") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+###
+
+## Primary Analysis (Solution)
+
+```{r capstone-model}
+model <- lm(fev1_liters ~ pm25_annual + age + sex + smoking_status,
+            data = study_data)
+
+model_results <- tidy(model, conf.int = TRUE) %>%
+  mutate(across(where(is.numeric), ~round(., 4)))
+
+model_results %>%
+  kable(
+    col.names = c("Term", "Estimate", "SE", "Statistic",
+                  "P-value", "Lower 95% CI", "Upper 95% CI"),
+    caption = "Table 2. Linear Regression Results: FEV₁ ~ PM₂.₅ + Covariates"
+  ) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+
+# Extract PM2.5 coefficient for inline code
+pm25_coef <- model_results %>% filter(term == "pm25_annual")
+pm25_beta <- pm25_coef$estimate
+pm25_p <- pm25_coef$p.value
+pm25_sig <- ifelse(pm25_p < 0.05, "statistically significant", "not statistically significant")
+```
+
+The PM₂.₅ coefficient was $\beta$ = `r pm25_beta` (p = `r pm25_p`), which is
+`r pm25_sig` at the $\alpha$ = 0.05 level. This suggests that each 1 µg/m³
+increase in annual PM₂.₅ exposure is associated with a
+`r abs(pm25_beta)` L decrease in FEV₁, after adjusting for age, sex, and
+smoking status.
+
+## Visualization (Solution)
+
+```{r capstone-figure, fig.width=8, fig.height=5, fig.cap="**Figure 3.** Association between annual PM₂.₅ exposure and FEV₁, stratified by sex."}
+ggplot(study_data, aes(x = pm25_annual, y = fev1_liters, color = sex)) +
+  geom_point(alpha = 0.5, size = 2) +
+  geom_smooth(method = "lm", se = TRUE, linewidth = 0.8) +
+  scale_color_manual(values = c("Female" = "#3182CE", "Male" = "#805AD5")) +
+  labs(
+    title = "PM₂.₅ Exposure and Respiratory Function",
+    subtitle = paste("N =", n_total, "participants, adjusted R² =",
+                     round(summary(model)$adj.r.squared, 3)),
+    x = "Annual PM₂.₅ (µg/m³)",
+    y = "FEV₁ (liters)",
+    color = "Sex",
+    caption = "Data: Simulated RTP cohort | NIEHS Training"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "bottom")
+```
+
+## Discussion (Solution)
+
+Our analysis of `r n_total` participants found a `r pm25_sig` negative
+association between annual PM₂.₅ exposure and FEV₁ ($\beta$ = `r pm25_beta`,
+p = `r pm25_p`). After adjusting for age, sex, and smoking status, the model
+explained `r round(summary(model)$adj.r.squared * 100, 1)`% of the variance
+in FEV₁.
+
+Male participants had higher FEV₁ values, and current smokers had the lowest
+values, both consistent with well-established respiratory physiology. The
+negative PM₂.₅ association aligns with prior epidemiological evidence linking
+particulate matter exposure to decreased lung function.
+
+**Limitations** include the cross-sectional design, which precludes causal
+inference, and the use of area-level PM₂.₅ averages rather than personal
+exposure monitoring. Future work should incorporate longitudinal follow-up and
+individual-level exposure assessment.
+
+## Session Info
+
+```{r}
+sessionInfo()
+```

@@ -1,0 +1,82 @@
+---
+title: "R Markdown + Quarto for Reproducible Science"
+subtitle: "A One-Day Workshop for NIEHS Scientists"
+author: "R. Burke Squires"
+format:
+  html:
+    toc: true
+---
+
+## About this workshop
+
+A hands-on day covering **R Markdown** and **Quarto** — the two tools the R community uses to weave narrative, code, and code output into a single reproducible document.
+
+The morning grounds you in R Markdown (the established tool you probably already have files in). The afternoon moves to Quarto (the modern successor where active development is happening). A deliberate 25-minute bridge module between them makes the migration explicit — you'll leave knowing how to convert your existing `.Rmd` files when you're ready.
+
+This entire training site is built with Quarto itself.
+
+## Who this is for
+
+- NIEHS scientists, postdocs, and trainees who want a single, reproducible workflow for analysis-plus-writing.
+- People comfortable with R (and ideally a little Python — the afternoon shows R and Python side-by-side via tabsets).
+- People who know what a Markdown bullet list is. **No prior R Markdown or Quarto experience required.**
+
+## What you will be able to do by 5 PM
+
+1. Render an `.Rmd` file and read its three-part anatomy.
+2. Convert an `.Rmd` file to `.qmd` and understand what changes.
+3. Author Quarto documents mixing prose, code, figures, and tables.
+4. Render the same `.qmd` to HTML, Word, and PDF without rewriting.
+5. Add cross-references, citations, and equations that survive format changes.
+6. Build slide decks with `revealjs` from a `.qmd` source.
+7. Generate parameterized reports across chemicals, sites, or years.
+8. Continue using Quarto on your own laptop Monday morning.
+
+## Schedule
+
+| Time          | Block                                          | Duration |
+|---------------|------------------------------------------------|----------|
+| 09:00 – 09:05 | Posit Cloud verification                       | 5 min    |
+| 09:05 – 09:30 | **R Markdown basics** (YAML, markdown, knit)   | 25 min   |
+| 09:30 – 10:00 | **Code chunks + inline code**                  | 30 min   |
+| 10:00 – 10:15 | Break                                          | 15 min   |
+| 10:15 – 10:40 | **Bridge: R Markdown → Quarto**                | 25 min   |
+| 10:40 – 11:10 | Quarto 1 — your first `.qmd`                   | 30 min   |
+| 11:10 – 12:10 | Quarto 2 — code chunks + tables                | 60 min   |
+| 12:10 – 13:10 | Lunch                                          | 60 min   |
+| 13:10 – 13:55 | Quarto 3 — figures & visualizations            | 45 min   |
+| 13:55 – 14:40 | Quarto 4 — equations, cross-refs, citations    | 45 min   |
+| 14:40 – 14:55 | Break                                          | 15 min   |
+| 14:55 – 15:25 | Quarto 5 — revealjs presentations              | 30 min   |
+| 15:25 – 15:50 | Quarto 6 — parameterized reports               | 25 min   |
+| 15:50 – 16:10 | Quarto 7 — projects, themes, publishing        | 20 min   |
+| 16:10 – 16:35 | Capstone                                       | 25 min   |
+| 16:35 – 17:00 | Wrap-up + next steps                           | 25 min   |
+
+Total contact: **6 hours** (plus 30 min of breaks and a 60-min lunch). R Markdown teaching ~80 min, Quarto teaching ~3:55, capstone + wrap-up ~50 min.
+
+::: {.callout-note}
+## On the time split
+R Markdown is in maintenance mode; Quarto is where active development is. Skills transfer almost wholesale from R Markdown to Quarto, so the morning teaches the foundation, then the afternoon dives deep into Quarto's distinctive features (cross-references, multi-format, parameterized reports, projects) using your existing R Markdown materials as the launching pad. The bridge module makes the migration explicit so students know how to convert their own `.Rmd` files.
+:::
+
+## Prerequisites & setup
+
+For the workshop itself: **a free [Posit Cloud](https://posit.cloud) account and a browser**. That's it. Quarto, R, Python, and an IDE are all preinstalled.
+
+For continuing on your own laptop after the workshop, see [Next Steps](next_steps.qmd) — full local install for Mac and Windows.
+
+::: {.callout-note}
+## On Posit Cloud free-tier limits
+The free tier has a monthly compute-hour cap. For today's workshop you'll be well under it. If you keep using Posit Cloud heavily afterward, you can either upgrade or move to a local install — see [Next Steps](next_steps.qmd).
+:::
+
+Open [`00_setup.qmd`](00_setup.qmd) when your instructor signals.
+
+## Materials & licensing
+
+All slides, notebooks, and code in this training are released under CC BY 4.0. Reuse with attribution.
+
+## Acknowledgements
+
+This training draws on the Quarto documentation at [quarto.org](https://quarto.org), the R Markdown documentation at [rmarkdown.rstudio.com](https://rmarkdown.rstudio.com), Hadley Wickham and Mine Çetinkaya-Rundel's *R for Data Science* (2e), and simulated NIEHS-relevant data (biomarker, air quality) for the examples.

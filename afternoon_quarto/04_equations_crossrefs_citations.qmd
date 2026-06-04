@@ -1,0 +1,407 @@
+---
+title: "Quarto 4 — Equations, Cross-References, Citations"
+subtitle: "The grammar of scientific writing"
+author: "R. Burke Squires"
+date: today
+bibliography: ../references.bib
+format:
+  html:
+    toc: true
+    toc-depth: 3
+---
+
+## Goals for this 45-minute block
+
+- Write LaTeX equations (inline and display) including NIEHS-relevant formulas.
+- Cross-reference equations, figures, tables, and sections from prose.
+- Manage a bibliography with BibTeX and CSL citation styles.
+- Understand which features survive format changes (HTML, Word, PDF).
+
+## Setup
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+#| include: false
+
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+
+# Workshop dataset
+set.seed(42)
+n <- 200
+biomarker_data <- data.frame(
+  participant_id = 1:n,
+  age = round(rnorm(n, 48, 14)),
+  sex = sample(c("Female", "Male"), n, replace = TRUE, prob = c(0.55, 0.45)),
+  pfoa_serum = round(rlnorm(n, meanlog = 0.8, sdlog = 0.9), 2),
+  cholesterol = round(rnorm(n, 210, 38)),
+  site = sample(c("Research Triangle Park", "Durham", "Chapel Hill"),
+                n, replace = TRUE)
+)
+```
+
+# Equations
+
+Quarto renders LaTeX math beautifully in HTML and PDF, and reasonably in Word. The syntax is identical to what you'd use in R Markdown.
+
+## Inline equations
+
+Surround with single dollar signs:
+
+```markdown
+The significance threshold was $\alpha = 0.05$.
+```
+
+renders as: The significance threshold was $\alpha = 0.05$.
+
+A few common patterns:
+
+| You write | You see |
+|-----------|--------|
+| `$\alpha = 0.05$` | $\alpha = 0.05$ |
+| `$R^2 = 0.87$` | $R^2 = 0.87$ |
+| `$\beta_1 = 0.42$` | $\beta_1 = 0.42$ |
+| `$p < 0.001$` | $p < 0.001$ |
+| `$\mu \pm \sigma$` | $\mu \pm \sigma$ |
+| `$\text{BMI} = \frac{kg}{m^2}$` | $\text{BMI} = \frac{kg}{m^2}$ |
+| `$\log_{10}(\text{PFOA})$` | $\log_{10}(\text{PFOA})$ |
+| `$\chi^2_{(3)} = 12.4$` | $\chi^2_{(3)} = 12.4$ |
+
+## Display equations
+
+Double dollar signs render display-style (centered, larger):
+
+```markdown
+$$Y_i = \beta_0 + \beta_1 X_{i1} + \beta_2 X_{i2} + \varepsilon_i$$
+```
+
+$$Y_i = \beta_0 + \beta_1 X_{i1} + \beta_2 X_{i2} + \varepsilon_i$$
+
+## NIEHS-relevant equations
+
+A few formulas you might recognize from your work.
+
+### Dose-response (Hill model)
+
+$$\text{Response} = \frac{E_{\max} \cdot C^n}{EC_{50}^n + C^n}$$
+
+Where $E_{\max}$ is the maximum effect, $C$ is concentration, $EC_{50}$ is the half-maximal effective concentration, and $n$ is the Hill coefficient.
+
+### Hazard quotient
+
+$$\text{HQ} = \frac{\text{CDI}}{\text{RfD}}$$
+
+Where HQ is the hazard quotient, CDI is the chronic daily intake (mg/kg/day), and RfD is the reference dose (mg/kg/day).
+
+### Lifetime Average Daily Dose (LADD)
+
+$$\text{LADD} = \frac{C \times IR \times EF \times ED}{BW \times AT}$$
+
+Where:
+
+- $C$ — concentration in the exposure medium
+- $IR$ — intake rate
+- $EF$ — exposure frequency
+- $ED$ — exposure duration
+- $BW$ — body weight
+- $AT$ — averaging time
+
+### Odds ratio
+
+$$\text{OR} = \frac{a/b}{c/d} = \frac{ad}{bc}$$
+
+## Equation cross-references
+
+This is a place where Quarto improves on R Markdown. Add a label after the equation:
+
+```markdown
+$$
+Y_i = \beta_0 + \beta_1 X_{i1} + \varepsilon_i
+$$ {#eq-linear-regression}
+```
+
+$$
+Y_i = \beta_0 + \beta_1 X_{i1} + \varepsilon_i
+$$ {#eq-linear-regression}
+
+Then reference from prose: `@eq-linear-regression` renders as "Equation 1" with a hyperlink.
+
+> The model in @eq-linear-regression assumes residuals are normally distributed with constant variance.
+
+::: {.callout-warning}
+## Label syntax for equations
+The label goes in **curly braces immediately after the closing `$$`** — separated by a space:
+
+```
+$$ ... $$ {#eq-label}
+```
+
+A common mistake is putting the label on its own line, which doesn't work.
+:::
+
+## Aligned equations
+
+Use the LaTeX `aligned` environment for multi-line equations with alignment at `&`:
+
+$$
+\begin{aligned}
+\text{logit}(P) &= \beta_0 + \beta_1 X_1 + \beta_2 X_2 \\
+\text{where logit}(P) &= \log\left(\frac{P}{1-P}\right)
+\end{aligned}
+$$
+
+::: {.callout-note}
+## Equation rendering across formats
+- **HTML** uses MathJax — full LaTeX math support, rendered in the browser.
+- **PDF** (via LaTeX) — native LaTeX, every command works.
+- **Word (docx)** uses Office's native math support — most common LaTeX commands work, but obscure packages do not. If a complex equation looks wrong in Word, simplify or supply an image.
+:::
+
+# Cross-references
+
+Cross-references let you refer to figures, tables, equations, and sections from prose, with automatic numbering that updates when content moves.
+
+## Requirements for a cross-reference to work
+
+Two things must be present:
+
+1. **A label with the right prefix:** `fig-` for figures, `tbl-` for tables, `eq-` for equations, `sec-` for sections, `lst-` for code listings.
+2. **A caption:** `fig-cap:` for figures, `tbl-cap:` for tables; equations and sections don't need explicit captions but need the label.
+
+### Figure cross-reference
+
+```{r}
+#| label: fig-pfoa-cholesterol
+#| fig-cap: "Serum PFOA and total cholesterol are positively associated."
+#| message: false
+#| warning: false
+
+ggplot(biomarker_data, aes(x = pfoa_serum, y = cholesterol)) +
+  geom_point(alpha = 0.5, color = "#205C40") +
+  geom_smooth(method = "lm", color = "#C77D34", se = FALSE) +
+  scale_x_log10() +
+  labs(x = "Serum PFOA (ng/mL, log scale)",
+       y = "Total Cholesterol (mg/dL)") +
+  theme_minimal()
+```
+
+In prose: `@fig-pfoa-cholesterol` → "Figure 1" with a clickable link.
+
+### Table cross-reference
+
+```{r}
+#| label: tbl-summary-by-sex
+#| tbl-cap: "Biomarker summary by sex."
+
+biomarker_data |>
+  group_by(sex) |>
+  summarise(
+    N = n(),
+    `Mean Age` = round(mean(age), 1),
+    `Mean PFOA (ng/mL)` = round(mean(pfoa_serum), 2),
+    `Mean Cholesterol (mg/dL)` = round(mean(cholesterol), 1)
+  ) |>
+  kable() |>
+  kable_styling(bootstrap_options = c("striped"), full_width = FALSE)
+```
+
+From prose: `@tbl-summary-by-sex` → "Table 1".
+
+### Section cross-reference
+
+Add `{#sec-name}` after a heading:
+
+```markdown
+## Methods {#sec-methods}
+```
+
+Reference as `@sec-methods` → "Section 1.2" (numbering only works when `number-sections: true` is in YAML).
+
+### Multiple references
+
+You can refer to several at once:
+
+```markdown
+The results (@fig-pfoa-cholesterol, @tbl-summary-by-sex) support
+the hypothesis stated in @eq-linear-regression.
+```
+
+renders cleanly with three clickable links.
+
+## Cross-reference comparison: R Markdown vs Quarto
+
+This is where Quarto genuinely improves the experience.
+
+| Feature | R Markdown | Quarto |
+|---------|-----------|--------|
+| Figure cross-refs | Requires `bookdown` package + special chunk labels | Built in, just use `fig-` prefix |
+| Table cross-refs | Same — needs `bookdown` | Built in, `tbl-` prefix |
+| Equation cross-refs | `bookdown` with `(\#eq:foo)` | Built in, `{#eq-foo}` |
+| Section cross-refs | Manual anchor + `#anchor-name` | `@sec-name` |
+| Cross-format support | Inconsistent | Same syntax across HTML/Word/PDF |
+
+You can do everything in R Markdown that you can in Quarto for cross-references; you just need the `bookdown` package and a slightly more verbose syntax. Quarto bakes it into the base experience.
+
+# Citations and bibliographies
+
+Citations work the same way in R Markdown and Quarto. The mechanics:
+
+## Setting up
+
+1. Create a `.bib` file with your references (`references.bib` is conventional).
+2. Add `bibliography: references.bib` to your YAML.
+3. Specify a citation style with `csl:` (optional; defaults to Chicago author-date).
+
+This file already has a bibliography configured — look at the YAML at the top.
+
+## A BibTeX entry
+
+```bibtex
+@article{smith2023pfas,
+  title = {PFAS Exposure and Health Outcomes in the Triangle Region},
+  author = {Smith, Jane and Doe, John},
+  journal = {Environmental Health Perspectives},
+  year = {2023},
+  volume = {131},
+  pages = {1--12},
+  doi = {10.1289/EHP12345}
+}
+```
+
+The key (`smith2023pfas`) is what you cite by. Get BibTeX entries from:
+
+- **Zotero** — export collection → BibTeX.
+- **Google Scholar** — click the quote icon under a result → BibTeX.
+- **PubMed** — use a free converter like `doi2bib.org`.
+- **Crossref** — many citation managers can pull from DOI directly.
+
+## Citing in prose
+
+| You write | You get (author-year style) |
+|-----------|----------------------------|
+| `@nrc2009` | NRC (2009) |
+| `[@nrc2009]` | (NRC 2009) |
+| `[@nrc2009, p. 47]` | (NRC 2009, p. 47) |
+| `[-@nrc2009]` | (2009) |
+| `[@nrc2009; @wilson2017good]` | (NRC 2009; Wilson et al. 2017) |
+
+A few worked examples using the entries already in this project's `references.bib`:
+
+> Quarto is the successor to R Markdown for multi-language scientific publishing [@allaire2022quarto]. The framework for environmental risk assessment was laid out authoritatively in *Science and Decisions* [@nrc2009]. For broader reproducibility practices, see [@wilson2017good].
+
+The bibliography is auto-generated at the end of the document. To place it somewhere specific:
+
+```markdown
+## References
+
+::: {#refs}
+:::
+```
+
+## Citation styles
+
+Different journals require different citation formats (APA, AMA, Nature, Vancouver). Quarto uses **CSL** (Citation Style Language) files:
+
+```yaml
+csl: nature.csl
+# or load directly from the Zotero repository:
+csl: https://www.zotero.org/styles/jama
+```
+
+The [Zotero Style Repository](https://www.zotero.org/styles) has 10,000+ journal styles. Find your target journal, copy the URL.
+
+::: {.callout-tip}
+## CSL files don't need to be in your project
+You can reference a CSL file by URL directly. Quarto downloads and caches it. Saves you from having a `nature.csl` file cluttering every project.
+:::
+
+## Manual reference entries (no `.bib`)
+
+You can also write references inline using Pandoc's reference syntax:
+
+```yaml
+references:
+- type: article-journal
+  id: smith2023pfas
+  author:
+  - family: Smith
+    given: Jane
+  - family: Doe
+    given: John
+  title: "PFAS Exposure and Health Outcomes"
+  container-title: Environmental Health Perspectives
+  issued:
+    year: 2023
+  volume: 131
+  page: 1-12
+  DOI: 10.1289/EHP12345
+```
+
+This is rarely used in practice — `.bib` files are easier — but useful for one-off documents where you don't want a separate bibliography file.
+
+## What happens in non-HTML output
+
+- **HTML:** citations are hyperlinks; bibliography auto-numbered at the end.
+- **Word (docx):** citations are inserted as text with the configured style; bibliography is plain text at the end.
+- **PDF (via LaTeX):** citations and bibliography are typeset via biblatex/natbib.
+
+Same source, three sensible outputs.
+
+# Brief: multiple output formats
+
+Cross-references and citations work because Quarto rendered them — the prose `@fig-foo` becomes a numbered, linked reference regardless of output format. To produce multiple formats from one source, stack them in YAML:
+
+```yaml
+format:
+  html:
+    toc: true
+  docx: default
+  pdf:
+    documentclass: article
+```
+
+Then render all at once:
+
+```bash
+quarto render my_report.qmd --to all
+```
+
+Or pick one:
+
+```bash
+quarto render my_report.qmd --to docx
+```
+
+Quarto Module 7 covers the format-specific deep dive (themes, CSS, conditional output, when each format shines).
+
+# Exercises
+
+### Exercise 4.1 — Equation with cross-reference
+
+Add the hazard quotient equation to your file with the label `{#eq-hq}`. In a paragraph above it, reference it: "We assess risk using the hazard quotient (@eq-hq)..."
+
+Render and confirm the cross-reference is clickable.
+
+### Exercise 4.2 — Multiple cross-references
+
+In your file, write a paragraph that references at least one figure, one table, and one equation. Use the `(@fig-..., @tbl-..., @eq-...)` pattern. Render. Confirm all three are clickable.
+
+### Exercise 4.3 — Add a citation
+
+1. Open `references.bib` in the project root.
+2. Add a new BibTeX entry — any paper of your choosing.
+3. Cite it in your document using `[@yourkey]`.
+4. Render and confirm it appears in the reference list at the end.
+
+## Optional bonus — quartobot
+
+There's a community tool ([quartobot by Sean Davis](https://github.com/seandavi/quartobot)) that lets you write `@doi:10.21105/joss.01686` directly in your prose, with no hand-curated BibTeX entry needed. It's marked optional for this workshop. See [`quartobot_bonus.qmd`](quartobot_bonus.qmd) for details.
+
+## What's next
+
+Quarto Module 5 — **Revealjs Presentations**: turn `.qmd` into slide decks.
+
+Open [`05_revealjs_presentations.qmd`](05_revealjs_presentations.qmd).

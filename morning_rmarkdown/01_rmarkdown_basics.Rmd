@@ -1,0 +1,272 @@
+---
+title: "Module 1: R Markdown Basics"
+subtitle: "YAML Headers, Markdown Syntax, and Knitting"
+author: "NIEHS Training"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    theme: flatly
+    toc: true
+    toc_float: true
+    toc_depth: 3
+    number_sections: true
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# The Anatomy of an R Markdown Document
+
+Every `.Rmd` file has three components:
+
+1. **YAML header** — metadata at the top between `---` marks
+2. **Markdown text** — your narrative, formatted with simple syntax
+3. **Code chunks** — R code that produces results
+
+Let's explore each one.
+
+# The YAML Header
+
+The YAML header lives at the very top of the file, enclosed by triple dashes
+(`---`). It controls the document's title, author, output format, and more.
+
+Here is the YAML header for this notebook:
+
+````
+---
+title: "Module 1: R Markdown Basics"
+subtitle: "YAML Headers, Markdown Syntax, and Knitting"
+author: "NIEHS Training"
+date: "`r knitr::inline_expr('Sys.Date()')`"
+output:
+  html_document:
+    theme: flatly
+    toc: true
+    toc_float: true
+    toc_depth: 3
+    number_sections: true
+---
+````
+
+## Key YAML Fields
+
+| Field | Purpose | Example |
+|-------|---------|---------|
+| `title` | Document title | `"Dose-Response Analysis of PFAS Exposure"` |
+| `subtitle` | Secondary title | `"Supplementary Methods"` |
+| `author` | Author name(s) | `"J. Smith, NIEHS"` |
+| `date` | Date (can use R code) | `` "`r knitr::inline_expr('Sys.Date()')`" `` |
+| `output` | Output format | `html_document`, `word_document`, `pdf_document` |
+
+> **YAML is sensitive to indentation.** Use spaces (not tabs), and be consistent. 
+> Indentation levels must be exactly 2 spaces. A misplaced space can break knitting.
+
+## Exercise 1.1: Edit the YAML {.unnumbered}
+
+**Try this:** Open this file's source (if you're viewing the rendered HTML, 
+switch back to the `.Rmd` in the source pane). Change the `author` field to 
+your own name, then knit the document. You should see your name appear in the
+rendered output.
+
+
+# Markdown Syntax
+
+Markdown is a lightweight way to format text. You write plain text with a few
+special characters, and R Markdown converts them into formatted output.
+
+## Text Formatting
+
+Here is how the raw Markdown compares to what you see after knitting:
+
+| What you type | What you see |
+|---------------|-------------|
+| `**bold text**` | **bold text** |
+| `*italic text*` | *italic text* |
+| `***bold and italic***` | ***bold and italic*** |
+| `` `inline code` `` | `inline code` |
+| `~~strikethrough~~` | ~~strikethrough~~ |
+| `superscript^2^` | superscript^2^ |
+| `subscript~2~` | subscript~2~ |
+
+## Headers
+
+Headers create the section structure. Use `#` symbols:
+
+```
+# Header 1 (largest)
+## Header 2
+### Header 3
+#### Header 4
+```
+
+The table of contents on the left side of this document is automatically
+generated from the headers.
+
+## Lists
+
+**Unordered lists** use `-`, `*`, or `+`:
+
+```
+- Item one
+- Item two
+  - Sub-item (indent with 2 spaces)
+  - Another sub-item
+- Item three
+```
+
+Produces:
+
+- Item one
+- Item two
+  - Sub-item (indent with 2 spaces)
+  - Another sub-item
+- Item three
+
+**Ordered lists** use numbers:
+
+```
+1. First step
+2. Second step
+3. Third step
+```
+
+1. First step
+2. Second step
+3. Third step
+
+> **Tip:** Markdown actually ignores the numbers you type — it auto-numbers 
+> sequentially. So `1. 1. 1.` will render as `1. 2. 3.`. This is handy when
+> you need to reorder items.
+
+## Links and Images
+
+```
+[Link text](https://www.niehs.nih.gov)
+
+![Alt text for image](path/to/image.png)
+```
+
+Here's a real link: [NIEHS Homepage](https://www.niehs.nih.gov)
+
+## Block Quotes
+
+Use `>` to create a block quote:
+
+```
+> This is a block quote. It's useful for highlighting important information
+> or attributing a source.
+```
+
+> This is a block quote. It's useful for highlighting important information
+> or attributing a source.
+
+## Horizontal Rules
+
+Three or more dashes, asterisks, or underscores create a horizontal rule:
+
+```
+---
+```
+
+---
+
+## Footnotes
+
+You can add footnotes with `[^1]` and define them anywhere in the document:
+
+```
+Environmental exposure assessment is critical[^1].
+
+[^1]: See EPA Exposure Factors Handbook for methodology details.
+```
+
+Environmental exposure assessment is critical[^1].
+
+[^1]: See EPA Exposure Factors Handbook for methodology details.
+
+
+# Knitting Your Document
+
+**Knitting** is the process of converting your `.Rmd` file into a finished
+document. Behind the scenes, two things happen:
+
+1. **knitr** executes all R code chunks and creates a Markdown (`.md`) file 
+   with results inserted
+2. **Pandoc** converts the Markdown into your chosen output format (HTML, Word,
+   PDF)
+
+## How to Knit
+
+- **Click the Knit button** at the top of the source pane, OR
+- Use the keyboard shortcut: `Ctrl+Shift+K` (Windows/Linux) or `Cmd+Shift+K` 
+  (Mac)
+- The dropdown arrow next to Knit lets you choose the output format
+
+## What Happens When You Knit
+
+```{r knit-diagram, echo=FALSE, fig.align='center'}
+# Simple illustration of the knit process
+cat("
+  .Rmd file
+      |
+      v
+  [knitr: runs R code, inserts results]
+      |
+      v
+  .md file (Markdown with results)
+      |
+      v
+  [Pandoc: converts to output format]
+      |
+      v
+  .html / .docx / .pdf
+")
+```
+
+## Important: Knitting Runs in a Clean Session
+
+When you knit, R Markdown starts a **fresh R session**. This means:
+
+- Objects you created in the Console are NOT available during knitting
+- Every package must be loaded with `library()` inside the `.Rmd` file
+- Every data file must be read inside the `.Rmd` file
+
+This is a feature, not a bug — it guarantees **reproducibility**. If the
+document knits successfully, anyone else can reproduce your results.
+
+```{r clean-session-demo}
+# This object is created during knitting and IS available
+workshop_data <- data.frame(
+  chemical = c("PFOA", "PFOS", "BPA", "Lead", "Arsenic"),
+  category = c("PFAS", "PFAS", "Plasticizer", "Heavy Metal", "Metalloid"),
+  epa_priority = c(TRUE, TRUE, TRUE, TRUE, TRUE)
+)
+
+workshop_data
+```
+
+
+# Exercise 1.2: Create Your First R Markdown Document {.unnumbered}
+
+**Hands-on practice (5 minutes):**
+
+1. In Posit Cloud, go to **File → New File → R Markdown...**
+2. Enter a title like "My First R Markdown"
+3. Enter your name as author
+4. Keep the default output as HTML
+5. Click **OK** — RStudio creates a template `.Rmd` file
+6. Click **Knit** to render it
+7. Examine the output — notice how the code chunks produced results
+
+Now try modifying the template:
+
+- Change the title
+- Add a sentence in **bold** and one in *italics*
+- Add a numbered list of three things you want to learn today
+- Knit again and see your changes
+
+---
+
+**Next up:** `02_code_chunks.Rmd` — where the real power of R Markdown lives.

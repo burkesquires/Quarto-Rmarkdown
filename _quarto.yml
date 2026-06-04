@@ -1,0 +1,99 @@
+project:
+  type: website
+  output-dir: _site
+  render:
+    - "*.qmd"
+    - "!morning_rmarkdown/"
+    - "!instructor/"
+    - "!optional/"
+    - "!_site/"
+
+website:
+  title: "R Markdown + Quarto for Reproducible Science"
+  description: "A one-day NIEHS training combining R Markdown and Quarto"
+  navbar:
+    background: "#205C40"
+    foreground: "#FFFFFF"
+    left:
+      - href: index.qmd
+        text: Home
+      - text: "Morning (R Markdown)"
+        menu:
+          - href: morning_rmarkdown/01_rmarkdown_basics.Rmd
+            text: "1. R Markdown Basics"
+          - href: morning_rmarkdown/02_code_chunks.Rmd
+            text: "2. Code Chunks"
+          - href: morning_rmarkdown/quick_reference.Rmd
+            text: "Quick Reference"
+      - text: "Bridge"
+        href: bridge/rmd_to_quarto_bridge.qmd
+      - text: "Afternoon (Quarto)"
+        menu:
+          - afternoon_quarto/01_first_document.qmd
+          - afternoon_quarto/02_code_chunks_and_tables.qmd
+          - afternoon_quarto/03_figures_and_visualizations.qmd
+          - afternoon_quarto/04_equations_crossrefs_citations.qmd
+          - afternoon_quarto/05_revealjs_presentations.qmd
+          - afternoon_quarto/06_parameterized_reports.qmd
+          - afternoon_quarto/07_projects_themes_publishing.qmd
+          - afternoon_quarto/quartobot_bonus.qmd
+      - text: "End of Day"
+        menu:
+          - capstone.qmd
+          - next_steps.qmd
+  sidebar:
+    style: "docked"
+    background: "#F4F1EC"
+    contents:
+      - href: index.qmd
+        text: "Welcome"
+      - href: 00_setup.qmd
+        text: "Setup (Posit Cloud)"
+      - section: "Morning — R Markdown"
+        contents:
+          - href: morning_rmarkdown/01_rmarkdown_basics.Rmd
+            text: "1. R Markdown Basics"
+          - href: morning_rmarkdown/02_code_chunks.Rmd
+            text: "2. Code Chunks"
+      - section: "Bridge"
+        contents:
+          - bridge/rmd_to_quarto_bridge.qmd
+      - section: "Afternoon — Quarto"
+        contents:
+          - afternoon_quarto/01_first_document.qmd
+          - afternoon_quarto/02_code_chunks_and_tables.qmd
+          - afternoon_quarto/03_figures_and_visualizations.qmd
+          - afternoon_quarto/04_equations_crossrefs_citations.qmd
+          - afternoon_quarto/05_revealjs_presentations.qmd
+          - afternoon_quarto/06_parameterized_reports.qmd
+          - afternoon_quarto/07_projects_themes_publishing.qmd
+          - afternoon_quarto/quartobot_bonus.qmd
+      - section: "End of day"
+        contents:
+          - capstone.qmd
+          - next_steps.qmd
+
+format:
+  html:
+    theme:
+      light: [cosmo, styles.css]
+    toc: true
+    toc-depth: 3
+    code-copy: true
+    code-overflow: wrap
+    fig-width: 7
+    fig-height: 4.5
+    fig-align: "center"
+    df-print: paged
+
+bibliography: references.bib
+csl: https://www.zotero.org/styles/nature
+
+execute:
+  freeze: auto
+
+author:
+  - name: R. Burke Squires
+    affiliation: National Institute of Environmental Health Sciences (NIEHS)
+
+date: today

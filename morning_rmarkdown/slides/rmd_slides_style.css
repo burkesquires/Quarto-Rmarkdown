@@ -1,0 +1,105 @@
+/* R Markdown Training — ioslides custom theme */
+/* Fixed for slide overflow: all code/output/tables capped */
+
+/* ============ SLIDE OVERFLOW FIX ============ */
+slides > slide {
+  font-family: 'Calibri', 'Helvetica Neue', sans-serif;
+  overflow: auto;
+}
+
+/* Code blocks — capped height with scroll */
+pre {
+  background-color: #1E293B;
+  color: #90CDF4;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.25;
+  border: none;
+  max-height: 300px;
+  overflow-y: auto;
+}
+code {
+  color: #3182CE;
+  font-size: 85%;
+  background-color: #EBF8FF;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+pre code {
+  color: #90CDF4;
+  background-color: transparent;
+  padding: 0;
+  font-size: 13px;
+}
+
+/* Figures — constrain height */
+slides > slide img {
+  max-height: 340px;
+}
+.plotly { max-height: 330px !important; }
+
+/* ============ TABLES ============ */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 15px;
+}
+th {
+  background-color: #1a365d;
+  color: #FFFFFF;
+  padding: 4px 8px;
+  text-align: left;
+  font-weight: 600;
+}
+td {
+  padding: 3px 8px;
+  border-bottom: 1px solid #E2E8F0;
+}
+tr:nth-child(even) { background-color: #F7FAFC; }
+
+/* ============ TITLE SLIDE ============ */
+slide.title-slide { background-color: #1a365d !important; }
+slide.title-slide hgroup h1 { color: #FFFFFF; font-size: 44px; }
+slide.title-slide hgroup h2 { color: #90CDF4; font-size: 24px; font-weight: 400; }
+slide.title-slide p { color: #A0AEC0; }
+
+/* ============ SEGUE DIVIDERS ============ */
+slide.segue { background-color: #1a365d !important; }
+slide.segue h1 { color: #FFFFFF; font-size: 48px; }
+slide.segue h2 { color: #90CDF4; font-size: 22px; }
+
+/* ============ HEADINGS ============ */
+h2 {
+  color: #1a365d;
+  font-size: 34px;
+  border-bottom: 3px solid #3182CE;
+  padding-bottom: 4px;
+  margin-bottom: 6px;
+}
+h3 { color: #3182CE; font-size: 22px; margin-top: 4px; margin-bottom: 3px; }
+
+/* ============ BODY TEXT ============ */
+slides > slide p { font-size: 17px; line-height: 1.35; margin: 3px 0 5px 0; }
+blockquote {
+  border-left: 4px solid #3182CE;
+  background-color: #EBF8FF;
+  padding: 6px 12px;
+  margin: 6px 0;
+  font-size: 15px;
+  color: #1a365d;
+}
+
+/* ============ LISTS ============ */
+ul, ol { margin-top: 3px; margin-bottom: 3px; }
+li { margin-bottom: 1px; line-height: 1.3; font-size: 17px; }
+
+/* Two-column */
+.columns-2 { font-size: 15px; }
+.columns-2 li { font-size: 15px; }
+
+/* ============ UTILITY ============ */
+.small-code pre { font-size: 11px; line-height: 1.15; }
+.small-table table { font-size: 13px; }
+.small-table td, .small-table th { padding: 2px 6px; }
+.small-text, .small-text li { font-size: 14px; }

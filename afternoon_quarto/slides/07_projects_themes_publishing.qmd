@@ -1,0 +1,226 @@
+---
+title: "Quarto 7 — Projects, Themes, Publishing"
+subtitle: "From single files to deployed sites"
+author: "R. Burke Squires"
+institute: "NIEHS"
+date: today
+format:
+  revealjs:
+    theme: [default, niehs-theme.scss]
+    logo: ../../images/niehs-logo.png
+    footer: "R Markdown + Quarto · NIEHS · 2026"
+    slide-number: true
+    chalkboard: true
+    code-overflow: wrap
+---
+
+## Goals — 20 minutes
+
+Three short topics:
+
+::: {.incremental}
+- **Projects** (~7 min) — what they are, four types
+- **Themes and CSS** (~7 min) — make it look like a NIEHS report
+- **Publishing** (~6 min) — get it to a URL
+:::
+
+# Projects {.section-divider}
+
+## A project is a folder + `_quarto.yml`
+
+```
+my-project/
+├── _quarto.yml          ← Required
+├── index.qmd
+├── chapters/
+│   ├── ch01.qmd
+│   └── ch02.qmd
+├── references.bib
+├── styles.css
+└── _site/               ← Rendered output
+```
+
+::: {.fragment}
+This workshop is a Quarto **website** project. Look at the root `_quarto.yml`.
+:::
+
+## Four project types
+
+| Type | Use when |
+|------|----------|
+| `default` | Shared resources, independent renders |
+| `website` | Multi-page site (this workshop) |
+| `book` | Sequential pagination + bibliography |
+| `manuscript` | Article + supplementary notebooks |
+
+::: {.fragment}
+**Quarto Manuscripts (1.4+)** — built for the scientific article use case. Worth investigating for NIEHS publishing workflows.
+:::
+
+# Themes & CSS {.section-divider}
+
+## 25 Bootswatch themes — pick one
+
+```yaml
+format:
+  html:
+    theme: cosmo
+    # or: flatly, journal, lumen, paper,
+    # simplex, sandstone, spacelab, united, yeti,
+    # cerulean, cyborg, darkly, ...
+```
+
+::: {.fragment}
+**R Markdown parity:** the same theme names work in both.
+:::
+
+## Dark mode toggle
+
+```yaml
+format:
+  html:
+    theme:
+      light: cosmo
+      dark: darkly
+```
+
+::: {.fragment}
+Quarto adds a sun/moon button to the navbar.
+:::
+
+## Custom CSS
+
+```yaml
+format:
+  html:
+    theme: [cosmo, styles.css]
+```
+
+```{.css}
+:root {
+  --niehs-green: #205C40;
+}
+
+h1, h2, h3 {
+  color: var(--niehs-green);
+}
+
+blockquote {
+  border-left: 4px solid var(--niehs-green);
+  padding-left: 1em;
+}
+```
+
+## SCSS for deep customization
+
+```{.scss}
+/*-- scss:defaults --*/
+$primary: #205C40;
+$body-color: #2B2B2B;
+
+/*-- scss:rules --*/
+.callout-note .callout-title {
+  background-color: rgba(32, 92, 64, 0.1);
+}
+```
+
+::: {.fragment}
+The slide decks use exactly this pattern — see `niehs-theme.scss`.
+:::
+
+## Conditional output
+
+```{.r}
+if (knitr::is_html_output()) {
+  DT::datatable(my_data)   # interactive
+} else {
+  kable(my_data)            # static
+}
+```
+
+::: {.fragment}
+Same `knitr::is_*_output()` functions you knew from R Markdown.
+:::
+
+# Publishing {.section-divider}
+
+## Five reasonable targets
+
+::: {.incremental}
+- **Target 0** — render + share HTML (no account needed)
+- **Target 1** — Quarto Pub (free, public)
+- **Target 2** — GitHub Pages
+- **Target 3** — Posit Connect Cloud
+- **Target 4** — any static host (Netlify, S3, internal NIEHS server)
+:::
+
+## Target 0 — local + share
+
+```bash
+quarto render
+```
+
+::: {.incremental}
+- HTMLs are self-contained
+- Email them, or drop on a shared drive
+- Upload to an internal NIEHS server
+- **Often the right answer for internal-only work**
+:::
+
+## Target 1 — Quarto Pub
+
+```bash
+quarto publish quarto-pub
+```
+
+::: {.fragment}
+Free, public at `username.quarto.pub`. First time browser auth, then one command forever.
+:::
+
+## Target 2 — GitHub Pages
+
+```bash
+quarto publish gh-pages
+```
+
+::: {.fragment}
+Site at `username.github.io/repo-name`. Requires a Git repo with GitHub remote.
+:::
+
+## Don't confuse names
+
+::: {.callout-warning}
+## posit.cloud ≠ Posit Connect Cloud
+
+**posit.cloud** — where you *develop* (this workshop).
+
+**Posit Connect Cloud** — where you *publish*.
+
+Publishing from posit.cloud was **deprecated in Quarto 1.8**. Replacement is Posit Connect Cloud (separate product, similar name).
+:::
+
+# Beyond today {.section-divider}
+
+## Topics worth exploring later
+
+::: {.incremental}
+- **Quarto Dashboards** — fluid-layout interactive dashboards (1.4+)
+- **Quarto Extensions** — community shortcodes, filters, custom formats
+- **Shiny + Quarto** — interactive documents backed by Shiny
+- **Custom Pandoc filters** — when you need to bend the rendering pipeline
+- **Quarto Manuscripts** — submitting to scientific journals
+:::
+
+::: {.fragment}
+All linked from <https://quarto.org/docs>.
+:::
+
+# Hands-on {.section-divider}
+
+## Notebook Quarto 7
+
+::: {.callout-tip}
+Open `afternoon_quarto/07_projects_themes_publishing.qmd`. Exercises 7.1 and 7.2.
+:::
+
+20 minutes. Then capstone.

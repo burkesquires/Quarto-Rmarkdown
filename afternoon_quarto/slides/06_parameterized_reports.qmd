@@ -1,0 +1,202 @@
+---
+title: "Quarto 6 — Parameterized Reports"
+subtitle: "Generate many reports from one source"
+author: "R. Burke Squires"
+institute: "NIEHS"
+date: today
+format:
+  revealjs:
+    theme: [default, niehs-theme.scss]
+    logo: ../../images/niehs-logo.png
+    footer: "R Markdown + Quarto · NIEHS · 2026"
+    slide-number: true
+    chalkboard: true
+    code-overflow: wrap
+---
+
+## Goals — 25 minutes
+
+::: {.incremental}
+- Define parameters in YAML
+- Use parameters in code and prose
+- Render the same `.qmd` with different parameters
+- Batch-generate reports across chemicals, sites, years
+:::
+
+# The problem {.section-divider}
+
+## Six reports, same analysis
+
+::: {.incremental}
+- PFOA at Research Triangle Park, 2024 ✓
+- PFOS at Research Triangle Park, 2024
+- PFOA at Durham, 2024
+- PFOA at Chapel Hill, 2024
+- PFOS at all three sites, 2024
+- PFOA in 2023 (comparison)
+:::
+
+::: {.fragment}
+**Six duplicate files** — or **one parameterized template**.
+:::
+
+# Defining parameters {.section-divider}
+
+## In the YAML
+
+```yaml
+---
+title: "Biomonitoring Report"
+format: html
+params:
+  chemical: "PFOA"
+  threshold: 4.0
+  study_year: 2024
+  site: "Research Triangle Park"
+---
+```
+
+::: {.fragment}
+Strings quote, numbers don't, booleans lowercase, `null` is null.
+:::
+
+# Using parameters {.section-divider}
+
+## In prose
+
+```markdown
+This report analyzes **`r params$chemical`**
+data from **`r params$study_year`** at
+**`r params$site`** using a threshold of
+**`r params$threshold` ng/mL**.
+```
+
+## In code chunks
+
+```{.r}
+exposure_data |>
+  filter(site == params$site) |>
+  summarise(
+    n_above = sum(concentration > params$threshold),
+    pct = round(n_above / n() * 100, 1)
+  )
+```
+
+## Dynamic captions
+
+```yaml
+#| fig-cap: !expr paste("Distribution of",
+#|   params$chemical, "at", params$site)
+```
+
+::: {.fragment}
+`!expr` evaluates R at render time. Caption updates with parameters.
+:::
+
+# Re-rendering {.section-divider}
+
+## From R
+
+```{.r}
+quarto::quarto_render(
+  "06_parameterized_reports.qmd",
+  execute_params = list(
+    chemical = "PFOS",
+    threshold = 6.0,
+    site = "Durham"
+  ),
+  output_file = "report_PFOS_Durham.html"
+)
+```
+
+## From the command line
+
+```bash
+quarto render 06_parameterized_reports.qmd \
+  -P chemical:PFOS \
+  -P threshold:6.0 \
+  -P site:Durham
+```
+
+::: {.fragment}
+The `-P` flag is the Quarto improvement over R Markdown — much more scriptable.
+:::
+
+## "Render with Parameters" button
+
+In RStudio/Posit Cloud's IDE:
+
+::: {.incremental}
+- Click the dropdown arrow next to **Render**
+- Select **"Render with Parameters..."**
+- Fill in values interactively
+- Useful for one-off renders without writing code
+:::
+
+# Batch generation {.section-divider}
+
+## The pattern
+
+```{.r}
+chemicals <- c("PFOA", "PFOS", "PFNA", "BPA")
+sites <- c("RTP", "Durham", "Chapel Hill")
+thresholds <- list(PFOA = 4.0, PFOS = 6.0,
+                   PFNA = 2.0, BPA = 5.0)
+
+for (chem in chemicals) {
+  for (site in sites) {
+    quarto::quarto_render(
+      "06_parameterized_reports.qmd",
+      execute_params = list(
+        chemical = chem,
+        site = site,
+        threshold = thresholds[[chem]]
+      ),
+      output_file = paste0("report_",
+        chem, "_", site, ".html")
+    )
+  }
+}
+```
+
+::: {.fragment}
+**12 reports** from one source. Add a chemical, re-run, get more.
+:::
+
+# When this pattern shines {.section-divider}
+
+## Earns its keep when
+
+::: {.incremental}
+- A **template** applies to many cases
+- Analysis is **identical**; only inputs change
+- Reports regenerate **regularly** as data arrives
+:::
+
+::: {.fragment}
+NIEHS use cases: annual chemical summaries, multi-site monitoring, sub-population analyses, sensitivity sweeps across thresholds.
+:::
+
+# R Markdown vs Quarto {.section-divider}
+
+## Same idea, better plumbing
+
+| Aspect | R Markdown | Quarto |
+|--------|-----------|--------|
+| YAML | `params:` | `params:` |
+| Access | `params$x` | `params$x` |
+| Render R | `rmarkdown::render(params=...)` | `quarto::quarto_render(execute_params=...)` |
+| Render CLI | not native | `quarto render -P key:value` |
+| Dynamic captions | `fig.cap = paste(...)` | `!expr paste(...)` |
+
+# Hands-on {.section-divider}
+
+## Notebook Quarto 6
+
+::: {.callout-tip}
+Open `afternoon_quarto/06_parameterized_reports.qmd`. Change YAML parameters, re-render, observe.
+
+Exercises 6.1 and 6.2.
+:::
+
+25 min. Then projects + themes + publishing.

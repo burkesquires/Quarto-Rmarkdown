@@ -1,0 +1,66 @@
+---
+title: "R Markdown Quick Reference"
+subtitle: "Keep this open during the workshop!"
+output:
+  html_document:
+    theme: flatly
+    toc: false
+---
+
+## Markdown Formatting
+
+| Syntax | Result |
+|--------|--------|
+| `**bold**` | **bold** |
+| `*italic*` | *italic* |
+| `` `code` `` | `code` |
+| `[link](url)` | [link](https://example.com) |
+| `# Heading 1` | Level 1 heading |
+| `## Heading 2` | Level 2 heading |
+| `- item` | Bullet list |
+| `1. item` | Numbered list |
+| `> quote` | Block quote |
+| `---` | Horizontal rule |
+
+## Code Chunk Options
+
+| Option | Effect |
+|--------|--------|
+| `echo=FALSE` | Hide code, show output |
+| `eval=FALSE` | Show code, don't run it |
+| `include=FALSE` | Run code silently |
+| `message=FALSE` | Suppress messages |
+| `warning=FALSE` | Suppress warnings |
+| `fig.width=7` | Figure width (inches) |
+| `fig.height=5` | Figure height (inches) |
+| `fig.cap="..."` | Figure caption |
+| `out.width="80%"` | Display width |
+
+## Keyboard Shortcuts (Posit Cloud)
+
+| Action | Windows/Linux | Mac |
+|--------|--------------|-----|
+| Knit document | Ctrl+Shift+K | Cmd+Shift+K |
+| Insert chunk | Ctrl+Alt+I | Cmd+Option+I |
+| Run chunk | Ctrl+Shift+Enter | Cmd+Shift+Enter |
+| Run line | Ctrl+Enter | Cmd+Enter |
+
+## Inline Code
+
+Write `` `r knitr::inline_expr('mean(x)')` `` to insert R results in text.
+
+## YAML Starter Template
+
+````yaml
+---
+title: "Your Title"
+author: "Your Name, NIEHS"
+date: "`r knitr::inline_expr('Sys.Date()')`"
+output:
+  html_document:
+    theme: flatly
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+````

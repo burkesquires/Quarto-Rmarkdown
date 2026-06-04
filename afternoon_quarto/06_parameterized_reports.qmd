@@ -1,0 +1,317 @@
+---
+title: "Quarto 6 — Parameterized Reports"
+subtitle: "Generate many reports from one source"
+author: "R. Burke Squires"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+params:
+  chemical: "PFOA"
+  threshold: 4.0
+  study_year: 2024
+  site: "Research Triangle Park"
+---
+
+## Goals for this 25-minute block
+
+- Understand what a parameterized report is and when to use one.
+- Define parameters in YAML and use them throughout a document.
+- Render the same `.qmd` file with different parameter values from the command line and from R.
+- Use parameterization for batch report generation across chemicals, sites, or years.
+
+## The problem parameterization solves
+
+You've written a report on **PFOA** levels at **Research Triangle Park** in **2024**. Now you need to write the same report for:
+
+- PFOS at the same site
+- PFOA at Durham
+- PFOA at Chapel Hill
+- PFOS at all three sites
+- PFOA in 2023 (for comparison)
+
+That's six reports with structurally identical analysis but different inputs. Without parameterization, you have six near-duplicate `.qmd` files to maintain. With parameterization, you have **one** `.qmd` file and a parameter list.
+
+This is the single most underused R Markdown / Quarto feature for environmental health research. If you produce repeated reports across chemicals, sites, sub-populations, or time periods, parameterized reports save weeks per year.
+
+## Defining parameters
+
+Parameters live in the YAML header under a `params:` key:
+
+```yaml
+---
+title: "Biomonitoring Report"
+format: html
+params:
+  chemical: "PFOA"
+  threshold: 4.0
+  study_year: 2024
+  site: "Research Triangle Park"
+---
+```
+
+Look at the YAML at the top of **this** file — it has exactly these four parameters.
+
+::: {.callout-tip}
+## YAML types matter
+- `"PFOA"` (with quotes) is a string.
+- `4.0` (no quotes, decimal) is a number.
+- `2024` (no quotes, integer) is a number.
+- `true` / `false` (no quotes, lowercase) are booleans.
+- `null` is null.
+
+Get the type wrong and you'll get cryptic errors in your code. When in doubt, quote it as a string and `as.numeric()` it in R.
+:::
+
+## Using parameters in code and prose
+
+Parameters appear in R as `params$chemical`, `params$threshold`, etc.
+
+### In prose with inline code
+
+```markdown
+This report analyzes **`r params$chemical`** data from
+**`r params$study_year`** at **`r params$site`** using a threshold of
+**`r params$threshold` ng/mL**.
+```
+
+renders as:
+
+This report analyzes **`r params$chemical`** data from **`r params$study_year`** at **`r params$site`** using a threshold of **`r params$threshold` ng/mL**.
+
+### In chunks
+
+```{r}
+#| label: setup
+#| message: false
+#| include: false
+
+library(tidyverse)
+
+# Simulate data based on the chemical parameter
+# (Real workflow would read from a file; this is for demo)
+set.seed(42)
+n <- 200
+
+# Different chemicals have different distributional parameters
+chem_params <- list(
+  PFOA = list(meanlog = 0.8, sdlog = 0.9),
+  PFOS = list(meanlog = 1.1, sdlog = 0.7),
+  PFNA = list(meanlog = 0.5, sdlog = 0.6),
+  BPA  = list(meanlog = 0.3, sdlog = 1.1)
+)
+
+if (params$chemical %in% names(chem_params)) {
+  meanlog <- chem_params[[params$chemical]]$meanlog
+  sdlog <- chem_params[[params$chemical]]$sdlog
+} else {
+  meanlog <- 0.5
+  sdlog <- 0.8
+}
+
+exposure_data <- data.frame(
+  participant_id = 1:n,
+  site = sample(c("Research Triangle Park", "Durham", "Chapel Hill"),
+                n, replace = TRUE),
+  concentration = round(rlnorm(n, meanlog = meanlog, sdlog = sdlog), 2)
+)
+
+# Filter to the site of interest if specified
+if (!is.null(params$site) && params$site != "All") {
+  filtered_data <- exposure_data |>
+    filter(site == params$site)
+} else {
+  filtered_data <- exposure_data
+}
+
+n_above <- sum(filtered_data$concentration > params$threshold)
+pct_above <- round(n_above / nrow(filtered_data) * 100, 1)
+median_conc <- round(median(filtered_data$concentration), 2)
+```
+
+## Results from this parameter set
+
+Of the `r nrow(filtered_data)` participants at **`r params$site`**, **`r n_above` (`r pct_above`%)** had serum `r params$chemical` concentrations exceeding the `r params$threshold` ng/mL threshold. The median concentration was `r median_conc` ng/mL.
+
+```{r}
+#| label: fig-distribution
+#| fig-cap: !expr paste("Distribution of serum", params$chemical, "at", params$site, "—", params$study_year)
+#| fig-width: 7
+#| fig-height: 4
+#| echo: false
+
+ggplot(filtered_data, aes(x = concentration)) +
+  geom_histogram(fill = "#0D9488", color = "white", bins = 25) +
+  geom_vline(xintercept = params$threshold, color = "#DC2626",
+             linewidth = 1, linetype = "dashed") +
+  annotate("text", x = params$threshold + 0.3, y = Inf,
+           label = paste("Threshold:", params$threshold, "ng/mL"),
+           vjust = 2, hjust = 0, color = "#DC2626", size = 3.5) +
+  labs(title = paste(params$chemical, "Serum Concentrations,",
+                     params$site, params$study_year),
+       x = paste(params$chemical, "(ng/mL)"),
+       y = "Count") +
+  theme_minimal()
+```
+
+::: {.callout-note}
+## Dynamic captions
+The `fig-cap` above uses `!expr` to evaluate an R expression: `!expr paste("Distribution of", params$chemical, "...")`. This is Quarto's way to compute caption text from parameters at render time. Without this, the caption would be a static string.
+:::
+
+## Re-rendering with different parameters
+
+### From the R console
+
+```{r}
+#| eval: false
+
+# Render for PFOS at Durham
+quarto::quarto_render(
+  "06_parameterized_reports.qmd",
+  execute_params = list(
+    chemical = "PFOS",
+    threshold = 6.0,
+    site = "Durham",
+    study_year = 2024
+  ),
+  output_file = "report_PFOS_Durham_2024.html"
+)
+```
+
+Each call produces a different rendered output from the same source.
+
+### From the command line
+
+```bash
+quarto render 06_parameterized_reports.qmd -P chemical:PFOS -P threshold:6.0 -P site:Durham
+```
+
+The `-P` flag (or `--execute-param`) sets a parameter. Repeat for each one.
+
+### The "Render with Parameters" button
+
+In RStudio (and Posit Cloud's IDE), click the dropdown arrow next to the **Render** button and select **"Render with Parameters..."** — you get a dialog where you can fill in values interactively. Useful for one-off renders without writing code.
+
+## Batch report generation
+
+The real power: a loop that generates a report for every combination you care about.
+
+```{r}
+#| label: batch-demo
+#| eval: false
+
+# Generate a separate HTML report for each chemical-site combination
+chemicals <- c("PFOA", "PFOS", "PFNA", "BPA")
+sites <- c("Research Triangle Park", "Durham", "Chapel Hill")
+
+# Conventional thresholds (μg/L or ng/mL)
+thresholds <- list(PFOA = 4.0, PFOS = 6.0, PFNA = 2.0, BPA = 5.0)
+
+for (chem in chemicals) {
+  for (site in sites) {
+    out_file <- paste0("report_", chem, "_",
+                       gsub(" ", "_", site), "_2024.html")
+
+    quarto::quarto_render(
+      "06_parameterized_reports.qmd",
+      execute_params = list(
+        chemical = chem,
+        site = site,
+        threshold = thresholds[[chem]],
+        study_year = 2024
+      ),
+      output_file = out_file
+    )
+  }
+}
+# Result: 12 HTML reports, one per chemical-site combination
+```
+
+Twelve reports from one source file. Add a new chemical or site, re-run the loop, you have new reports. The analysis logic stays in one place.
+
+::: {.callout-tip}
+## When this pattern shines
+Parameterized reports earn their keep when:
+
+- You have a **template** that should apply to many cases.
+- The **analysis is identical**; only inputs change.
+- Reports need to be **regenerated regularly** as new data arrives.
+
+NIEHS-relevant cases: annual chemical-specific exposure summaries, multi-site monitoring reports, sub-population analyses, sensitivity analyses across multiple thresholds.
+:::
+
+## Parameter validation
+
+Parameters from a user can be wrong. A robust template validates them at the top:
+
+```{r}
+#| eval: false
+
+# At the top of your setup chunk
+valid_chemicals <- c("PFOA", "PFOS", "PFNA", "PFHxS", "GenX", "BPA")
+if (!params$chemical %in% valid_chemicals) {
+  stop("Invalid chemical: ", params$chemical,
+       ". Must be one of: ", paste(valid_chemicals, collapse = ", "))
+}
+
+if (!is.numeric(params$threshold) || params$threshold <= 0) {
+  stop("Invalid threshold: ", params$threshold,
+       ". Must be a positive number.")
+}
+```
+
+A failed render with a clear error is better than a successful render of nonsense.
+
+## R Markdown vs Quarto for parameters
+
+Same syntax, almost identical behavior:
+
+| Aspect | R Markdown | Quarto |
+|--------|-----------|--------|
+| YAML key | `params:` | `params:` (same) |
+| Access in R | `params$x` | `params$x` (same) |
+| Render with params (R) | `rmarkdown::render(..., params = list(...))` | `quarto::quarto_render(..., execute_params = list(...))` |
+| Render with params (CLI) | N/A in core R Markdown | `quarto render ... -P key:value` |
+| "Render with Parameters" button | Yes | Yes |
+| Dynamic figure captions | Use `fig.cap = paste(...)` chunk option | `#\| fig-cap: !expr paste(...)` |
+
+Parameterized reports are arguably **the** feature that justifies moving an existing R Markdown workflow to Quarto for any team doing recurring report generation — the CLI integration and YAML-style chunk options make batch generation more script-friendly.
+
+## Exercises
+
+### Exercise 6.1 — Try different parameter values
+
+1. In this file's YAML, change `chemical: "PFOA"` to `chemical: "PFOS"`.
+2. Change `threshold: 4.0` to `threshold: 6.0`.
+3. Change `site: "Research Triangle Park"` to `site: "Durham"`.
+4. Render. Observe how the title, prose, statistics, and plot all update.
+
+### Exercise 6.2 — Render two versions from R
+
+Open the R console and run:
+
+```{r}
+#| eval: false
+
+quarto::quarto_render(
+  "06_parameterized_reports.qmd",
+  execute_params = list(chemical = "PFOA", site = "Durham"),
+  output_file = "report_PFOA_Durham.html"
+)
+
+quarto::quarto_render(
+  "06_parameterized_reports.qmd",
+  execute_params = list(chemical = "PFOS", site = "Chapel Hill"),
+  output_file = "report_PFOS_ChapelHill.html"
+)
+```
+
+Open both HTML files. Confirm they have different titles, statistics, and plots.
+
+## What's next
+
+Quarto Module 7 — **Projects, Themes, and Publishing**: organize multi-document collections (websites, books), customize the look (themes, CSS), and publish to GitHub Pages, Quarto Pub, or Posit Connect Cloud.
+
+Open [`07_projects_themes_publishing.qmd`](07_projects_themes_publishing.qmd).

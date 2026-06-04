@@ -1,0 +1,81 @@
+---
+title: "Setup — Posit Cloud Verification"
+subtitle: "A five-minute check before we begin"
+author: "R. Burke Squires"
+date: today
+format:
+  html:
+    toc: true
+---
+
+## Today we're on Posit Cloud
+
+For the workshop itself we are using **Posit Cloud** — a browser-based RStudio environment with R, Python, and Quarto already installed. There is nothing to install on your laptop today.
+
+::: {.callout-tip}
+## Why Posit Cloud for the workshop
+Setup that would take 60–90 minutes to do locally on a federal-government laptop takes about 60 seconds here. We use the time on actual training instead.
+:::
+
+For continuing on your own after the workshop, see [Next Steps — Continuing Locally](next_steps.qmd) — that's the guide for installing everything on your own Mac or PC for Monday morning.
+
+## Step 1 — Sign in to Posit Cloud
+
+1. Go to <https://posit.cloud>.
+2. Sign in or create a free account (Google / GitHub / email all work).
+3. Your instructor will share a **workshop project link** — click it to open the project in your browser.
+
+You should see the four-pane RStudio interface (Source, Console, Environment, Files).
+
+## Step 2 — Confirm Quarto is working
+
+In the **Terminal** pane (next to the Console tab), type:
+
+```bash
+quarto --version
+```
+
+You should see `1.9.x` or later. If you see anything else, raise your hand — we'll sort it out.
+
+## Step 3 — Render this file
+
+Open this file (`00_setup.qmd`) in the Posit Cloud editor and click the **Render** button (blue arrow icon at the top of the file). Quarto will:
+
+1. Run any code chunks.
+2. Convert markdown + results to HTML.
+3. Open the result in the Viewer pane.
+
+```{r}
+#| label: hello-world
+#| message: false
+
+# A trivial chunk that proves the engine is alive.
+mean(1:10)
+```
+
+If you see "5.5" above this paragraph and the rendered HTML opens in the Viewer — you are ready.
+
+## Step 4 — Brief tour of the project
+
+Look at the **Files** pane in the lower-right. You should see:
+
+- `_quarto.yml` — the project configuration.
+- `index.qmd` — the workshop landing page (this site).
+- `morning_rmarkdown/` — the morning R Markdown notebooks and slides.
+- `bridge/` — the R Markdown → Quarto bridge module (after the first break).
+- `afternoon_quarto/` — the afternoon Quarto modules.
+- `capstone.qmd` and `next_steps.qmd` — end of day.
+- `references.bib` — sample bibliography for the citations module.
+
+You don't need to understand the structure yet — Quarto Module 7 will cover it. For now, just know everything you need is in this folder.
+
+## A note on Posit Cloud free-tier limits
+
+The free Posit Cloud tier has a monthly compute-hour limit. For today's workshop this is more than enough — but if you keep using Posit Cloud heavily after the workshop, you may run into it. Two reasonable responses:
+
+- Upgrade to a paid Posit Cloud plan (~$5/month at the lowest tier — check current pricing at <https://posit.cloud/plans>).
+- **Move to a local install** — that's covered in [Next Steps](next_steps.qmd).
+
+## What's next
+
+We start with R Markdown. Open [`morning_rmarkdown/01_rmarkdown_basics.Rmd`](morning_rmarkdown/01_rmarkdown_basics.Rmd) when your instructor signals.

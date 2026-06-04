@@ -1,0 +1,76 @@
+---
+title: "Quartobot Bonus — Identifier-Based Citations with quartobot"
+subtitle: "Write @doi:… directly, skip the BibTeX bookkeeping"
+author: "R. Burke Squires"
+date: today
+format:
+  html:
+    toc: true
+---
+
+::: {.callout-note}
+## This module is optional
+Everything you need for citations is in [Quarto Module 4 — Equations, Cross-References, Citations](04_equations_crossrefs_citations.qmd). This bonus shows a community tool that removes the most tedious part of that workflow. Skip it if you're short on time — nothing later depends on it.
+:::
+
+## The problem this solves
+
+In Quarto Module 4 you maintained a `references.bib` file by hand: copy a BibTeX entry, paste it in, give it a key, then cite the key. For a paper with 60 references — which is most NIEHS manuscripts — that bookkeeping adds up.
+
+**quartobot** lets you skip it. You write the persistent identifier directly in your prose:
+
+```markdown
+Long-term PM2.5 exposure is associated with cardiovascular
+mortality [@doi:10.1056/NEJMoa1817364].
+```
+
+and at render time, quartobot looks up the metadata from the source registrar (Crossref for DOIs, PubMed for PMIDs, arXiv for preprints) and hands it to Quarto's normal citation machinery. No hand-curated entry for that key.
+
+It accepts `doi:`, `pmid:`, `arxiv:`, `pmc:`, `isbn:`, `url:`, and `wikidata:` identifiers. The resolver underneath is [manubot](https://manubot.org/)'s citation engine, which has years of source-API edge-case handling behind it.
+
+## How it slots in
+
+One line in `_quarto.yml` runs the resolver before Pandoc on every render:
+
+```yaml
+project:
+  pre-render: >-
+    quartobot resolve --from-scan .
+    --output references.json
+    --id-mode citation-key
+
+bibliography:
+  - references.bib       # your hand-curated entries still work
+  - references.json      # quartobot writes resolved entries here
+```
+
+The important part for your existing work: a normal `references.bib` keeps working alongside it. quartobot fills in the keys it can resolve; you hand-curate the ones it can't (old reports, grey literature, internal documents without a DOI). It's additive, not a replacement.
+
+::: {.callout-warning}
+## NIEHS network caveat
+quartobot hits Crossref / PubMed / arXiv over the network on the **first** render of each new citation (results are cached afterward). On the NIEHS network, confirm those API endpoints aren't firewalled before relying on this in a live setting — the same caution that applies to any render-time external lookup. If they're blocked, you can resolve once on an open network and commit the cached `references.json`.
+:::
+
+## Try it / read the real docs
+
+quartobot is maintained by [Sean Davis](https://github.com/seandavi). Rather than duplicate his documentation here (which would go stale), go to the source:
+
+- **Start here:** [First manuscript in 15 minutes](https://seandavi.github.io/quartobot/first-manuscript/) — install, scaffold, write, render, push, deploy, end to end.
+- **Just need one lookup?** [Resolve a single citation](https://seandavi.github.io/quartobot/resolve-single-citation/) — one identifier in, CSL JSON out, from the shell.
+- **Why it's built this way:** [Design rationale](https://seandavi.github.io/quartobot/design/) — why a pre-render hook, why CSL JSON, the prior art.
+- **Project home:** <https://github.com/seandavi/quartobot>
+
+Installation is a single command (`uv tool install quartobot`); the [install page](https://seandavi.github.io/quartobot/install/) has the details.
+
+## Where it goes beyond this workshop
+
+quartobot has two further layers that are out of scope for a one-day intro but worth knowing exist:
+
+- **AI-assisted drafting (MCP).** `quartobot mcp` exposes its resolver to AI agents — including Claude Desktop — so that any citation an agent proposes gets checked against the same registrar your manuscript renders from. The agent's metadata and your rendered metadata can't drift apart. See [MCP + Claude Desktop](https://seandavi.github.io/quartobot/mcp-claude-desktop/).
+- **CI with PR previews.** `quartobot use github-ci` scaffolds a GitHub Actions workflow that renders on every push and posts a live preview link on each pull request — so reviewers see exactly what a branch renders to. See [first manuscript, step 7](https://seandavi.github.io/quartobot/first-manuscript/#7-add-the-publish-on-every-commit-ci).
+
+If there's appetite, these two layers would make a natural follow-up session on agent-assisted, reproducible manuscript publishing.
+
+## Back to the main track
+
+Return to [Quarto Module 5 — Revealjs Presentations](05_revealjs_presentations.qmd), or back to [Quarto Module 4 — Equations, Cross-References, Citations](04_equations_crossrefs_citations.qmd) if you skipped here early.

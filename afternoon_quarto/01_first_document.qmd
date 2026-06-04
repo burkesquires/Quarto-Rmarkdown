@@ -1,0 +1,283 @@
+---
+title: "Quarto 1 — Your First .qmd"
+subtitle: "What you already know + the Quarto-specific additions"
+author: "R. Burke Squires"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+---
+
+## Where we are
+
+You spent the morning learning R Markdown and the bridge module covered the three things that change:
+
+1. `output:` → `format:`
+2. Chunk options move from `{r ...}` to `#|` lines
+3. File extension is `.qmd`
+
+This 30-minute module is your first **standalone Quarto document** — you'll write a `.qmd` from scratch, set up the YAML the Quarto way, and meet the features that **only exist in Quarto** (callouts, panel tabsets, multi-format YAML in one place).
+
+## The Quarto authoring workflow on Posit Cloud
+
+You already know Knit. The Quarto equivalent is **Render**:
+
+- **File → New File → Quarto Document** opens a new `.qmd` with a starter template.
+- The **Render** button (same place as the Knit button, but renamed) renders the file.
+- Keyboard shortcut: `Ctrl/Cmd+Shift+K` (same as Knit — Posit Cloud's IDE uses one shortcut for both, depending on file extension).
+
+That's it. The workflow you used this morning carries over.
+
+## The Quarto YAML, expanded
+
+A minimal YAML:
+
+```yaml
+---
+title: "My report"
+format: html
+---
+```
+
+But you'll usually want more. Here's a realistic scientific report header:
+
+```yaml
+---
+title: "Serum PFOA and Cholesterol in the Triangle Region"
+subtitle: "Biomonitoring Analysis, 2024"
+author:
+  - name: Jane Smith
+    affiliation: NIEHS Biostatistics Branch
+  - name: John Doe
+    affiliation: NIEHS Epidemiology Branch
+date: today
+abstract: |
+  We characterize the association between serum PFOA
+  concentration and total cholesterol in 200 participants
+  across three Triangle-region sites.
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    code-fold: true
+    fig-width: 7
+    fig-align: center
+  docx: default
+  pdf:
+    documentclass: article
+    geometry: margin=1in
+---
+```
+
+A few things to notice:
+
+::: {.incremental}
+- **Multi-author YAML** uses a list, with each author getting `name:` and `affiliation:` keys.
+- **`date: today`** is a Quarto convenience — no need for `` `r Sys.Date()` `` inline code.
+- **Abstract** uses YAML's `|` block-scalar so you can write multi-line prose.
+- **Multiple formats** stack under `format:` — you can render to HTML, Word, *and* PDF from one source. We'll cover this in Quarto Module 4.
+:::
+
+### Exercise 1.1 — Build a YAML
+
+In a new `.qmd` file, write a YAML header with:
+
+1. A `title` and `subtitle`.
+2. Your name as `author` (with affiliation).
+3. `date: today`.
+4. `format: html` with `toc: true` and `code-fold: true`.
+
+Render. Confirm you see a table of contents and a "Code" button that hides/shows code chunks.
+
+## Callout blocks — the first Quarto-only feature
+
+R Markdown has no native callout boxes. To create the styled "Tip" and "Warning" boxes you saw in Module 05 of the morning, the existing materials use inline HTML and CSS — workable, but ugly in source.
+
+Quarto has native callouts. Five types:
+
+::: {.callout-note}
+## Note
+General information that's nice to know but not essential.
+:::
+
+::: {.callout-tip}
+## Tip
+A helpful trick that improves how you work.
+:::
+
+::: {.callout-warning}
+## Warning
+Something that often goes wrong — pay attention here.
+:::
+
+::: {.callout-important}
+## Important
+Critical information; missing this breaks something.
+:::
+
+::: {.callout-caution}
+## Caution
+Used sparingly for genuinely dangerous operations (data loss, irreversible changes).
+:::
+
+### Syntax
+
+```markdown
+::: {.callout-note}
+## Optional title
+
+Body content goes here. Markdown formatting works
+inside callouts: **bold**, *italic*, `code`, [links](https://...).
+:::
+```
+
+Open and close with `:::`. The class name (`callout-note`, `callout-tip`, etc.) determines the styling.
+
+### Variations
+
+```markdown
+::: {.callout-warning collapse=true}
+## Click to expand
+
+This callout is collapsed by default — useful for "extra detail"
+that shouldn't dominate the page.
+:::
+
+::: {.callout-tip icon=false}
+## A clean callout with no icon
+
+Set `icon=false` if the default icon clutters your layout.
+:::
+
+::: {.callout-note appearance=simple}
+## A flatter look
+
+`appearance=simple` removes the colored title bar; just the
+left border remains.
+:::
+```
+
+### Exercise 1.2 — Replace a `<div>` callout
+
+In your file, write a paragraph wrapped in a `::: {.callout-tip}` callout. Render. Compare what you see to the inline HTML/CSS callout in `morning_rmarkdown/05_scientific_writing.Rmd` (if you have time to look at it).
+
+## Panel tabsets — Quarto's tabbed sections
+
+R Markdown's tabsets work but are limited to wrapping content under a heading with `{.tabset}`. Quarto's `panel-tabset` is more flexible — it works with any level of heading and renders nicely in both HTML and Word.
+
+```markdown
+::: {.panel-tabset}
+
+## R
+
+```{r}
+#| eval: false
+library(ggplot2)
+ggplot(biomarker_data, aes(pfoa_serum, cholesterol)) + geom_point()
+```
+
+## Python
+
+```{python}
+#| eval: false
+import seaborn as sns
+sns.scatterplot(data=biomarker_data, x="pfoa_serum", y="cholesterol")
+```
+
+## SAS
+
+```sas
+PROC SGPLOT DATA=biomarker_data;
+  SCATTER X=pfoa_serum Y=cholesterol;
+RUN;
+```
+
+:::
+```
+
+The above renders as clickable R / Python / SAS tabs in HTML, and as sequential sections in Word/PDF.
+
+::: {.callout-tip}
+## When to use a tabset
+Tabsets shine for side-by-side comparisons: the same analysis in two languages, methods for two cohorts, results stratified by sex. They are *not* a substitute for structuring your document — don't hide critical content behind a tab.
+:::
+
+## Quarto chunk option syntax — quick refresher
+
+The bridge module covered this. As a reminder:
+
+```` markdown
+```{r}
+#| label: pfoa-scatter
+#| fig-cap: "PFOA vs total cholesterol, by sex."
+#| fig-width: 7
+#| fig-height: 4
+#| warning: false
+#| message: false
+
+library(ggplot2)
+ggplot(biomarker_data, aes(pfoa_serum, cholesterol, color = sex)) +
+  geom_point(alpha = 0.6) +
+  theme_minimal()
+```
+````
+
+Compare to R Markdown:
+
+```` markdown
+```{r pfoa-scatter, fig.cap="PFOA vs total cholesterol, by sex.", fig.width=7, fig.height=4, warning=FALSE, message=FALSE}
+library(ggplot2)
+ggplot(biomarker_data, aes(pfoa_serum, cholesterol, color = sex)) +
+  geom_point(alpha = 0.6) +
+  theme_minimal()
+```
+````
+
+Same effect; cleaner source. Quarto Module 2 (next) goes deeper on chunks.
+
+## The dataset for the rest of the day
+
+The afternoon uses a simulated NIEHS biomonitoring dataset — `biomarker_data` — with PFOA, cholesterol, age, sex, and site information. It's the same dataset used in your existing R Markdown training (Module 04). Define it once in your file's setup chunk:
+
+```{r}
+#| label: define-biomarker-data
+#| include: false
+
+set.seed(42)
+n <- 200
+biomarker_data <- data.frame(
+  participant_id = 1:n,
+  age = round(rnorm(n, 48, 14)),
+  sex = sample(c("Female", "Male"), n, replace = TRUE, prob = c(0.55, 0.45)),
+  pfoa_serum = round(rlnorm(n, meanlog = 0.8, sdlog = 0.9), 2),
+  cholesterol = round(rnorm(n, 210, 38)),
+  site = sample(c("Research Triangle Park", "Durham", "Chapel Hill"),
+                n, replace = TRUE)
+)
+```
+
+The chunk option `include: false` runs the code but hides both the code and its output. Use this pattern for setup chunks throughout your Quarto documents.
+
+## What we've covered in 30 minutes
+
+::: {.incremental}
+- The Quarto authoring workflow (Render replaces Knit)
+- Expanded YAML structure (multi-author, abstract, multi-format)
+- **Callouts** — Quarto-native, no HTML/CSS hacks
+- **Panel tabsets** — flexible, work in multiple output formats
+- The biomarker dataset we'll use for the rest of the afternoon
+:::
+
+What we **didn't** cover (because the morning + bridge covered it):
+
+- Markdown formatting (same as R Markdown)
+- Basic chunk options (covered with `#|` syntax in the bridge)
+- Inline code (same syntax)
+- Headings, lists, links, equations basics
+
+## What's next
+
+Quarto Module 2 covers code chunks in depth, including the deep dive on **tables** that your morning training had ear-marked for Module 03 — `kable`, `kableExtra`, `DT`, and `broom` for clean model output.
+
+Open [`02_code_chunks_and_tables.qmd`](02_code_chunks_and_tables.qmd).

@@ -1,0 +1,165 @@
+---
+title: "Quarto 2 — Code Chunks & Tables"
+subtitle: "Deeper chunks, publication-quality tables"
+author: "R. Burke Squires"
+institute: "NIEHS"
+date: today
+format:
+  revealjs:
+    theme: [default, niehs-theme.scss]
+    logo: ../../images/niehs-logo.png
+    footer: "R Markdown + Quarto · NIEHS · 2026"
+    slide-number: true
+    chalkboard: true
+    code-overflow: wrap
+---
+
+## Goals — 60 minutes
+
+::: {.incremental}
+- Full range of chunk options
+- Publication tables: `kable`, `kableExtra`, `DT`
+- Clean model output with `broom`
+- R + Python side-by-side via tabsets
+:::
+
+# Engines, briefly {.section-divider}
+
+## Two, mostly invisible
+
+| Engine | When |
+|--------|------|
+| `knitr` | `{r}` chunks (and mixed R+Python) |
+| `jupyter` | `{python}`, `{julia}`, `{ojs}` alone |
+
+::: {.fragment}
+Override only if needed: `engine: knitr` or `engine: jupyter` in YAML.
+:::
+
+# Tables {.section-divider}
+
+## Why we don't just print
+
+```{.r}
+head(biomarker_data, 5)
+```
+
+::: {.fragment}
+Functional. Ugly. Not for reports.
+:::
+
+## kable — the baseline
+
+```{.r}
+biomarker_data |>
+  group_by(site) |>
+  summarise(
+    N = n(),
+    mean_pfoa = mean(pfoa_serum)
+  ) |>
+  kable(caption = "Mean PFOA by site")
+```
+
+Works in HTML, Word, PDF. Simple, reliable.
+
+## kableExtra — publication quality
+
+```{.r}
+... |>
+  kable() |>
+  kable_styling(
+    bootstrap_options = c("striped", "hover"),
+    full_width = FALSE
+  ) |>
+  row_spec(elevated_rows,
+           bold = TRUE, color = "#DC2626") |>
+  add_header_above(c(" " = 1, "PFAS" = 2, "Other" = 2)) |>
+  footnote(general = "...")
+```
+
+::: {.fragment}
+Conditional row formatting, grouped headers, footnotes — all available.
+:::
+
+## DT — interactive HTML
+
+```{.r}
+DT::datatable(participants,
+              filter = "top",
+              options = list(pageLength = 10))
+```
+
+::: {.incremental}
+- Searchable, sortable, paginated
+- **HTML only** — falls back in Word/PDF
+:::
+
+## broom — clean model output
+
+```{.r}
+model <- lm(log(pfoa_serum) ~ age + bmi + sex, data = biomarker_data)
+
+tidy(model, conf.int = TRUE) |>
+  kable() |>
+  kable_styling()
+```
+
+::: {.fragment}
+`tidy()` for coefficients. `glance()` for fit statistics. Both data frames — pipe directly into `kable()`.
+:::
+
+## When to use which
+
+| Method | Best for | Formats |
+|--------|----------|---------|
+| `kable()` | Simple, reliable | HTML/Word/PDF |
+| `kableExtra` | Publication quality | HTML (best) |
+| `DT` | Interactive | HTML only |
+| `gt` | Highly customized | HTML/PDF |
+
+# Quarto-distinctive chunk options {.section-divider}
+
+## Five that earn their keep
+
+::: {.incremental}
+- `cache: true` — skip slow code when unchanged
+- `code-fold: true` — collapse code behind a click
+- `output: asis` — let output write markdown
+- `dev: svg` — vector figures
+- `echo: fenced` — show the chunk header (teaching docs)
+:::
+
+# Mixed R + Python {.section-divider}
+
+## Tabsets
+
+````markdown
+::: {.panel-tabset}
+
+### R
+```{r}
+ggplot(biomarker_data, aes(pfoa_serum, cholesterol)) +
+  geom_point()
+```
+
+### Python
+```{python}
+sns.scatterplot(data=r.biomarker_data, x="pfoa_serum", y="cholesterol")
+```
+
+:::
+````
+
+::: {.fragment}
+Tabs in HTML; sequential in Word/PDF. Excellent for mixed-language teams.
+:::
+
+# Hands-on {.section-divider}
+
+## Notebook Quarto 2
+
+::: {.callout-tip}
+Open `afternoon_quarto/02_code_chunks_and_tables.qmd`. Exercises 2.1, 2.2, 2.3.
+:::
+
+Back in 60 min — then figures and visualizations.
