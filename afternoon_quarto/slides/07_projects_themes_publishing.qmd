@@ -36,7 +36,7 @@ my-project/
 │   ├── ch01.qmd
 │   └── ch02.qmd
 ├── references.bib
-├── styles.css
+├── styles.scss
 └── _site/               ← Rendered output
 ```
 
@@ -93,7 +93,7 @@ Quarto adds a sun/moon button to the navbar.
 ```yaml
 format:
   html:
-    theme: [cosmo, styles.css]
+    theme: [cosmo, styles.scss]
 ```
 
 ```{.css}

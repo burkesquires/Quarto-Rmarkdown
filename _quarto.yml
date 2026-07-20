@@ -76,7 +76,7 @@ website:
 format:
   html:
     theme:
-      light: [cosmo, styles.css]
+      light: [cosmo, styles.scss]
     toc: true
     toc-depth: 3
     code-copy: true
