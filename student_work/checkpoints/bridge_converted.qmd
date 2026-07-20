@@ -1,0 +1,60 @@
+---
+title: "My Morning Report — Converted to Quarto"
+author: "Your name"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    code-fold: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+# Quarto cell-option booleans use lowercase in #| lines.
+# Native R values inside R code still use TRUE and FALSE.
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  fig.width = 7,
+  fig.height = 4
+)
+
+dat <- read.csv("data/workshop_biomarkers.csv")
+n_records <- nrow(dat)
+mean_age <- mean(dat$age)
+median_pfoa <- median(dat$pfoa_serum)
+```
+
+## Purpose
+
+This **reproducible report** combines *narrative text* with results calculated from a synthetic teaching dataset.
+
+## Data preview
+
+```{r}
+#| label: data-preview
+#| echo: false
+
+knitr::kable(
+  head(dat),
+  caption = "First six synthetic records."
+)
+```
+
+## Dynamic summary
+
+The synthetic teaching dataset contains `r n_records` records. Mean age is `r round(mean_age, 1)` years, and the median simulated serum PFOA concentration is `r round(median_pfoa, 2)`.
+
+## Learning goals
+
+1. Render a complete document from a clean session.
+2. Recognize the YAML and cell-option changes between R Markdown and Quarto.
+3. Keep reported values synchronized with the analysis.
+
+::: {.callout-note}
+These data are synthetic and are used only to practice a reproducible workflow.
+:::

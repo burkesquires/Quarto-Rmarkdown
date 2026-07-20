@@ -1,6 +1,6 @@
 ---
-title: "Setup — Posit Cloud Verification"
-subtitle: "A five-minute check before we begin"
+title: "Setup — Posit Cloud and Student Workspace"
+subtitle: "A 15-minute preflight before we begin"
 author: "R. Burke Squires"
 date: today
 format:
@@ -8,113 +8,122 @@ format:
     toc: true
 ---
 
-## Today we're on Posit Cloud
+## Today we are using Posit Cloud
 
-For the workshop itself we are using **Posit Cloud** — a browser-based RStudio environment with R, Python, and Quarto already installed. There is nothing to install on your laptop today.
+The workshop runs in a browser-based RStudio environment prepared by the instructor. Do not install packages during class unless the instructor asks you to; the template should already contain everything required for the core exercises.
 
-::: {.callout-tip}
-## Why Posit Cloud for the workshop
-Setup that would take 60–90 minutes to do locally on a federal-government laptop takes about 60 seconds here. We use the time on actual training instead.
+::: {.callout-important}
+## Work only in `student_work/`
+The course website and lesson files are reference material. Your morning `.Rmd` file and cumulative Quarto report are `student_work/morning_report.Rmd` and `student_work/my_report.qmd`. That folder is a separate Quarto project, so rendering your report cannot trigger failures in the website, capstone instructions, or slide files.
 :::
 
-For continuing on your own after the workshop, see [Next Steps — Continuing Locally](next_steps.qmd) — that's the guide for installing everything on your own Mac or PC for Monday morning.
+## Step 1 — Open your own project copy
 
-## Step 1 — Sign in to Posit Cloud
+1. Sign in to the instructor-provided Posit Cloud workspace.
+2. Open the assigned workshop project.
+3. Confirm that you can edit files. In the **Files** pane, open `student_work/my_report.qmd`.
+4. Replace `YOUR NAME` in the YAML with your name and save.
+5. Confirm that `student_work/morning_report.Rmd` is also present; you will edit it during the morning block.
 
-1. Go to <https://posit.cloud>.
-2. Sign in or create a free account (Google / GitHub / email all work).
-3. Your instructor will share a **workshop project link** — click it to open the project in your browser.
+If your change does not persist, you may be viewing the instructor template rather than your own writable copy. Raise your hand before continuing.
 
-You should see the four-pane RStudio interface (Source, Console, Environment, Files).
+## Step 2 — Confirm Quarto is available
 
-## Step 2 — Confirm Quarto is working
-
-In the **Terminal** pane (next to the Console tab), type:
+In the **Terminal** pane, run:
 
 ```bash
 quarto --version
 ```
 
-You should see `1.9.x` or later. If you see anything else, raise your hand — we'll sort it out.
+A version number should appear. Then run:
 
-## Step 3 — Render this file
-
-Open this file (`00_setup.qmd`) in the Posit Cloud editor and click the **Render** button (blue arrow icon at the top of the file). Quarto will:
-
-1. Run any code chunks.
-2. Convert markdown + results to HTML.
-3. Open the result in the Viewer pane.
-
-```{r}
-#| label: hello-world
-#| message: false
-
-# A trivial chunk that proves the engine is alive.
-mean(1:10)
+```bash
+quarto check knitr
 ```
 
-If you see "5.5" above this paragraph and the rendered HTML opens in the Viewer — you are ready.
+The check should find R and knitr. Some checks for tools we are not using today may be unavailable; that does not block the core workshop.
 
-## Step 4 — Confirm the R packages are installed
+## Step 3 — Render the learner report
 
-The afternoon uses several R packages. In the workshop Posit Cloud project they are **pre-installed** — this chunk just confirms it. Run it (click the green ▶ on the chunk, or render this file):
+With `student_work/my_report.qmd` open, click **Render** or press `Ctrl/Cmd+Shift+K`.
+
+A successful render shows:
+
+- a title with your name,
+- a short readiness message,
+- a table reporting a mean of 5.5,
+- and no error in an unrelated course file.
+
+You can also render from the terminal without involving the website project:
+
+```bash
+cd student_work
+quarto render my_report.qmd --to html
+```
+
+## Step 4 — Check the core R packages
+
+Run this in the R console or in a temporary R chunk:
 
 ```{r}
-#| label: check-packages
+#| label: check-core-packages
 #| message: false
 
-needed <- c("tidyverse", "knitr", "kableExtra", "DT",
-            "broom", "patchwork", "plotly", "rmarkdown")
+core <- c("rmarkdown", "knitr", "dplyr", "ggplot2")
+advanced <- c("kableExtra", "DT", "broom", "patchwork", "plotly", "quarto")
 
-installed <- needed %in% rownames(installed.packages())
-report <- data.frame(package = needed,
-                     installed = ifelse(installed, "yes", "MISSING"))
-print(report, row.names = FALSE)
-
-if (all(installed)) {
-  message("All packages present — you're ready.")
-} else {
-  missing <- needed[!installed]
-  message("Missing: ", paste(missing, collapse = ", "),
-          " — raise your hand.")
+check_packages <- function(x) {
+  data.frame(
+    package = x,
+    installed = vapply(x, requireNamespace, logical(1), quietly = TRUE),
+    row.names = NULL
+  )
 }
+
+cat("Core packages:\n")
+print(check_packages(core), row.names = FALSE)
+
+cat("\nDemonstration/bonus packages:\n")
+print(check_packages(advanced), row.names = FALSE)
 ```
 
-If every row says `yes`, you're set. If anything says `MISSING`, raise your hand — your instructor can install it in a few seconds with `install.packages("name")`.
+Every **core** package should report `TRUE`. Missing demonstration/bonus packages do not prevent you from completing the required exercises.
 
-::: {.callout-important}
-## Instructor note (delete before sharing with students)
-**Pre-install all eight packages into the Posit Cloud workspace template before the workshop**, so attendees never wait on `install.packages()` (it can take several minutes per package × 30 people = a stalled room). From the workspace's R console, once:
+## Step 5 — Know the recovery path
 
-```r
-install.packages(c("tidyverse", "knitr", "kableExtra", "DT",
-                   "broom", "patchwork", "plotly", "rmarkdown"))
+Your folder contains:
+
+```text
+student_work/
+├── _quarto.yml
+├── morning_report.Rmd
+├── my_report.qmd
+├── parameter_demo.qmd
+├── data/workshop_biomarkers.csv
+├── references.bib
+├── nature.csl
+└── checkpoints/
+    ├── morning_report_complete.Rmd
+    ├── bridge_converted.qmd
+    ├── 01_yaml_complete.qmd
+    ├── 02_table_complete.qmd
+    ├── 03_figure_complete.qmd
+    └── 04_crossrefs_citations_complete.qmd
 ```
 
-Then save the project as the assignment/template so every student copy inherits the installed library. If you also plan to demo PDF output, add `tinytex::install_tinytex()` as well.
-:::
+If your report stops rendering, compare it with the most recent checkpoint rather than starting over.
 
-## Step 5 — Brief tour of the project
+## Data safety
 
-Look at the **Files** pane in the lower-right. You should see:
+Use only the supplied synthetic data during class unless the instructor has explicitly approved another dataset. Do not upload personally identifiable, protected, controlled, unpublished, or otherwise restricted data to the training workspace.
 
-- `_quarto.yml` — the project configuration.
-- `index.qmd` — the workshop landing page (this site).
-- `morning_rmarkdown/` — the morning R Markdown notebooks and slides.
-- `bridge/` — the R Markdown → Quarto bridge module (after the first break).
-- `afternoon_quarto/` — the afternoon Quarto modules.
-- `capstone.qmd` and `next_steps.qmd` — end of day.
-- `references.bib` — sample bibliography for the citations module.
+## Ready check
 
-You don't need to understand the structure yet — Quarto Module 7 will cover it. For now, just know everything you need is in this folder.
+Before moving on, confirm all four statements:
 
-## A note on Posit Cloud free-tier limits
+- [ ] I am in my own writable project copy.
+- [ ] `quarto --version` prints a version.
+- [ ] `student_work/my_report.qmd` renders successfully.
+- [ ] The four core R packages are installed.
 
-The free Posit Cloud tier has a monthly compute-hour limit. For today's workshop this is more than enough — but if you keep using Posit Cloud heavily after the workshop, you may run into it. Two reasonable responses:
-
-- Upgrade to a paid Posit Cloud plan (~$5/month at the lowest tier — check current pricing at <https://posit.cloud/plans>).
-- **Move to a local install** — that's covered in [Next Steps](next_steps.qmd).
-
-## What's next
-
-We start with R Markdown. Open [`morning_rmarkdown/01_rmarkdown_basics.Rmd`](morning_rmarkdown/01_rmarkdown_basics.Rmd) when your instructor signals.
+Next, open `morning_rmarkdown/01_rmarkdown_basics.Rmd` when the instructor signals.

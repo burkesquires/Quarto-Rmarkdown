@@ -1,38 +1,38 @@
 ---
 title: "From R Markdown to Quarto"
-subtitle: "What changes, what doesn't"
+subtitle: "What transfers, what changes"
 author: "R. Burke Squires"
 institute: "NIEHS"
 date: today
 format:
   revealjs:
-    theme: [default, niehs-theme.scss]
-    logo: ../images/niehs-logo.png
-    footer: "Quarto Workshop · NIEHS · 2026"
+    theme: [default, ../../afternoon_quarto/slides/niehs-theme.scss]
+    logo: ../../images/niehs-logo.png
+    footer: "R Markdown + Quarto · NIEHS · 2026"
     slide-number: true
     chalkboard: true
     code-overflow: wrap
 ---
 
-## The headline
+## The durable model
 
-> If you know R Markdown, you know **85% of Quarto**.
+> YAML + prose + executable code still produce the document.
 
 ::: {.fragment}
-The remaining 15% is mostly syntax — and it's the **same** syntax across every language Quarto supports.
+R Markdown remains supported. Quarto adds a broader publishing system; it does not invalidate existing `.Rmd` work.
 :::
 
-# What stays the same {.section-divider}
+# What transfers {.section-divider}
 
-## Don't relearn these
+## Keep these skills
 
 ::: {.incremental}
-- YAML header at the top
-- Pandoc markdown for prose
-- `` `r expr` `` inline code
+- YAML at the top
+- Pandoc Markdown for prose
+- Inline R results when using knitr
 - `` ```{r} `` chunk fences
-- Same conceptual three-part anatomy
-- Render button does the same thing
+- Clean-session rendering
+- Narrative, code, data, and output in one source
 :::
 
 # What changes {.section-divider}
@@ -64,11 +64,7 @@ format:
 :::
 ::::
 
-::: {.fragment}
-Top-level key, format names, underscores → hyphens.
-:::
-
-## Change 2: chunk options leave the curly braces
+## Change 2: chunk options become `#|` lines
 
 ::: {.columns}
 ::: {.column width="50%"}
@@ -95,92 +91,51 @@ plot(1:10)
 :::
 ::::
 
-## Why this change matters
+## Why the `#|` form helps
 
 ::: {.incremental}
-1. **Same option names across languages.** `fig-width: 6` works in `{r}` and `{python}`.
-2. **Long chunk headers stop being walls of text.**
-3. **Better editor support** — folding, syntax highlighting, IDE help.
+- One option per line
+- YAML-style names and values
+- Consistent execution-option syntax across supported engines
+- Easier-to-read chunk headers
 :::
 
 ## Change 3: cross-references are built in
 
-**In R Markdown:** install `bookdown`, learn its labeling conventions.
-
-**In Quarto:** label with the right prefix, add a caption — done.
-
 ```` markdown
 ```{r}`r ''`
 #| label: fig-ozone
-#| fig-cap: "Ozone vs temperature."
+#| fig-cap: "Ozone and temperature."
+#| fig-alt: "Scatterplot of ozone against temperature."
 
 plot(x, y)
 ```
 
-The relationship is roughly linear (@fig-ozone).
+See @fig-ozone.
 ````
 
 ::: {.fragment}
-This is the biggest quality-of-life win.
+Labels need a type prefix such as `fig-` or `tbl-`.
 :::
 
-## Change 4: file extension is `.qmd`
+## Change 4: new Quarto sources use `.qmd`
 
 ::: {.incremental}
-- New files: `.qmd`, not `.Rmd`.
-- Existing `.Rmd` files still render with `quarto render` (mostly).
-- You don't have to convert everything at once.
-:::
-
-# The translation table {.smaller .section-divider}
-
-## Chunk options
-
-| R Markdown | Quarto |
-|---|---|
-| `echo=FALSE` | `#\| echo: false` |
-| `eval=FALSE` | `#\| eval: false` |
-| `include=FALSE` | `#\| include: false` |
-| `message=FALSE` | `#\| message: false` |
-| `warning=FALSE` | `#\| warning: false` |
-| `fig.width=6` | `#\| fig-width: 6` |
-| `fig.height=4` | `#\| fig-height: 4` |
-| `fig.cap="..."` | `#\| fig-cap: "..."` |
-| `cache=TRUE` | `#\| cache: true` |
-
-`TRUE`/`FALSE` (R) → `true`/`false` (YAML).
-
-# Migration strategies {.section-divider}
-
-## Pick your pace
-
-::: {.incremental}
-1. **Leave old `.Rmd` alone.** They still render. Forever, basically.
-2. **Convert as you touch.** Next time you edit, take 10 min.
-3. **Big-bang migration.** Worth it for actively-developed projects.
-:::
-
-## A semi-automated path
-
-::: {.incremental}
-1. Copy `your_file.Rmd` → `your_file.qmd`.
-2. YAML: `output: html_document` → `format: html`.
-3. `quarto render your_file.qmd`.
-4. Fix the errors that come up (usually a few chunk options).
-:::
-
-::: {.fragment}
-~10–15 min per file, once you've done a couple.
+- Keep working `.Rmd` files when they still meet the need.
+- Use `.qmd` for a new Quarto document.
+- Convert a copy, render it, and compare outputs before replacing anything.
 :::
 
 # Hands-on {.section-divider}
 
-## Convert your morning file
+## Convert your safe learner report
+
+1. Knit `student_work/morning_report.Rmd`.
+2. Save a copy as `student_work/bridge_converted.qmd`.
+3. Translate its YAML and two chunk headers.
+4. Render the `.qmd` copy.
+5. Use `student_work/checkpoints/bridge_converted.qmd` for recovery.
 
 ::: {.callout-tip}
-Open `notebooks/rm_02_rmd_to_quarto_bridge.qmd`. Do Exercise 2.1.
-
-Goal: take the `.Rmd` you built before the break and produce a working `.qmd` version of it.
+Do not edit the workshop website or its root `_quarto.yml`.
 :::
-
-This is the single most important exercise of the morning.

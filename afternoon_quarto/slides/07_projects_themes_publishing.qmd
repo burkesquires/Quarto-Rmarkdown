@@ -1,6 +1,6 @@
 ---
-title: "Quarto 7 — Projects, Themes, Publishing"
-subtitle: "From single files to deployed sites"
+title: "Projects and Safe Sharing"
+subtitle: "Choose the correct output and an approved destination"
 author: "R. Burke Squires"
 institute: "NIEHS"
 date: today
@@ -14,213 +14,86 @@ format:
     code-overflow: wrap
 ---
 
-## Goals — 20 minutes
-
-Three short topics:
+## Goal — 20 minutes
 
 ::: {.incremental}
-- **Projects** (~7 min) — what they are, four types
-- **Themes and CSS** (~7 min) — make it look like a NIEHS report
-- **Publishing** (~6 min) — get it to a URL
+- Recognize what `_quarto.yml` controls.
+- Distinguish a website from a standalone report.
+- Choose a sharing destination appropriate to the content.
 :::
 
-# Projects {.section-divider}
+# Project boundary {.section-divider}
 
-## A project is a folder + `_quarto.yml`
+## Two projects in this workshop
 
-```
-my-project/
-├── _quarto.yml          ← Required
-├── index.qmd
-├── chapters/
-│   ├── ch01.qmd
-│   └── ch02.qmd
-├── references.bib
-├── styles.scss
-└── _site/               ← Rendered output
-```
+| Location | Type | Role |
+|---|---|---|
+| Workshop root | Website | Read-only lessons |
+| `student_work/` | Default | Learner files |
 
-::: {.fragment}
-This workshop is a Quarto **website** project. Look at the root `_quarto.yml`.
+::: {.callout-important}
+Do not edit the root `_quarto.yml` during class.
 :::
 
-## Four project types
+# Sharing unit {.section-divider}
 
-| Type | Use when |
-|------|----------|
-| `default` | Shared resources, independent renders |
-| `website` | Multi-page site (this workshop) |
-| `book` | Sequential pagination + bibliography |
-| `manuscript` | Article + supplementary notebooks |
+## Website
 
-::: {.fragment}
-**Quarto Manuscripts (1.4+)** — built for the scientific article use case. Worth investigating for NIEHS publishing workflows.
-:::
+A rendered website normally depends on shared assets.
 
-# Themes & CSS {.section-divider}
+> Share or deploy the complete `_site/` directory.
 
-## 25 Bootswatch themes — pick one
+## Standalone HTML report
+
+For a single report whose resources are embedded:
 
 ```yaml
 format:
   html:
-    theme: cosmo
-    # or: flatly, journal, lumen, paper,
-    # simplex, sandstone, spacelab, united, yeti,
-    # cerulean, cyborg, darkly, ...
+    embed-resources: true
 ```
 
 ::: {.fragment}
-**R Markdown parity:** the same theme names work in both.
+Test the resulting file offline before relying on it for archival or email delivery.
 :::
 
-## Dark mode toggle
+# Format-aware output {.section-divider}
 
-```yaml
-format:
-  html:
-    theme:
-      light: cosmo
-      dark: darkly
-```
+## Interactive plus static fallback
 
-::: {.fragment}
-Quarto adds a sun/moon button to the navbar.
-:::
-
-## Custom CSS
-
-```yaml
-format:
-  html:
-    theme: [cosmo, styles.scss]
-```
-
-```{.css}
-:root {
-  --niehs-green: #205C40;
-}
-
-h1, h2, h3 {
-  color: var(--niehs-green);
-}
-
-blockquote {
-  border-left: 4px solid var(--niehs-green);
-  padding-left: 1em;
-}
-```
-
-## SCSS for deep customization
-
-```{.scss}
-/*-- scss:defaults --*/
-$primary: #205C40;
-$body-color: #2B2B2B;
-
-/*-- scss:rules --*/
-.callout-note .callout-title {
-  background-color: rgba(32, 92, 64, 0.1);
-}
-```
-
-::: {.fragment}
-The slide decks use exactly this pattern — see `niehs-theme.scss`.
-:::
-
-## Conditional output
-
-```{.r}
+```r
 if (knitr::is_html_output()) {
-  DT::datatable(my_data)   # interactive
+  DT::datatable(my_data)
 } else {
-  kable(my_data)            # static
+  knitr::kable(my_data)
 }
 ```
 
-::: {.fragment}
-Same `knitr::is_*_output()` functions you knew from R Markdown.
-:::
+For DOCX-specific logic:
 
-# Publishing {.section-divider}
-
-## Five reasonable targets
-
-::: {.incremental}
-- **Target 0** — render + share HTML (no account needed)
-- **Target 1** — Quarto Pub (free, public)
-- **Target 2** — GitHub Pages
-- **Target 3** — Posit Connect Cloud
-- **Target 4** — any static host (Netlify, S3, internal NIEHS server)
-:::
-
-## Target 0 — local + share
-
-```bash
-quarto render
+```r
+knitr::pandoc_to("docx")
 ```
 
-::: {.incremental}
-- HTMLs are self-contained
-- Email them, or drop on a shared drive
-- Upload to an internal NIEHS server
-- **Often the right answer for internal-only work**
-:::
+# Public versus internal {.section-divider}
 
-## Target 1 — Quarto Pub
+## Destination follows authorization
 
-```bash
-quarto publish quarto-pub
-```
-
-::: {.fragment}
-Free, public at `username.quarto.pub`. First time browser auth, then one command forever.
-:::
-
-## Target 2 — GitHub Pages
-
-```bash
-quarto publish gh-pages
-```
-
-::: {.fragment}
-Site at `username.github.io/repo-name`. Requires a Git repo with GitHub remote.
-:::
-
-## Don't confuse names
+| Content | Destination |
+|---|---|
+| Approved public material | Approved public host |
+| Internal material | Institutionally managed internal service |
+| Controlled or protected data | Only an environment authorized for that data |
 
 ::: {.callout-warning}
-## posit.cloud ≠ Posit Connect Cloud
-
-**posit.cloud** — where you *develop* (this workshop).
-
-**Posit Connect Cloud** — where you *publish*.
-
-Publishing from posit.cloud was **deprecated in Quarto 1.8**. Replacement is Posit Connect Cloud (separate product, similar name).
+Quarto Pub and GitHub Pages are public publishing options. A private external repository is not automatically approved for agency data.
 :::
 
-# Beyond today {.section-divider}
+# End-of-day check {.section-divider}
 
-## Topics worth exploring later
+## Before leaving
 
-::: {.incremental}
-- **Quarto Dashboards** — fluid-layout interactive dashboards (1.4+)
-- **Quarto Extensions** — community shortcodes, filters, custom formats
-- **Shiny + Quarto** — interactive documents backed by Shiny
-- **Custom Pandoc filters** — when you need to bend the rendering pipeline
-- **Quarto Manuscripts** — submitting to scientific journals
-:::
-
-::: {.fragment}
-All linked from <https://quarto.org/docs>.
-:::
-
-# Hands-on {.section-divider}
-
-## Notebook Quarto 7
-
-::: {.callout-tip}
-Open `afternoon_quarto/07_projects_themes_publishing.qmd`. Exercises 7.1 and 7.2.
-:::
-
-20 minutes. Then capstone.
+1. Render `student_work/my_report.qmd` from a restarted session.
+2. Confirm the table, figure, cross-references, citation, and bibliography.
+3. Save or export the learner workspace using the instructor's approved method.
+4. Record one real project you will try next.

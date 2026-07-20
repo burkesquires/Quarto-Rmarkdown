@@ -1,6 +1,6 @@
 ---
-title: "Quarto 3 — Figures & Visualizations"
-subtitle: "Publication-quality plots in .qmd"
+title: "Quarto 3 — Figures"
+subtitle: "A readable plot, caption, alt text, and label"
 author: "R. Burke Squires"
 institute: "NIEHS"
 date: today
@@ -14,158 +14,91 @@ format:
     code-overflow: wrap
 ---
 
-## Goals — 45 minutes
+## The required outcome — 45 minutes
 
-::: {.incremental}
-- Basic ggplot → publication-quality
-- Figure sizing with chunk options
-- Multi-panel via `patchwork`
-- Interactive via `plotly`
-- Side-by-side via Quarto columns
-- Save for manuscripts
-:::
+> Add one `ggplot2` figure with clear axes, a caption, `fig-alt`, and a `fig-` label.
 
-# Sizing — the R Markdown → Quarto gotcha {.section-divider}
+Advanced composition, interactive plots, and manuscript export are demonstrations.
 
-## Names changed
+# Figure options {.section-divider}
 
-| R Markdown | Quarto |
-|------------|--------|
-| `fig.width=8` | `fig-width: 8` |
-| `fig.height=4` | `fig-height: 4` |
-| `fig.cap="..."` | `fig-cap: "..."` |
-| `out.width="80%"` | `out-width: "80%"` |
-| `fig.align="center"` | `fig-align: "center"` |
+## Creation and display size
 
-::: {.fragment}
-**Dot becomes hyphen.** That's the rule.
-:::
+| Option | Controls |
+|---|---|
+| `fig-width` | Width at creation, in inches |
+| `fig-height` | Height at creation, in inches |
+| `out-width` | Display width in the output |
+| `fig-align` | Display alignment |
 
-## fig-width vs out-width
+## A cross-reference-ready figure
 
-::: {.incremental}
-- `fig-width` — *creation* dimensions in inches
-- `out-width` — *display* dimensions in the rendered doc
-- Use both for: "render at 8×6 inches but show at 60% width"
-:::
+```` markdown
+```{r}`r ''`
+#| label: fig-pfoa-cholesterol
+#| fig-cap: "Simulated serum PFOA and total cholesterol."
+#| fig-alt: "Scatterplot of simulated serum PFOA against total cholesterol, with points distinguished by site."
+#| echo: false
 
-# patchwork {.section-divider}
-
-## Combine plots
-
-```{.r}
-p1 <- ggplot(biomarker_data, aes(pfoa_serum)) +
-  geom_histogram()
-p2 <- ggplot(biomarker_data, aes(pfoa_serum, cholesterol)) +
-  geom_point()
-
-p1 + p2          # side by side
-p1 / p2          # stacked
-(p1 + p2) / p3   # two on top, one below
+# ggplot code
 ```
+````
 
 ::: {.fragment}
-Arithmetic operators on plot objects. Easy.
+Do not type “Figure 1” in the caption. Quarto numbers it.
 :::
 
-## Auto-tagged panels
+# Accessible visual encoding {.section-divider}
 
-```{.r}
-p1 + p2 + p3 +
-  plot_annotation(tag_levels = "A")
-```
+## Do not rely on color alone
 
-::: {.fragment}
-Panels labeled A, B, C automatically.
-:::
-
-# Quarto columns {.section-divider}
-
-## Side-by-side plots in prose
-
-```markdown
-:::: {.columns}
-
-::: {.column width="50%"}
-[plot chunk 1]
-:::
-
-::: {.column width="50%"}
-[plot chunk 2]
-:::
-
-::::
-```
-
-::: {.fragment}
-Each plot retains its own caption and label. Quarto-only — R Markdown doesn't have this.
-:::
-
-# Interactive with plotly {.section-divider}
-
-## ggplot → plotly
-
-```{.r}
-p <- ggplot(biomarker_data,
-            aes(pfoa_serum, cholesterol, color = sex,
-                text = paste("Age:", age))) +
-  geom_point()
-
-ggplotly(p, tooltip = c("text", "x", "y"))
+```r
+ggplot(dat, aes(
+  pfoa_serum,
+  cholesterol,
+  color = site,
+  shape = site
+)) +
+  geom_point(alpha = 0.65)
 ```
 
 ::: {.incremental}
-- Hover, zoom, pan
-- HTML only — degrades in Word/PDF
-- For multi-format: conditional with `knitr::is_html_output()`
+- Use informative axis labels and units.
+- Combine color with shape, line type, labels, or facets.
+- Write alt text that communicates the figure's purpose and visible pattern.
 :::
 
-# Saving figures {.section-divider}
+# Advanced demonstrations {.section-divider}
 
-## ggsave for manuscripts
-
-```{.r}
-# For journal submission
-ggsave("figures/figure1.png",
-       width = 7, height = 5, dpi = 300)
-
-# Or TIFF if required
-ggsave("figures/figure1.tiff",
-       width = 7, height = 5, dpi = 300,
-       compression = "lzw")
-
-# Or vector
-ggsave("figures/figure1.svg",
-       width = 7, height = 5)
-```
-
-# Cross-references {.section-divider}
-
-## Two requirements
+## Know the tradeoffs
 
 ::: {.incremental}
-1. **Label with prefix** — `fig-`, `tbl-`, `eq-`, `sec-`, `lst-`
-2. **Caption** — `fig-cap:` or `tbl-cap:`
+- `patchwork` combines static ggplots.
+- Facets repeat the same visual grammar across groups.
+- `plotly` adds HTML interaction and needs a static fallback for other formats.
+- `ggsave()` creates a separate submission file when a journal requires one.
 :::
 
-## In prose
+# Scientific boundary {.section-divider}
 
-```markdown
-The data are positively associated
-(@fig-pfoa-cholesterol), consistent
-across sites (@fig-faceted).
-```
+## The pattern is generated
 
-::: {.fragment}
-Renders as "Figure 1" and "Figure 5" with clickable links. Numbering automatic.
+The workshop data are synthetic. A visible fitted trend is an instructional feature, not scientific evidence.
+
+::: {.callout-important}
+Describe what the teaching plot displays without making a causal or substantive PFAS claim.
 :::
 
 # Hands-on {.section-divider}
 
-## Notebook Quarto 3
+## Add the required figure
 
-::: {.callout-tip}
-Open `afternoon_quarto/03_figures_and_visualizations.qmd`. Exercises 3.1, 3.2, 3.3.
-:::
+In `student_work/my_report.qmd`, plot `pfoa_serum` against `cholesterol` and add:
 
-45 minutes. Then equations + citations.
+1. Clear labels.
+2. `fig-pfoa-cholesterol`.
+3. An informative caption.
+4. Useful alt text.
+5. Color plus shape when mapping site.
+
+Recovery: `student_work/checkpoints/03_figure_complete.qmd`.

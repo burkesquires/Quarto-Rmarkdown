@@ -9,16 +9,14 @@ format:
     toc-depth: 3
 ---
 
-## Goals for this module
+## Goals for this 25-minute demonstration
 
-In the next 60 minutes you will:
+- See how one YAML change turns Quarto source into a Revealjs deck.
+- Learn that level-2 headings create slides.
+- Observe speaker notes, incremental reveals, columns, and code highlighting.
+- Make one small edit to a copied learner file.
 
-- Convert a Quarto document into a slide deck with one YAML change.
-- Use the level-2 heading rule to create new slides.
-- Add speaker notes, incremental reveals, columns, and code highlighting.
-- Customize the look with the built-in themes.
-
-You will end this module with a working presentation that you could give tomorrow.
+A complete presentation is not required for the capstone.
 
 ## The smallest possible deck
 
@@ -80,7 +78,7 @@ title: "Title of the talk"
 subtitle: "A subtitle"
 author: "R. Burke Squires"
 institute: "NIEHS"
-date: "2026-05-19"
+date: today
 format: revealjs
 ---
 ```
@@ -199,23 +197,19 @@ The `chalkboard` feature is genuinely useful in training — you can annotate sl
 
 ::: {.callout-important}
 ## Open the workshop slide deck now
-Open `slides/05_revealjs_demo.qmd` (we will create this together). This is a real, working slide deck rendered to revealjs. Look at the YAML at the top, then scroll through and notice how each `##` heading maps to a slide. The lecturer will demo this live.
+Open `afternoon_quarto/slides/05_revealjs_presentations.qmd`. It is a complete working deck. Inspect the YAML and notice how each `##` heading maps to a slide.
 :::
 
-## Exercise 4.1 — Convert and customize
+## Learner edit — make a safe copy
 
-Take the file you started in Module 1 and:
+In the Files pane, copy `student_work/my_report.qmd` to `student_work/my_slides.qmd`. In the copy only:
 
-1. Change the YAML to `format: revealjs` (delete the `html:` block).
-2. Render and step through the result.
-3. Pick a theme that you like.
-4. Find one bullet list in your file and wrap it in `::: {.incremental}` ... `:::`.
-5. Add a section divider using `#` somewhere.
-6. Add a speaker note using `::: {.notes}` ... `:::`.
+1. Change the format to `revealjs`.
+2. Render and confirm that level-2 headings become slides.
+3. Wrap one short bullet list in `::: {.incremental}`.
+4. Add one speaker note.
 
-## Exercise 4.2 — Code highlighting
-
-Find any code chunk in your slides. Add `#| code-line-numbers: "1|2|3"` to it (or whatever line numbers you have). Render and step through the slide — each click should highlight the next line.
+Do not convert the main `my_report.qmd`; it remains the capstone report. Code highlighting and custom themes are optional demonstrations.
 
 ## A subtle point about chunks in slides
 
@@ -246,6 +240,6 @@ You will see `.scrollable` and `.smaller` used as per-slide modifiers attached t
 
 ## What's next
 
-The final teaching module covers **Quarto projects** — multi-document collections like websites and books — and **publishing** the things you've built.
+Next, the instructor demonstrates **parameterized reports**. Projects and safe sharing follow after the capstone.
 
 Open [`06_parameterized_reports.qmd`](06_parameterized_reports.qmd).

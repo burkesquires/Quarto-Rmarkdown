@@ -1,6 +1,6 @@
 ---
-title: "Quarto 7 — Projects, Themes, Publishing"
-subtitle: "From single files to deployed sites"
+title: "Quarto 7 — Projects and Safe Sharing"
+subtitle: "Know what the project controls, then choose the right sharing unit"
 author: "R. Burke Squires"
 date: today
 format:
@@ -11,99 +11,72 @@ format:
 
 ## Goals for this 20-minute block
 
-Three short topics, each ~7 minutes:
+This is an **instructor-led demonstration and discussion**. By the end, you should be able to:
 
-- **Quarto projects** — what they are, the four types, when to use each.
-- **Themes and CSS** — make your reports look like NIEHS reports.
-- **Publishing** — get your work to a URL.
+- Recognize what a Quarto project controls.
+- Distinguish a website from a standalone report.
+- Explain why a website must normally be shared as a folder or deployed as a site.
+- Choose an institutionally approved sharing method for the sensitivity of the content.
 
-## 1. Quarto projects
-
-A Quarto project is just a folder with a `_quarto.yml` file at its root. That file:
-
-- Defines project-wide YAML defaults (apply to every document)
-- Declares the project type (website, book, manuscript, default)
-- Lets you render the whole project with one `quarto render`
-- Centralizes resources (CSS, bibliography, images)
-
-```
-my-project/
-├── _quarto.yml          ← Required. Defines the project.
-├── index.qmd
-├── about.qmd
-├── chapters/
-│   ├── ch01.qmd
-│   └── ch02.qmd
-├── references.bib
-├── styles.scss
-└── _site/               ← Rendered output (auto-created)
-```
-
-This workshop is a Quarto **website** project. Look at the `_quarto.yml` at the root to see how it's wired together.
-
-### The four project types
-
-| Type | Use when |
-|---|---|
-| `default` | A folder of `.qmd` files that share resources but render independently |
-| `website` | Multi-page site with navbar, sidebar, search (what this workshop uses) |
-| `book` | Sequential pagination, downloadable PDF/EPUB, unified bibliography |
-| `manuscript` | Scholarly article + supplementary analysis notebooks (Quarto 1.4+) |
-
-### Quarto Manuscripts (worth knowing)
-
-Added in Quarto 1.4 — designed for the scientific article use case where the manuscript **is** the analysis notebook. The output bundle includes the article PDF, an interactive HTML version, and the rendered analysis as supplementary material:
-
-```yaml
-project:
-  type: manuscript
-
-manuscript:
-  article: index.qmd
-  notebooks:
-    - notebooks/figure-1.qmd
-    - notebooks/supplementary-analysis.qmd
-```
-
-For NIEHS publishing workflows, this is the project type most worth investigating.
-
-## 2. Themes and CSS
-
-Quarto ships with all 25 Bootswatch themes — change the look of an entire site by changing one YAML value.
-
-### Built-in themes
-
-```yaml
-format:
-  html:
-    theme: cosmo     # or: flatly, journal, lumen, paper, simplex, sandstone,
-                     # spacelab, united, yeti, cerulean, cyborg, darkly, ...
-```
-
-Try changing `theme: cosmo` to `theme: journal` in your project's `_quarto.yml` and re-rendering. The look changes everywhere.
-
-::: {.callout-tip}
-## R Markdown theme parity
-The R Markdown `theme:` value (e.g., `flatly`) is the **same** name in Quarto. Themes you know from R Markdown work identically.
+::: {.callout-important}
+## Keep the course website read-only
+Do not edit the workshop's root `_quarto.yml` during class. It controls every page in the training website. Your editable report remains in `student_work/my_report.qmd`, which belongs to a separate, small Quarto project.
 :::
 
-### Dark mode
+## 1. What a Quarto project controls
+
+A Quarto project is a directory with a `_quarto.yml` file at its root. The file can define shared formats, execution settings, navigation, resources, and which documents belong to the project.
+
+```text
+my-project/
+├── _quarto.yml
+├── index.qmd
+├── report.qmd
+├── references.bib
+├── styles.scss
+└── _site/               # rendered website output, when applicable
+```
+
+This workshop contains two deliberately different projects:
+
+| Project | Type | Purpose |
+|---|---|---|
+| Workshop root | `website` | Read-only lessons and navigation |
+| `student_work/` | `default` | A small learner workspace whose files render independently |
+
+The separation matters. Rendering or previewing a page inside a website project can involve project-level work beyond the page you are viewing. A small learner project makes errors easier to locate and prevents one unfinished lesson from blocking another.
+
+### Common project types
+
+| Type | Use it for |
+|---|---|
+| `default` | Reports or notebooks that share settings but render independently |
+| `website` | A multi-page site with navigation and search |
+| `book` | Ordered chapters with unified navigation and bibliography |
+| `manuscript` | A scholarly article connected to computational notebooks |
+
+The complete project documentation is at <https://quarto.org/docs/projects/quarto-projects.html>.
+
+## 2. Themes: observe, do not edit the course site
+
+The instructor will briefly show the root `_quarto.yml` and `styles.scss`. The site combines a built-in Bootstrap theme with local SCSS:
 
 ```yaml
 format:
   html:
     theme:
-      light: cosmo
-      dark: darkly
+      light: [cosmo, styles.scss]
 ```
 
-Quarto adds a sun/moon toggle to the navbar. Readers pick.
+A standalone report can use a simpler setting:
 
-### Custom CSS
+```yaml
+format:
+  html:
+    theme: cosmo
+```
 
-For specific tweaks beyond what themes offer, you have two options depending on *what* you're customizing.
-
-**Option A — a plain CSS file with the `css:` key.** Use this for ordinary style rules (colors, fonts, spacing) that layer on top of the theme:
+For ordinary CSS rules, use the `css:` key:
 
 ```yaml
 format:
@@ -112,178 +85,107 @@ format:
     css: custom.css
 ```
 
-Then in `custom.css`:
-
-```css
-/* NIEHS forest green accent */
-:root {
-  --niehs-green: #205C40;
-  --niehs-accent: #C77D34;
-}
-
-h1, h2, h3 {
-  color: var(--niehs-green);
-}
-
-blockquote {
-  border-left: 4px solid var(--niehs-green);
-  padding-left: 1em;
-  color: #475569;
-}
-```
-
-**Option B — an SCSS file in the `theme:` list.** Use this when you want your rules compiled *as part of the Bootstrap theme* (which lets you override Bootstrap's own SCSS variables). A file in the `theme:` slot **must** be `.scss` and **must** contain at least one layer boundary:
-
-```yaml
-format:
-  html:
-    theme: [cosmo, styles.scss]
-```
-
-```scss
-/*-- scss:rules --*/
-h1, h2, h3 {
-  color: #205C40;
-}
-```
-
-::: {.callout-warning}
-## The gotcha that bites everyone
-If you put a plain `.css` file in the **`theme:`** list, Quarto tries to read it as SCSS and errors with *"doesn't contain at least one layer boundary."* Either move it to the `css:` key (Option A) or add a `/*-- scss:rules --*/` line and rename it `.scss` (Option B). This workshop's own site uses Option B — see `styles.scss` in the project root.
-:::
-
-### SCSS for advanced theming
-
-For deeper customization, create a `.scss` file with `defaults` and `rules` blocks:
+For Bootstrap variable overrides, place an SCSS file in the theme list and include a Quarto SCSS layer boundary:
 
 ```scss
 /*-- scss:defaults --*/
 $primary: #205C40;
-$body-color: #2B2B2B;
-$presentation-heading-color: $primary;
 
 /*-- scss:rules --*/
-.callout-note .callout-title {
-  background-color: rgba(32, 92, 64, 0.1);
+h1, h2, h3 {
+  color: $primary;
 }
 ```
 
-Reference it in YAML:
+::: {.callout-tip}
+## Wednesday's priority
+A report that renders reproducibly is more valuable than a heavily customized report that does not. Treat theming as a post-workshop refinement.
+:::
 
-```yaml
-format:
-  html:
-    theme: [cosmo, niehs-theme.scss]
-```
+## 3. Conditional output across formats
 
-The afternoon slide decks use a `niehs-theme.scss` exactly this way — look at `afternoon_quarto/slides/niehs-theme.scss`.
-
-### Conditional output across formats
-
-Sometimes you want different content depending on the output format (an interactive table for HTML, a static one for Word). R Markdown uses `knitr::is_html_output()`. Quarto uses the same function:
+An HTML widget such as `DT::datatable()` is not portable to every output format. Provide a static fallback:
 
 ```{r}
 #| eval: false
 
 if (knitr::is_html_output()) {
-  DT::datatable(my_data)        # interactive HTML widget
+  DT::datatable(my_data)
 } else {
-  knitr::kable(my_data)         # static table for Word/PDF
+  knitr::kable(my_data)
 }
 ```
 
-`knitr::is_latex_output()`, `knitr::is_docx_output()`, and `knitr::pandoc_to()` cover other format checks.
+Useful checks include:
 
-## 3. Publishing
+```r
+knitr::is_html_output()
+knitr::is_latex_output()
+knitr::pandoc_to("docx")
+```
 
-Quarto's `publish` subcommand handles deployment. Five reasonable targets.
+## 4. A website and a standalone HTML report are different sharing units
 
-### Target 0 — render and share the HTML
+### Website project
+
+The normal output of this workshop website is a directory such as `_site/`. Its pages can depend on shared style sheets, scripts, images, and search assets. Share or deploy the **complete output directory**, not one HTML page copied out of it.
 
 ```bash
 quarto render
 ```
 
-Every `.qmd` becomes a standalone HTML file in `_site/`. These HTMLs are self-contained — you can:
+### Standalone report
 
-- Email the file directly (single-doc reports work well).
-- Drop the whole `_site/` folder on a shared drive (G:, OneDrive, SharePoint).
-- Upload to an internal NIEHS web server.
+For a single HTML report that is easier to email or archive as one file, enable embedded resources in that report:
 
-For internal-only work, this is often the right answer. No accounts, no auth, no public URLs.
-
-### Target 1 — Quarto Pub
-
-Free, public hosting at `username.quarto.pub`:
-
-```bash
-quarto publish quarto-pub
+```yaml
+format:
+  html:
+    embed-resources: true
 ```
 
-First time: browser auth. Then one command forever.
+This embeds most supporting resources into the HTML file. When MathJax content also needs to work offline, review Quarto's `self-contained-math` option and test the file on a disconnected computer.
 
-### Target 2 — GitHub Pages
+See <https://quarto.org/docs/output-formats/html-publishing.html#embed-resources>.
 
-Push rendered site to a `gh-pages` branch:
+## 5. Choose a sharing destination based on the content
+
+| Content | Appropriate approach |
+|---|---|
+| Public-release training material | Approved public website, Quarto Pub, or GitHub Pages |
+| Internal material | Approved shared drive, internal web server, or institutionally managed publishing service |
+| Controlled, sensitive, protected, or unpublished data | Only an environment and destination approved for that data |
+
+::: {.callout-warning}
+## Public publishing is public
+Do not publish personally identifiable information, protected health information, controlled data, sensitive agency information, or unpublished results to Quarto Pub, GitHub Pages, or another public service. A private external repository is not automatically approved for agency data. Follow your organization's records, privacy, security, and release-review requirements.
+:::
+
+The instructor may show the syntax without running it:
 
 ```bash
+# Public-release material only, after required review
+quarto publish quarto-pub
 quarto publish gh-pages
 ```
 
-Site appears at `username.github.io/repo-name`. Requires the directory to be a Git repo with a GitHub remote.
+Quarto's publishing overview distinguishes public services from organizational platforms such as Posit Connect: <https://quarto.org/docs/publishing/>.
 
-### Target 3 — Posit Connect Cloud
+## Discussion: choose the sharing unit
 
-Posit's hosted platform (free tier exists for static content; paid tier supports Shiny-Quarto interactivity):
+For each case, name both the **output** and the **destination**:
 
-```bash
-quarto publish posit-connect-cloud
-```
+1. A public workshop handout with no sensitive information.
+2. An internal multi-page methods site.
+3. A single report for an approved internal collaborator.
+4. An analysis containing controlled participant-level data.
 
-::: {.callout-warning}
-## Don't confuse with posit.cloud
-**Publishing from posit.cloud was deprecated in Quarto 1.8.** Replacement is Posit Connect **Cloud** — a separate product despite the similar name. posit.cloud is still where you *develop*; only the publishing target changed.
-:::
+A defensible answer states not only *how* to publish, but also *why that destination is authorized*.
 
-### Target 4 — static host (anywhere)
+## End-of-day sequence
 
-Render locally, copy `_site/` to Netlify, S3, Azure Static Web Apps, GitLab Pages — anywhere that serves HTML.
+You have already completed the cumulative capstone. Finish with:
 
-## Beyond today
-
-Topics we touched but didn't cover deeply, with links for further reading:
-
-::: {.incremental}
-- **Quarto Dashboards** — fluid-layout interactive dashboards (Quarto 1.4+): <https://quarto.org/docs/dashboards/>
-- **Quarto Extensions** — community shortcodes, filters, custom formats: <https://quarto.org/docs/extensions/>
-- **Shiny + Quarto** — interactive documents backed by Shiny: <https://quarto.org/docs/interactive/shiny/>
-- **Custom Pandoc filters** — when you need to bend the rendering pipeline: <https://quarto.org/docs/extensions/filters.html>
-- **Quarto Manuscripts** — submitting to journals: <https://quarto.org/docs/manuscripts/>
-:::
-
-## Exercises
-
-### Exercise 7.1 — Change the theme
-
-1. Open `_quarto.yml` at the root of this workshop.
-2. Find the `theme:` line.
-3. Change `cosmo` to `journal`. Re-render. Compare.
-4. Try `flatly`, `darkly`, `sandstone`. Pick a favorite.
-5. Change back when done (or commit your preference).
-
-### Exercise 7.2 — Render and share
-
-In the Terminal:
-
-```bash
-quarto render
-ls _site/
-```
-
-Confirm rendered HTML files exist in `_site/`. Open one in the browser. Imagine emailing it to a collaborator — that's "Target 0" publishing.
-
-## What's next
-
-The capstone. Build something of your own from scratch.
-
-Open [`../capstone.qmd`](../capstone.qmd).
+1. Render `student_work/my_report.qmd` from a clean session.
+2. Save or export your learner workspace using the method provided by the instructor.
+3. Complete the exit ticket in [`../next_steps.qmd`](../next_steps.qmd).

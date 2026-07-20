@@ -1,0 +1,43 @@
+---
+title: "Serum PFOA and Cholesterol in a Synthetic Workshop Dataset"
+author: "YOUR NAME"
+date: today
+bibliography: ../references.bib
+format:
+  html:
+    toc: true
+    code-fold: true
+    link-citations: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+library(dplyr)
+library(ggplot2)
+library(knitr)
+
+biomarker_data <- read.csv("data/workshop_biomarkers.csv")
+```
+
+## Introduction
+
+This report demonstrates a **reproducible workflow** using *synthetic teaching data*. It summarizes serum PFOA and cholesterol measurements for 200 simulated records from three Triangle-region sites. The goal is to practice connecting narrative, code, and output in one document—not to make a scientific claim.
+
+::: {.callout-note}
+## Synthetic data
+The generated relationships are visible teaching examples and must not be interpreted as evidence about PFAS exposure or health outcomes.
+:::
+
+## Methods
+
+The document reads a fixed CSV file and performs all calculations during rendering from a clean R session.
+
+## Results
+
+The dataset contains `r nrow(biomarker_data)` rows.
+
+## Discussion
+
+Results will be added in later checkpoints.

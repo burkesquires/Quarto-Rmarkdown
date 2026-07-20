@@ -1,6 +1,6 @@
 ---
 title: "From R Markdown to Quarto"
-subtitle: "What changes, what doesn't, how to migrate"
+subtitle: "What transfers, what changes, and how to migrate safely"
 author: "R. Burke Squires"
 date: today
 format:
@@ -9,114 +9,80 @@ format:
     toc-depth: 3
 ---
 
-## Why this module exists
+## Goal for this 20-minute bridge
 
-You just spent the morning learning R Markdown. The rest of the day is Quarto. Before we dive in, this 25-minute bridge makes one thing explicit:
+You just learned the three-part anatomy of R Markdown: **YAML, prose, and executable code chunks**. Quarto uses the same model. This bridge focuses on the few changes you need to recognize before continuing in `student_work/my_report.qmd`.
 
-**Almost everything you just learned still works.** The conceptual model is the same. The mechanics change in three specific places, and we'll walk through each.
-
-::: {.callout-tip}
-## The headline
-If you already know R Markdown, you already know 85% of Quarto. The remaining 15% is mostly syntax — and one of those changes (`#|` chunk options) is the same in every language Quarto supports, which is a big simplification once you're past the muscle-memory cost.
+::: {.callout-note}
+## R Markdown remains a supported choice
+Existing `.Rmd` work does not need to be converted merely because Quarto exists. R Markdown remains supported. Quarto is a useful default for many new publishing projects, especially when you need built-in cross-references, multiple languages, presentations, websites, books, or manuscripts.
 :::
 
-## What's the same
-
-Don't relearn these — they transfer directly.
+## What transfers directly
 
 | Concept | R Markdown | Quarto |
 |---|---|---|
-| YAML header location | Top of file, between `---` lines | Top of file, between `---` lines |
-| Markdown prose | Pandoc-flavored markdown | Pandoc-flavored markdown |
-| Inline code | `` `r expr` `` | `` `r expr` `` |
-| Chunk fence | `` ```{r} `` ... `` ``` `` | `` ```{r} `` ... `` ``` `` |
-| Setup chunk pattern | `library()` + `opts_chunk$set` | Same idea (slightly evolved) |
-| Render command | `rmarkdown::render()` or the Knit button | `quarto render` or the Render button |
+| YAML header | Between `---` lines at the top | Same |
+| Prose | Pandoc Markdown | Same |
+| Inline R result | An inline `` `r knitr::inline_expr('expr')` `` expression | Same when using knitr |
+| R chunk fence | `` ```{r} `` | Same |
+| Reproducibility principle | Render the complete document in a clean session | Same |
+| Primary engine for R | knitr | knitr |
 
-If you understand the three-part anatomy (YAML + prose + chunks), the conceptual move to Quarto is trivial.
+The durable skill is not a particular button. It is understanding how source text, code, data, and metadata combine to produce an output.
 
 ## Change 1 — `output:` becomes `format:`
 
-In R Markdown:
+**R Markdown**
 
 ```yaml
----
-title: "My report"
 output:
   html_document:
     toc: true
     toc_depth: 2
     code_folding: hide
-    fig_width: 7
----
 ```
 
-In Quarto:
+**Quarto**
 
 ```yaml
----
-title: "My report"
 format:
   html:
     toc: true
     toc-depth: 2
     code-fold: true
-    fig-width: 7
----
 ```
 
-Three small differences:
+Three patterns to notice:
 
-1. **`output:` → `format:`** — top-level key renamed.
-2. **`html_document` → `html`** — format names shorten (no more `_document` suffix; `word_document` → `docx`, `pdf_document` → `pdf`).
-3. **Underscores become hyphens** — `toc_depth` → `toc-depth`, `code_folding` → `code-fold`, `fig_width` → `fig-width`. This is consistent across every option.
+1. `output:` becomes `format:`.
+2. `html_document`, `word_document`, and `pdf_document` become `html`, `docx`, and `pdf`.
+3. Many option names use hyphens instead of underscores: `toc-depth`, `code-fold`, and `fig-width`.
 
-::: {.callout-note}
-## The "hyphens not underscores" rule
-This shows up everywhere in Quarto YAML. If you find yourself with a setting that doesn't seem to work, the first thing to check is whether you accidentally used underscores from muscle memory.
-:::
+## Change 2 — Chunk options become `#|` lines
 
-## Change 2 — Chunk options move out of the curly braces
-
-This is the change you will notice most.
-
-**R Markdown:**
+**R Markdown**
 
 ```` markdown
-```{r myplot, fig.width=6, fig.height=4, echo=FALSE, message=FALSE}`r ''`
-library(ggplot2)
-ggplot(airquality, aes(Temp, Ozone)) + geom_point()
+```{r myplot, fig.width=6, echo=FALSE, message=FALSE}`r ''`
+plot(1:10)
 ```
 ````
 
-**Quarto:**
+**Quarto**
 
 ```` markdown
 ```{r}`r ''`
 #| label: myplot
 #| fig-width: 6
-#| fig-height: 4
 #| echo: false
 #| message: false
 
-library(ggplot2)
-ggplot(airquality, aes(Temp, Ozone)) + geom_point()
+plot(1:10)
 ```
 ````
 
-Options move from the chunk header line down into `#|` lines at the top of the chunk body. Each option gets its own line. Values use YAML conventions (`false` instead of `FALSE`, hyphens instead of dots).
-
-### Why this change matters
-
-It's not arbitrary syntax churn. Three benefits:
-
-::: {.incremental}
-1. **Same option names across languages.** `fig-width: 6` works in `{r}` and in `{python}`. R Markdown's `fig.width` only works in R chunks.
-2. **Long chunk headers stop being a wall of text.** A real-world chunk with 8 options used to be unreadable; now each option is on its own line.
-3. **Better tool support.** Editor folding, syntax highlighting, and IDE help all work better on the YAML-style format.
-:::
-
-### The translation table
+The Quarto form keeps each option on its own line and uses YAML-style values.
 
 | R Markdown | Quarto |
 |---|---|
@@ -130,81 +96,54 @@ It's not arbitrary syntax churn. Three benefits:
 | `fig.cap="..."` | `#\| fig-cap: "..."` |
 | `cache=TRUE` | `#\| cache: true` |
 
-Note `TRUE`/`FALSE` (R style) becomes `true`/`false` (YAML style).
+## Change 3 — Cross-references are built in
 
-## Change 3 — Cross-references work without `bookdown`
-
-In R Markdown, if you want to reference a figure from prose ("see Figure 1"), you need the `bookdown` package and special labeling. It works, but it's an extra layer.
-
-In Quarto, cross-references are built in. Two requirements: a label with the right prefix, and a caption.
+In Quarto, give an output a label with the correct prefix and add a caption:
 
 ```` markdown
 ```{r}`r ''`
 #| label: fig-ozone
-#| fig-cap: "Ozone vs temperature."
+#| fig-cap: "Ozone and temperature."
+#| fig-alt: "Scatterplot of ozone against temperature."
 
 plot(airquality$Temp, airquality$Ozone)
 ```
 
-The relationship is roughly linear (@fig-ozone).
+See @fig-ozone.
 ````
 
-The prefix matters: `fig-` for figures, `tbl-` for tables, `eq-` for equations, `sec-` for sections, `lst-` for code listings. Without the prefix, the cross-reference doesn't work.
+Common prefixes are `fig-`, `tbl-`, `eq-`, `sec-`, and `lst-`.
 
-This is the single largest *quality-of-life* improvement when you move from R Markdown to Quarto.
+## Change 4 — New Quarto sources use `.qmd`
 
-## Change 4 — Quarto extension is `.qmd`, not `.Rmd`
+Use `.qmd` for a new Quarto document. Existing `.Rmd` documents can remain in R Markdown. Migrate deliberately when there is a benefit, rather than converting an archive simply for uniformity.
 
-When you create a new Quarto file, it has the `.qmd` extension instead of `.Rmd`. This is how Posit Cloud / RStudio knows which renderer to call.
+A practical migration pattern is:
 
-::: {.callout-tip}
-## You can still render `.Rmd` files with Quarto
-Quarto is backwards-compatible with most R Markdown files. Run `quarto render my_file.Rmd` and it will usually work. So your existing `.Rmd` files don't break — you can keep using them, or migrate them at your own pace.
+1. Keep the original `.Rmd` file.
+2. Save a copy with a `.qmd` extension.
+3. Translate the YAML.
+4. Translate chunk options one chunk at a time.
+5. Render from a clean session and compare the output with the original.
+6. Commit or archive the change only after the result has been reviewed.
+
+## Hands-on — convert your safe learner report
+
+Do not edit a lesson page or the root project configuration.
+
+1. Open `student_work/morning_report.Rmd`.
+2. Click **Knit** and confirm the R Markdown version works.
+3. Save a copy as `student_work/bridge_converted.qmd`.
+4. Change `output:` to `format:` and translate the HTML options.
+5. Convert the setup and data-preview chunk options to `#|` lines.
+6. Click **Render**.
+7. Compare your file with `student_work/checkpoints/bridge_converted.qmd` only after you have tried the conversion.
+
+::: {.callout-important}
+## Success criterion
+Both the original `.Rmd` and your converted `.qmd` render, and you can point to the YAML and chunk-option changes that made the files different.
 :::
-
-## Migration strategies
-
-You don't have to convert everything at once. Three reasonable patterns:
-
-::: {.incremental}
-1. **New work in Quarto, leave old `.Rmd` files alone.** They keep rendering with R Markdown indefinitely.
-2. **Convert as you touch.** When you need to edit an old `.Rmd`, take the 10 minutes to convert it. Spread the cost over time.
-3. **Big-bang migration.** Convert a whole project at once. Worth it for actively-developed work; overkill for archived analyses.
-:::
-
-### A semi-automated conversion path
-
-Quarto can render most `.Rmd` files directly without changes. If you want to actually move to `.qmd`:
-
-1. Copy `your_file.Rmd` to `your_file.qmd`.
-2. In the YAML, change `output: html_document` to `format: html` (and other format names accordingly).
-3. Run `quarto render your_file.qmd`. Read any error messages.
-4. Address the errors — usually a few chunk options that need the `#|` conversion.
-
-There is no official "automatic converter" yet, but the manual process for one file takes 10–15 minutes once you've done it a couple of times.
-
-## When you would *not* move to Quarto
-
-A short and honest list:
-
-- **You have a large `.Rmd` codebase and no immediate need to change.** R Markdown is in maintenance, not deprecated. It will keep working.
-- **You depend on an R Markdown extension that doesn't have a Quarto equivalent.** This is rare but happens — check the specific package's documentation.
-- **You only ever produce one output format and the YAML simplicity matters more than the features.** Niche case.
-
-For most new scientific work in 2026, Quarto is the right default.
-
-## Exercise 2.1 — Convert your morning file
-
-Take the `.Rmd` file you built this morning and:
-
-1. Save a copy as `your_filename.qmd`.
-2. Change `output: html_document` to `format: html` (preserving any sub-options you had, converting underscores to hyphens).
-3. Convert the chunk options in **one** chunk to the `#|` format.
-4. Run `quarto render your_filename.qmd` from the terminal, or click **Render** in the editor.
-5. Address any errors.
-
-This is the most important exercise of the morning. Once you've done it once, the rest of the day is "you already know how to do this — here are more features."
 
 ## What's next
 
-We start the Quarto half of the day. Open [`../afternoon_quarto/01_first_document.qmd`](../afternoon_quarto/01_first_document.qmd) when your instructor signals.
+Return to the cumulative learner report at `student_work/my_report.qmd`, then open [`../afternoon_quarto/01_first_document.qmd`](../afternoon_quarto/01_first_document.qmd) when your instructor signals.

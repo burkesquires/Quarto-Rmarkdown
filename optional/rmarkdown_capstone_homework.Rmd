@@ -163,7 +163,7 @@ when the parent ## header has {.tabset}
 
 ### Histogram
 
-```{r pm25-histogram, fig.cap="**Figure 1.** Distribution of annual PM₂.₅ exposure (µg/m³)."}
+```{r pm25-histogram, fig.cap="Distribution of annual PM₂.₅ exposure (µg/m³)."}
 # YOUR HISTOGRAM CODE HERE
 # Hint: ggplot(study_data, aes(x = pm25_annual)) + geom_histogram(...)
 ```

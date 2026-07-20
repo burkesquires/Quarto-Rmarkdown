@@ -10,7 +10,7 @@ format:
 
 ::: {.callout-note}
 ## This module is optional
-Everything you need for citations is in [Quarto Module 4 — Equations, Cross-References, Citations](04_equations_crossrefs_citations.qmd). This bonus shows a community tool that removes the most tedious part of that workflow. Skip it if you're short on time — nothing later depends on it.
+Everything you need for citations is in [Quarto Module 4 — Equations, Cross-References, Citations](../afternoon_quarto/04_equations_crossrefs_citations.qmd). This bonus shows a community tool that removes the most tedious part of that workflow. Skip it if you're short on time — nothing later depends on it.
 :::
 
 ## The problem this solves
@@ -73,4 +73,4 @@ If there's appetite, these two layers would make a natural follow-up session on 
 
 ## Back to the main track
 
-Return to [Quarto Module 5 — Revealjs Presentations](05_revealjs_presentations.qmd), or back to [Quarto Module 4 — Equations, Cross-References, Citations](04_equations_crossrefs_citations.qmd) if you skipped here early.
+Return to [Quarto Module 5 — Revealjs Presentations](../afternoon_quarto/05_revealjs_presentations.qmd), or back to [Quarto Module 4 — Equations, Cross-References, Citations](../afternoon_quarto/04_equations_crossrefs_citations.qmd) if you skipped here early.
