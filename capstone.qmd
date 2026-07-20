@@ -33,7 +33,7 @@ Produce a short report (1–3 rendered pages) that includes:
 - [ ] An introductory paragraph (3–5 sentences) using markdown — at least one **bold** and one *italic*.
 - [ ] **One** captioned figure with a `fig-` label.
 - [ ] **One** captioned table with a `tbl-` label.
-- [ ] **One** inline code expression in prose (e.g., "The mean was `r mean(x)`.").
+- [ ] **One** inline code expression in prose (e.g., "The mean was `` `r mean(x)` ``.").
 - [ ] **One** cross-reference (`@fig-...` or `@tbl-...`) in prose.
 - [ ] A "Methods" section with at least one well-commented code chunk.
 :::
