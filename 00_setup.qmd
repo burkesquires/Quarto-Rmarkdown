@@ -55,7 +55,46 @@ mean(1:10)
 
 If you see "5.5" above this paragraph and the rendered HTML opens in the Viewer — you are ready.
 
-## Step 4 — Brief tour of the project
+## Step 4 — Confirm the R packages are installed
+
+The afternoon uses several R packages. In the workshop Posit Cloud project they are **pre-installed** — this chunk just confirms it. Run it (click the green ▶ on the chunk, or render this file):
+
+```{r}
+#| label: check-packages
+#| message: false
+
+needed <- c("tidyverse", "knitr", "kableExtra", "DT",
+            "broom", "patchwork", "plotly", "rmarkdown")
+
+installed <- needed %in% rownames(installed.packages())
+report <- data.frame(package = needed,
+                     installed = ifelse(installed, "yes", "MISSING"))
+print(report, row.names = FALSE)
+
+if (all(installed)) {
+  message("All packages present — you're ready.")
+} else {
+  missing <- needed[!installed]
+  message("Missing: ", paste(missing, collapse = ", "),
+          " — raise your hand.")
+}
+```
+
+If every row says `yes`, you're set. If anything says `MISSING`, raise your hand — your instructor can install it in a few seconds with `install.packages("name")`.
+
+::: {.callout-important}
+## Instructor note (delete before sharing with students)
+**Pre-install all eight packages into the Posit Cloud workspace template before the workshop**, so attendees never wait on `install.packages()` (it can take several minutes per package × 30 people = a stalled room). From the workspace's R console, once:
+
+```r
+install.packages(c("tidyverse", "knitr", "kableExtra", "DT",
+                   "broom", "patchwork", "plotly", "rmarkdown"))
+```
+
+Then save the project as the assignment/template so every student copy inherits the installed library. If you also plan to demo PDF output, add `tinytex::install_tinytex()` as well.
+:::
+
+## Step 5 — Brief tour of the project
 
 Look at the **Files** pane in the lower-right. You should see:
 

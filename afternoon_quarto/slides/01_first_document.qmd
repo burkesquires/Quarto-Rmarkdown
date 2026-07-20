@@ -132,12 +132,12 @@ margin: 16px 0;">
 ::: {.panel-tabset}
 
 ### R
-```{r}
+```{r}`r ''`
 ggplot(data, aes(x, y)) + geom_point()
 ```
 
 ### Python
-```{python}
+```{python}`r ''`
 sns.scatterplot(data=data, x="x", y="y")
 ```
 

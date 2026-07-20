@@ -136,10 +136,10 @@ Each bullet appears on click. The `::: {.incremental}` div is the magic.
 
 ### Slide with code that highlights
 
-```markdown
+````markdown
 ## Loading data
 
-```{r}
+```{r}`r ''`
 #| code-line-numbers: "1|2-3|4"
 
 library(dplyr)
@@ -147,7 +147,7 @@ aq <- read.csv("airquality.csv")
 aq <- na.omit(aq)
 summary(aq)
 ```
-```
+````
 
 The `code-line-numbers` option steps through the code one line at a time as you click. The string is a sequence of line ranges separated by `|`. Each step highlights a different set of lines.
 
@@ -224,13 +224,13 @@ In a slide deck, **a single chunk lives on a single slide**. If your code is too
 - Break it into multiple chunks across multiple slides, or
 - Add `scrollable: true` to that one slide:
 
-```markdown
+````markdown
 ## A long script {.scrollable}
 
-```{r}
+```{r}`r ''`
 # 50 lines of code...
 ```
-```
+````
 
 You will see `.scrollable` and `.smaller` used as per-slide modifiers attached to the heading. They are class names — Quarto picks them up and applies styles only to that slide.
 

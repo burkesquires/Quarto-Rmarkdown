@@ -166,12 +166,12 @@ In your file, write a paragraph wrapped in a `::: {.callout-tip}` callout. Rende
 
 R Markdown's tabsets work but are limited to wrapping content under a heading with `{.tabset}`. Quarto's `panel-tabset` is more flexible — it works with any level of heading and renders nicely in both HTML and Word.
 
-```markdown
+````markdown
 ::: {.panel-tabset}
 
 ## R
 
-```{r}
+```{r}`r ''`
 #| eval: false
 library(ggplot2)
 ggplot(biomarker_data, aes(pfoa_serum, cholesterol)) + geom_point()
@@ -179,7 +179,7 @@ ggplot(biomarker_data, aes(pfoa_serum, cholesterol)) + geom_point()
 
 ## Python
 
-```{python}
+```{python}`r ''`
 #| eval: false
 import seaborn as sns
 sns.scatterplot(data=biomarker_data, x="pfoa_serum", y="cholesterol")
@@ -194,7 +194,7 @@ RUN;
 ```
 
 :::
-```
+````
 
 The above renders as clickable R / Python / SAS tabs in HTML, and as sequential sections in Word/PDF.
 
@@ -208,7 +208,7 @@ Tabsets shine for side-by-side comparisons: the same analysis in two languages, 
 The bridge module covered this. As a reminder:
 
 ```` markdown
-```{r}
+```{r}`r ''`
 #| label: pfoa-scatter
 #| fig-cap: "PFOA vs total cholesterol, by sex."
 #| fig-width: 7
@@ -226,7 +226,7 @@ ggplot(biomarker_data, aes(pfoa_serum, cholesterol, color = sex)) +
 Compare to R Markdown:
 
 ```` markdown
-```{r pfoa-scatter, fig.cap="PFOA vs total cholesterol, by sex.", fig.width=7, fig.height=4, warning=FALSE, message=FALSE}
+```{r pfoa-scatter, fig.cap="PFOA vs total cholesterol, by sex.", fig.width=7, fig.height=4, warning=FALSE, message=FALSE}`r ''`
 library(ggplot2)
 ggplot(biomarker_data, aes(pfoa_serum, cholesterol, color = sex)) +
   geom_point(alpha = 0.6) +

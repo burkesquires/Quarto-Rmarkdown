@@ -11,7 +11,7 @@ format:
 
 ## Why this module exists
 
-You just spent 70 minutes learning R Markdown. The rest of the day is Quarto. Before we dive in, this 25-minute bridge makes one thing explicit:
+You just spent the morning learning R Markdown. The rest of the day is Quarto. Before we dive in, this 25-minute bridge makes one thing explicit:
 
 **Almost everything you just learned still works.** The conceptual model is the same. The mechanics change in three specific places, and we'll walk through each.
 
@@ -83,7 +83,7 @@ This is the change you will notice most.
 **R Markdown:**
 
 ```` markdown
-```{r myplot, fig.width=6, fig.height=4, echo=FALSE, message=FALSE}
+```{r myplot, fig.width=6, fig.height=4, echo=FALSE, message=FALSE}`r ''`
 library(ggplot2)
 ggplot(airquality, aes(Temp, Ozone)) + geom_point()
 ```
@@ -92,7 +92,7 @@ ggplot(airquality, aes(Temp, Ozone)) + geom_point()
 **Quarto:**
 
 ```` markdown
-```{r}
+```{r}`r ''`
 #| label: myplot
 #| fig-width: 6
 #| fig-height: 4
@@ -139,7 +139,7 @@ In R Markdown, if you want to reference a figure from prose ("see Figure 1"), yo
 In Quarto, cross-references are built in. Two requirements: a label with the right prefix, and a caption.
 
 ```` markdown
-```{r}
+```{r}`r ''`
 #| label: fig-ozone
 #| fig-cap: "Ozone vs temperature."
 

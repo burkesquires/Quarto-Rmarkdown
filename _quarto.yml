@@ -87,7 +87,7 @@ format:
     df-print: paged
 
 bibliography: references.bib
-csl: https://www.zotero.org/styles/nature
+csl: nature.csl
 
 execute:
   freeze: auto

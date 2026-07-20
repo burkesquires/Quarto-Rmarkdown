@@ -75,7 +75,7 @@ Top-level key, format names, underscores → hyphens.
 **R Markdown**
 
 ```` markdown
-```{r myplot, fig.width=6, echo=FALSE}
+```{r myplot, fig.width=6, echo=FALSE}`r ''`
 plot(1:10)
 ```
 ````
@@ -84,7 +84,7 @@ plot(1:10)
 **Quarto**
 
 ```` markdown
-```{r}
+```{r}`r ''`
 #| label: myplot
 #| fig-width: 6
 #| echo: false
@@ -110,7 +110,7 @@ plot(1:10)
 **In Quarto:** label with the right prefix, add a caption — done.
 
 ```` markdown
-```{r}
+```{r}`r ''`
 #| label: fig-ozone
 #| fig-cap: "Ozone vs temperature."
 
