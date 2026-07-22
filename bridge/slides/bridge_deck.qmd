@@ -6,7 +6,7 @@ institute: "NIEHS"
 date: today
 format:
   revealjs:
-    theme: [default, niehs-theme.scss]
+    theme: [default, ../../afternoon_quarto/slides/niehs-theme.scss]
     logo: ../images/niehs-logo.png
     footer: "Quarto Workshop · NIEHS · 2026"
     slide-number: true
@@ -29,7 +29,7 @@ The remaining 15% is mostly syntax — and it's the **same** syntax across every
 ::: {.incremental}
 - YAML header at the top
 - Pandoc markdown for prose
-- `` `r expr` `` inline code
+- `r knitr::inline_expr('expr')` inline code
 - `` ```{r} `` chunk fences
 - Same conceptual three-part anatomy
 - Render button does the same thing
@@ -75,7 +75,7 @@ Top-level key, format names, underscores → hyphens.
 **R Markdown**
 
 ```` markdown
-```{r myplot, fig.width=6, echo=FALSE}
+```{r myplot, fig.width=6, echo=FALSE}`r ''`
 plot(1:10)
 ```
 ````
@@ -84,7 +84,7 @@ plot(1:10)
 **Quarto**
 
 ```` markdown
-```{r}
+```{r}`r ''`
 #| label: myplot
 #| fig-width: 6
 #| echo: false
@@ -110,7 +110,7 @@ plot(1:10)
 **In Quarto:** label with the right prefix, add a caption — done.
 
 ```` markdown
-```{r}
+```{r}`r ''`
 #| label: fig-ozone
 #| fig-cap: "Ozone vs temperature."
 

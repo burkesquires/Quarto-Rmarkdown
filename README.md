@@ -45,8 +45,9 @@ rmarkdown_quarto_niehs/
 ├── 00_setup.qmd                               ← Posit Cloud verification
 ├── capstone.qmd                               ← End-of-day capstone exercise
 ├── next_steps.qmd                             ← Post-workshop local-install guide
-├── styles.css                                 ← Site CSS (NIEHS palette overlay)
+├── styles.scss                                ← Site theme layer (NIEHS palette overlay)
 ├── references.bib                             ← Sample bibliography
+├── nature.csl                                 ← Local citation style (avoids render-time network fetch)
 ├── rmarkdown_quarto_training.Rproj            ← Posit Cloud / RStudio project marker
 │
 ├── morning_rmarkdown/                         ← R Markdown training (Burke's existing materials)
@@ -184,7 +185,7 @@ If you want to deliver this workshop at another institution:
 
 1. **Search-and-replace `NIEHS`** across the project — most occurrences are in titles, footers, and prose framing.
 2. **Change the brand color** `#205C40` (NIEHS forest green) in:
-   - `styles.css`
+   - `styles.scss`
    - `afternoon_quarto/slides/niehs-theme.scss`
    - Inline references in slide decks
 3. **Replace `biomarker_data`** with a domain-appropriate dataset. The dataset definition appears in:

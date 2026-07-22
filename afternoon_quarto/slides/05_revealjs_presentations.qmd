@@ -88,7 +88,7 @@ Right.
 ## Step through code line by line
 
 ````
-```{r}
+```{r}`r ''`
 #| code-line-numbers: "1|2-3|4"
 library(dplyr)
 aq <- read.csv("airquality.csv")

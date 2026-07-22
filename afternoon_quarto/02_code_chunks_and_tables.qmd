@@ -252,7 +252,7 @@ Stack headers above related columns:
 
 ```{r}
 #| label: tbl-grouped-headers
-#| tbl-cap: "Biomarker concentrations grouped by serum vs ratio."
+#| tbl-cap: "Serum PFOA and PFOS concentrations by sex, with grouped column headers."
 
 biomarker_data |>
   group_by(sex) |>

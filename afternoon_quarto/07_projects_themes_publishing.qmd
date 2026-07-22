@@ -35,7 +35,7 @@ my-project/
 │   ├── ch01.qmd
 │   └── ch02.qmd
 ├── references.bib
-├── styles.css
+├── styles.scss
 └── _site/               ← Rendered output (auto-created)
 ```
 
@@ -101,15 +101,18 @@ Quarto adds a sun/moon toggle to the navbar. Readers pick.
 
 ### Custom CSS
 
-For specific tweaks beyond what themes offer:
+For specific tweaks beyond what themes offer, you have two options depending on *what* you're customizing.
+
+**Option A — a plain CSS file with the `css:` key.** Use this for ordinary style rules (colors, fonts, spacing) that layer on top of the theme:
 
 ```yaml
 format:
   html:
-    theme: [cosmo, styles.css]
+    theme: cosmo
+    css: custom.css
 ```
 
-Then in `styles.css`:
+Then in `custom.css`:
 
 ```css
 /* NIEHS forest green accent */
@@ -122,11 +125,6 @@ h1, h2, h3 {
   color: var(--niehs-green);
 }
 
-.callout-tip .callout-title {
-  background-color: rgba(32, 92, 64, 0.1);
-}
-
-/* Custom block-quote style */
 blockquote {
   border-left: 4px solid var(--niehs-green);
   padding-left: 1em;
@@ -134,7 +132,25 @@ blockquote {
 }
 ```
 
-This workshop's `styles.css` (in the project root) is exactly this pattern — Cosmo plus a minimal NIEHS overlay.
+**Option B — an SCSS file in the `theme:` list.** Use this when you want your rules compiled *as part of the Bootstrap theme* (which lets you override Bootstrap's own SCSS variables). A file in the `theme:` slot **must** be `.scss` and **must** contain at least one layer boundary:
+
+```yaml
+format:
+  html:
+    theme: [cosmo, styles.scss]
+```
+
+```scss
+/*-- scss:rules --*/
+h1, h2, h3 {
+  color: #205C40;
+}
+```
+
+::: {.callout-warning}
+## The gotcha that bites everyone
+If you put a plain `.css` file in the **`theme:`** list, Quarto tries to read it as SCSS and errors with *"doesn't contain at least one layer boundary."* Either move it to the `css:` key (Option A) or add a `/*-- scss:rules --*/` line and rename it `.scss` (Option B). This workshop's own site uses Option B — see `styles.scss` in the project root.
+:::
 
 ### SCSS for advanced theming
 

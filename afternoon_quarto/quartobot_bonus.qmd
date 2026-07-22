@@ -1,6 +1,6 @@
 ---
 title: "Quartobot Bonus — Identifier-Based Citations with quartobot"
-subtitle: "Write @doi:… directly, skip the BibTeX bookkeeping"
+subtitle: "Write identifiers like doi: directly, skip the BibTeX bookkeeping"
 author: "R. Burke Squires"
 date: today
 format:

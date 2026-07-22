@@ -236,11 +236,11 @@ ggplot(biomarker_data, aes(x = age, y = cholesterol)) +
 
 Sometimes you want two plots side by side in your prose without bundling them into a single ggplot object. Quarto's column layout makes this easy:
 
-```markdown
+````markdown
 :::: {.columns}
 
 ::: {.column width="50%"}
-```{r}
+```{r}`r ''`
 #| label: fig-left
 #| fig-cap: "PFOA distribution."
 
@@ -249,7 +249,7 @@ Sometimes you want two plots side by side in your prose without bundling them in
 :::
 
 ::: {.column width="50%"}
-```{r}
+```{r}`r ''`
 #| label: fig-right
 #| fig-cap: "PFOS distribution."
 
@@ -258,7 +258,7 @@ Sometimes you want two plots side by side in your prose without bundling them in
 :::
 
 ::::
-```
+````
 
 This is **Quarto-only** — R Markdown doesn't support this layout syntax natively. Each plot remains its own labeled, captioned figure, but the layout shows them side by side.
 

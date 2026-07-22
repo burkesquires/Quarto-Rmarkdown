@@ -381,7 +381,7 @@ Quarto Module 7 covers the format-specific deep dive (themes, CSS, conditional o
 
 ### Exercise 4.1 — Equation with cross-reference
 
-Add the hazard quotient equation to your file with the label `{#eq-hq}`. In a paragraph above it, reference it: "We assess risk using the hazard quotient (@eq-hq)..."
+Add the hazard quotient equation to your file with the label `{#eq-hq}`. In a paragraph above it, reference it: "We assess risk using the hazard quotient `(@eq-hq)`..."
 
 Render and confirm the cross-reference is clickable.
 

@@ -76,7 +76,7 @@ website:
 format:
   html:
     theme:
-      light: [cosmo, styles.css]
+      light: [cosmo, styles.scss]
     toc: true
     toc-depth: 3
     code-copy: true
@@ -87,7 +87,7 @@ format:
     df-print: paged
 
 bibliography: references.bib
-csl: https://www.zotero.org/styles/nature
+csl: nature.csl
 
 execute:
   freeze: auto

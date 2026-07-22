@@ -1,0 +1,51 @@
+/*-- scss:rules --*/
+
+/* NIEHS Quarto Training — minimal theme overrides */
+
+:root {
+  --niehs-green: #205C40;
+  --niehs-green-light: #4A8568;
+  --niehs-sand: #F4F1EC;
+  --niehs-accent: #C77D34;
+}
+
+.navbar-brand-container .navbar-title {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+h1, h2, h3 {
+  color: var(--niehs-green);
+}
+
+h2 {
+  border-bottom: 2px solid var(--niehs-green-light);
+  padding-bottom: 0.2em;
+  margin-top: 1.6em;
+}
+
+a {
+  color: var(--niehs-green);
+}
+
+a:hover {
+  color: var(--niehs-accent);
+}
+
+.callout.callout-style-default .callout-title {
+  font-weight: 600;
+}
+
+code:not(.sourceCode) {
+  background-color: #F0EFEA;
+  color: #B2511A;
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+}
+
+.sidebar nav[role="doc-toc"] ul > li > a.active,
+.sidebar nav[role="doc-toc"] ul > li > ul > li > a.active {
+  border-left-color: var(--niehs-green);
+  color: var(--niehs-green);
+  font-weight: 600;
+}

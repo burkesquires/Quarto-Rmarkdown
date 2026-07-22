@@ -137,13 +137,13 @@ tidy(model, conf.int = TRUE) |>
 ::: {.panel-tabset}
 
 ### R
-```{r}
+```{r}`r ''`
 ggplot(biomarker_data, aes(pfoa_serum, cholesterol)) +
   geom_point()
 ```
 
 ### Python
-```{python}
+```{python}`r ''`
 sns.scatterplot(data=r.biomarker_data, x="pfoa_serum", y="cholesterol")
 ```
 
