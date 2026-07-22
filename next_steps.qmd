@@ -1,6 +1,6 @@
 ---
 title: "Next Steps — Continuing on Your Own"
-subtitle: "What to do Monday morning after the workshop"
+subtitle: "Save your work, choose an approved environment, and apply one skill"
 author: "R. Burke Squires"
 date: today
 format:
@@ -9,204 +9,119 @@ format:
     toc-depth: 3
 ---
 
-## The plan
+## Before you leave today
 
-You spent the day on Posit Cloud. By Monday morning, you'll want to:
+Export the folder that contains your work:
 
-1. **Save your workshop project** so you don't lose what you built.
-2. **Install Quarto locally** on your work laptop so you can apply this to your real projects.
-3. **Apply it to something real** — a paper draft, a quarterly report, a methods writeup.
-
-This notebook walks through each one. Allow 60–90 minutes for the local install if you're starting from zero.
-
-::: {.callout-tip}
-## You don't have to go local right away
-Posit Cloud's free tier has a monthly compute-hour cap, but for occasional report-writing it may be enough. Many people stay on Posit Cloud indefinitely. The argument for going local is: faster iteration, no compute cap, your files are on your own machine.
-:::
-
-## Step 1 — Download your workshop project from Posit Cloud
-
-Two ways:
-
-### Option A — Export the whole project (recommended)
-
-1. In Posit Cloud, open your workshop project.
-2. In the **Files** pane (lower right), click **More → Export**.
-3. Posit Cloud will create a `.zip` of the project and prompt you to download it.
-4. Save the zip somewhere you'll find again (Desktop, OneDrive, G:).
-
-This gets you a complete copy: every `.qmd` you wrote, your `_quarto.yml`, references, rendered HTML.
-
-### Option B — Pull individual files
-
-If you only want specific files (the capstone, your converted `.qmd`, your notes):
-
-1. In the Files pane, check the box next to the files you want.
-2. **More → Export**.
-3. Posit Cloud zips just those files.
-
-### Option C — Push to GitHub (advanced, but worth it)
-
-If you have a GitHub account and want long-term version control:
-
-1. In Posit Cloud terminal: `git init && git add . && git commit -m "Workshop materials"`
-2. Create a new (private) repo on GitHub.
-3. Follow GitHub's instructions for pushing an existing repo.
-4. Now your work is in two places, both safe.
-
-## Step 2 — Install Quarto on your laptop
-
-### Mac
-
-You have two options:
-
-**Direct installer (recommended for most users):**
-
-1. Go to <https://quarto.org/docs/download/>.
-2. Download the macOS `.pkg` installer.
-3. Double-click and follow the prompts.
-4. Open Terminal and run `quarto --version` — you should see `1.9.x` or later.
-
-**Homebrew (if you use it):**
-
-```bash
-brew install --cask quarto
+```text
+student_work/
 ```
 
-### Windows
+In Posit Cloud, use the **Files** pane, select `student_work`, then choose **More → Export**. Keep the ZIP in an institutionally approved location.
 
-1. Go to <https://quarto.org/docs/download/>.
-2. Download the Windows `.exe` installer.
-3. Run it. Accept defaults — **leave "Add to PATH" checked**.
-4. Open a **new** PowerShell window (existing ones won't see the updated PATH).
-5. Run `quarto --version` — you should see `1.9.x` or later.
-
-::: {.callout-warning}
-## Antivirus / institutional laptops
-On federal-government laptops, the installer sometimes triggers antivirus. If it fails:
-
-- Check your antivirus quarantine and restore the Quarto files.
-- Contact IT for an exception — Quarto is open source, MIT-licensed, from Posit (a known vendor).
-- If IT won't approve and you're stuck, you can keep using Posit Cloud or switch to a personal laptop for Quarto work.
+::: {.callout-important}
+## Protect agency and research data
+Do not move controlled, sensitive, personally identifiable, protected health, unpublished, or otherwise restricted data to a personal device, public repository, or unapproved cloud service. A repository being marked “private” does not by itself make it authorized for agency data.
 :::
 
-### Verify
+## Choose where you will work next
 
-In any terminal:
+### Continue in an approved cloud workspace
+
+A managed browser-based workspace can be the easiest option when software installation is restricted. Confirm account, storage, data-handling, and cost requirements with your organization rather than relying on workshop-era pricing or plan details.
+
+### Install locally through approved channels
+
+Follow your organization’s software-approval process. Do not restore quarantined files, disable endpoint protection, or bypass an installation block.
+
+For an approved local setup:
+
+1. Install R from <https://cran.r-project.org/> if you will execute R code.
+2. Install an approved IDE such as RStudio Desktop or Positron.
+3. Install Quarto from <https://quarto.org/docs/download/>.
+4. Open a new terminal and run:
 
 ```bash
 quarto --version
-quarto check
-```
-
-`quarto check` lists which engines (R, Python) it can find. Some red ✗ is fine; we'll fix in the next step.
-
-## Step 3 — Install an IDE
-
-You used RStudio on Posit Cloud. The easiest path for parity is to install RStudio locally too.
-
-1. Go to <https://posit.co/download/rstudio-desktop/>.
-2. Download the installer for your OS.
-3. Run it; accept defaults.
-4. Launch RStudio. RStudio auto-detects Quarto.
-
-Two alternatives, if you want them:
-
-- **VS Code + Quarto extension** — better if you do a lot of Python or general programming. Install VS Code from <https://code.visualstudio.com/>, then in the Extensions panel search "Quarto" and install the official extension.
-- **Positron** — Posit's newer cross-language IDE. Worth trying if you do both R and Python heavily. <https://positron.posit.co/>
-
-## Step 4 — Install R and packages (if using R)
-
-1. Go to <https://cran.r-project.org/> and download R for your OS. Install with defaults.
-2. Open RStudio (or any R console) and run:
-
-```{r}
-#| eval: false
-
-install.packages(c(
-  "tidyverse",
-  "knitr",
-  "kableExtra",
-  "DT",
-  "palmerpenguins",
-  "rmarkdown"     # required by Quarto's knitr engine
-))
-```
-
-Takes 5–10 minutes.
-
-Then verify Quarto sees R:
-
-```bash
 quarto check knitr
 ```
 
-## Step 5 — Install Python (if using Python)
+5. In R, install the packages needed by your own report. Start small:
 
-The cleanest path for most people:
-
-1. Go to <https://www.python.org/downloads/> and download Python 3.12 or later.
-2. Install with defaults. On Windows, **check "Add Python to PATH"** during install.
-3. Install Jupyter and the packages:
-
-```bash
-python3 -m pip install --user jupyter matplotlib pandas seaborn statsmodels
+```r
+install.packages(c("rmarkdown", "knitr", "dplyr", "ggplot2"))
 ```
 
-(On Windows, `python` instead of `python3` may work.)
+Add specialized packages only when a project requires them.
 
-Then verify Quarto sees Python:
+### Python is optional
 
-```bash
-quarto check jupyter
+You do not need Python to use Quarto with R. A document containing both executable R and Python chunks also needs a working Python environment and the R package `reticulate`. Treat that as a separate setup task rather than a prerequisite for your first report.
+
+## Open the workshop report locally
+
+1. Unzip the exported `student_work` folder.
+2. Open the folder as a project in your IDE.
+3. Open `my_report.qmd`.
+4. Restart R.
+5. Render without running chunks manually first.
+
+If it fails, read the first error. A missing package or incorrect relative file path is more likely than a Quarto installation problem.
+
+## Share output safely
+
+### Share a complete website
+
+A Quarto website is normally a collection of HTML, CSS, JavaScript, images, and other resources. Share or deploy the complete output directory, such as `_site/`, to an approved web server or platform.
+
+### Share one standalone HTML report
+
+For an individual report that must travel as one HTML file, use:
+
+```yaml
+format:
+  html:
+    embed-resources: true
 ```
 
-::: {.callout-warning}
-## The "which Python?" trap
-The most common Quarto-with-Python problem is having multiple Python installs (system, Anaconda, Homebrew) and Quarto picking the wrong one. If `quarto check jupyter` reports a Python that isn't the one you installed packages into, install Jupyter explicitly into the Python Quarto sees: `<that-python> -m pip install jupyter`.
-:::
+For a document with MathJax content that must also work offline, add:
 
-## Step 6 — Open your workshop project locally
+```yaml
+    self-contained-math: true
+```
 
-1. Unzip the project you exported from Posit Cloud.
-2. Open RStudio.
-3. **File → Open Project in New Session** → browse to the unzipped folder, open the `.Rproj` file (or just open any `.qmd` file from the folder).
-4. Render any of your files — `afternoon_quarto/01_first_document.qmd` is a good test. It should look exactly like it did on Posit Cloud.
+### Choose an approved publishing target
 
-If something doesn't render, the gap is almost always a missing package. Re-run the install chunk from Step 4 (R) or Step 5 (Python).
+- Quarto Pub and ordinary GitHub Pages are appropriate only for content approved for public release.
+- An organizational platform such as Posit Connect or an approved intranet may support authenticated internal sharing.
+- “Private” external hosting is not automatically compliant with agency policy.
 
-## Step 7 — Apply it to something real
+Check with your data owner, information-system owner, records requirements, and security team before publishing real work.
 
-Now the actual point of the workshop. Pick something:
+## Apply one skill to one real project
 
-::: {.incremental}
-- A quarterly report you'd normally do in Word — rewrite it as a `.qmd` so the figures and tables regenerate from data.
-- A methods writeup that needs to live next to a code analysis — embed the code with `eval: false`, or run it inline.
-- An existing R Markdown file you maintain — try the migration path from the bridge module.
-- A talk you're giving in the next month — try drafting it as `revealjs` and see how it feels.
-:::
+Choose one manageable next step:
 
-Pick one. Don't pick four — pick one. The point is to put the workflow into your hands, not to overhaul your whole writing setup in a week.
+- Convert a recurring report whose tables and figures are currently copied into Word.
+- Add one inline value and one automatically generated table to an existing `.Rmd` file.
+- Create a new `.qmd` methods note that lives beside the analysis code.
+- Draft a short presentation in Revealjs after the report itself is stable.
 
-## Where to go for help
+Do not attempt to convert every workflow at once. The goal is one useful, repeatable success.
 
-::: {.incremental}
-- **Quarto docs:** <https://quarto.org/docs/> — search-first, the docs are thorough.
-- **R for Data Science (2e), Quarto chapters:** <https://r4ds.hadley.nz/quarto.html> — Hadley Wickham and Mine Çetinkaya-Rundel's introduction.
-- **Posit Community forum:** <https://community.rstudio.com/> — the official place to ask.
-- **Stack Overflow** — tag `quarto`.
-- **The instructor** — email any time. Genuinely.
-:::
+## A 30-minute follow-up session
 
-## A reasonable Monday morning
+1. **0–5 minutes:** open your exported `student_work` project.
+2. **5–10 minutes:** restart R and render `my_report.qmd`.
+3. **10–20 minutes:** replace one section with material from a real, approved project.
+4. **20–25 minutes:** render again and inspect the output.
+5. **25–30 minutes:** save the source, data provenance, and next action.
 
-If you want a concrete plan for the first 30 minutes back at your desk:
+## Help resources
 
-1. **Minute 0–10:** Install Quarto on your laptop (Step 2 above).
-2. **Minute 10–20:** Install RStudio (Step 3).
-3. **Minute 20–25:** Run `quarto check`, install the R packages you need (Step 4).
-4. **Minute 25–30:** Open your workshop project and render `afternoon_quarto/01_first_document.qmd`. Confirm it looks right.
+- Quarto documentation: <https://quarto.org/docs/>
+- Quarto FAQ for R Markdown users: <https://quarto.org/docs/faq/rmarkdown.html>
+- R for Data Science, Quarto chapter: <https://r4ds.hadley.nz/quarto.html>
+- Posit Community: <https://forum.posit.co/>
 
-That's the foundation. Everything else — applying it to your actual work — happens over the following weeks.
-
-Good luck.
+Keep the source file, data, and output together. Reproducibility is a project habit, not merely a document format.

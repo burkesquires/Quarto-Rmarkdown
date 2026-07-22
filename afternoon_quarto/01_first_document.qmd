@@ -17,7 +17,7 @@ You spent the morning learning R Markdown and the bridge module covered the thre
 2. Chunk options move from `{r ...}` to `#|` lines
 3. File extension is `.qmd`
 
-This 30-minute module is your first **standalone Quarto document** — you'll write a `.qmd` from scratch, set up the YAML the Quarto way, and meet the features that **only exist in Quarto** (callouts, panel tabsets, multi-format YAML in one place).
+This 35-minute module turns the learner file you already rendered into a useful Quarto report. Keep `student_work/my_report.qmd` open and add features to that same file rather than creating another document. You will meet Quarto-specific features such as callouts, panel tabsets, and multi-format YAML.
 
 ## The Quarto authoring workflow on Posit Cloud
 
@@ -45,7 +45,7 @@ But you'll usually want more. Here's a realistic scientific report header:
 ```yaml
 ---
 title: "Serum PFOA and Cholesterol in the Triangle Region"
-subtitle: "Biomonitoring Analysis, 2024"
+subtitle: "Biomonitoring Analysis, 2026"
 author:
   - name: Jane Smith
     affiliation: NIEHS Biostatistics Branch
@@ -53,9 +53,8 @@ author:
     affiliation: NIEHS Epidemiology Branch
 date: today
 abstract: |
-  We characterize the association between serum PFOA
-  concentration and total cholesterol in 200 participants
-  across three Triangle-region sites.
+  We summarize generated serum PFOA and cholesterol values
+  in 200 synthetic records across three Triangle-region sites.
 format:
   html:
     toc: true
@@ -64,9 +63,6 @@ format:
     fig-width: 7
     fig-align: center
   docx: default
-  pdf:
-    documentclass: article
-    geometry: margin=1in
 ---
 ```
 
@@ -74,17 +70,17 @@ A few things to notice:
 
 ::: {.incremental}
 - **Multi-author YAML** uses a list, with each author getting `name:` and `affiliation:` keys.
-- **`date: today`** is a Quarto convenience — no need for `` `r Sys.Date()` `` inline code.
+- **`date: today`** is a Quarto convenience — no need for `` `r knitr::inline_expr('Sys.Date()')` `` inline code.
 - **Abstract** uses YAML's `|` block-scalar so you can write multi-line prose.
-- **Multiple formats** stack under `format:` — you can render to HTML, Word, *and* PDF from one source. We'll cover this in Quarto Module 4.
+- **Multiple formats** stack under `format:` — the example offers HTML and Word from one source. PDF is optional reference material because it requires an additional typesetting toolchain.
 :::
 
 ### Exercise 1.1 — Build a YAML
 
-In a new `.qmd` file, write a YAML header with:
+In `student_work/my_report.qmd`, edit the YAML header so it has:
 
 1. A `title` and `subtitle`.
-2. Your name as `author` (with affiliation).
+2. Your name as `author`.
 3. `date: today`.
 4. `format: html` with `toc: true` and `code-fold: true`.
 
@@ -92,7 +88,7 @@ Render. Confirm you see a table of contents and a "Code" button that hides/shows
 
 ## Callout blocks — the first Quarto-only feature
 
-R Markdown has no native callout boxes. To create the styled "Tip" and "Warning" boxes you saw in Module 05 of the morning, the existing materials use inline HTML and CSS — workable, but ugly in source.
+Standard R Markdown HTML documents do not provide Quarto-style callouts as a built-in authoring feature. Similar boxes can be created with HTML/CSS or extensions, but Quarto makes the source concise and portable.
 
 Quarto has native callouts. Five types:
 
@@ -158,9 +154,9 @@ left border remains.
 :::
 ```
 
-### Exercise 1.2 — Replace a `<div>` callout
+### Exercise 1.2 — Customize a callout
 
-In your file, write a paragraph wrapped in a `::: {.callout-tip}` callout. Render. Compare what you see to the inline HTML/CSS callout in `morning_rmarkdown/05_scientific_writing.Rmd` (if you have time to look at it).
+In `student_work/my_report.qmd`, customize the existing synthetic-data callout: add or revise its heading and add one sentence that explains why the warning matters. As a stretch goal, add a short `callout-tip`. Render and confirm the source remains readable.
 
 ## Panel tabsets — Quarto's tabbed sections
 
@@ -238,35 +234,30 @@ Same effect; cleaner source. Quarto Module 2 (next) goes deeper on chunks.
 
 ## The dataset for the rest of the day
 
-The afternoon uses a simulated NIEHS biomonitoring dataset — `biomarker_data` — with PFOA, cholesterol, age, sex, and site information. It's the same dataset used in your existing R Markdown training (Module 04). Define it once in your file's setup chunk:
+The workshop uses one fixed synthetic dataset with PFOA, PFOS, cholesterol, age, sex, site, and BMI. In the course lesson, the data are one directory above; the learner report already reads its local copy.
 
 ```{r}
 #| label: define-biomarker-data
 #| include: false
 
-set.seed(42)
-n <- 200
-biomarker_data <- data.frame(
-  participant_id = 1:n,
-  age = round(rnorm(n, 48, 14)),
-  sex = sample(c("Female", "Male"), n, replace = TRUE, prob = c(0.55, 0.45)),
-  pfoa_serum = round(rlnorm(n, meanlog = 0.8, sdlog = 0.9), 2),
-  cholesterol = round(rnorm(n, 210, 38)),
-  site = sample(c("Research Triangle Park", "Durham", "Chapel Hill"),
-                n, replace = TRUE)
-)
+biomarker_data <- read.csv("../data/workshop_biomarkers.csv")
 ```
 
-The chunk option `include: false` runs the code but hides both the code and its output. Use this pattern for setup chunks throughout your Quarto documents.
+The chunk option `include: false` runs the code but hides both the code and its output. In `student_work/my_report.qmd`, the equivalent path is `data/workshop_biomarkers.csv`.
 
-## What we've covered in 30 minutes
+::: {.callout-warning}
+## Synthetic teaching data
+The records contain no participant data. The generated relationships exist only to make teaching examples visible and must not be interpreted as evidence about PFAS exposure or health outcomes.
+:::
+
+## What we have covered
 
 ::: {.incremental}
 - The Quarto authoring workflow (Render replaces Knit)
 - Expanded YAML structure (multi-author, abstract, multi-format)
 - **Callouts** — Quarto-native, no HTML/CSS hacks
 - **Panel tabsets** — flexible, work in multiple output formats
-- The biomarker dataset we'll use for the rest of the afternoon
+- The single synthetic dataset used throughout the workshop
 :::
 
 What we **didn't** cover (because the morning + bridge covered it):
@@ -278,6 +269,6 @@ What we **didn't** cover (because the morning + bridge covered it):
 
 ## What's next
 
-Quarto Module 2 covers code chunks in depth, including the deep dive on **tables** that your morning training had ear-marked for Module 03 — `kable`, `kableExtra`, `DT`, and `broom` for clean model output.
+Quarto Module 2 builds the required `knitr::kable()` table in your cumulative report. `kableExtra`, `DT`, and `broom` are demonstrations or bonus material after the core table works.
 
 Open [`02_code_chunks_and_tables.qmd`](02_code_chunks_and_tables.qmd).

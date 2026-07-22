@@ -11,10 +11,9 @@ format:
 
 ## Goals for this 60-minute block
 
-- Use the full range of chunk options confidently in `.qmd` files.
-- Author publication-quality tables with `kable`, `kableExtra`, and `DT`.
-- Display model output cleanly using `broom`.
-- Mix R and Python in the same document (via tabsets) where it helps.
+**Everyone does:** add one captioned `knitr::kable()` table to `student_work/my_report.qmd` and render it successfully.
+
+**Instructor demonstrations/bonus:** `kableExtra`, `DT`, `broom`, caching, and mixed R/Python. These are useful options, not completion requirements.
 
 ## Setup
 
@@ -24,38 +23,26 @@ format:
 #| warning: false
 #| include: false
 
-library(tidyverse)
+library(dplyr)
+library(ggplot2)
 library(knitr)
-library(kableExtra)
-library(DT)
-library(broom)
 
-# Define the canonical workshop dataset — same as morning Module 4 will use
-set.seed(42)
-n <- 200
-biomarker_data <- data.frame(
-  participant_id = 1:n,
-  age = round(rnorm(n, 48, 14)),
-  sex = sample(c("Female", "Male"), n, replace = TRUE, prob = c(0.55, 0.45)),
-  pfoa_serum = round(rlnorm(n, meanlog = 0.8, sdlog = 0.9), 2),
-  pfos_serum = round(rlnorm(n, meanlog = 1.1, sdlog = 0.7), 2),
-  bmi = round(rnorm(n, 27, 4.5), 1),
-  cholesterol = round(rnorm(n, 210, 38)),
-  site = sample(c("Research Triangle Park", "Durham", "Chapel Hill"),
-                n, replace = TRUE)
-)
+# Read the fixed synthetic workshop dataset
+biomarker_data <- read.csv("../data/workshop_biomarkers.csv")
 ```
 
-We use the simulated `biomarker_data` throughout the afternoon. Same dataset, multiple analyses.
+We use the same fixed synthetic dataset throughout the afternoon. It contains no participant data; generated relationships are teaching devices, not scientific evidence.
 
 ## The two execution engines
 
 Quarto picks an engine automatically based on what languages your document uses:
 
-| Engine | When it's used | Cache location |
-|--------|----------------|----------------|
-| `knitr` | `{r}` chunks (and mixed R+Python via reticulate) | `_freeze/` directory |
-| `jupyter` | `{python}`, `{julia}`, `{ojs}` chunks alone | `.ipynb` companion files |
+| Engine | When it is used | Caching when enabled |
+|---|---|---|
+| `knitr` | `{r}` chunks; mixed R+Python uses `reticulate` | knitr cache |
+| `jupyter` | Python, Julia, or other Jupyter-language documents | Jupyter cache |
+
+Project `freeze` is a separate feature. It stores completed document execution results in a project `_freeze/` directory for reuse during project renders.
 
 You almost never need to choose. If you want to force one:
 
@@ -64,8 +51,8 @@ engine: knitr   # or: jupyter
 ```
 
 ::: {.callout-note}
-## Mixed R + Python
-A document with both `{r}` and `{python}` chunks uses **knitr** with **reticulate** under the hood. R variables become accessible in Python via `r.<name>` and vice versa. Powerful, but use sparingly — it confuses readers.
+## Mixed R + Python is a demonstration
+A document with executable `{r}` and `{python}` chunks uses **knitr** with the R package **reticulate**. That requires a configured Python environment in addition to R. We show the idea, but it is not required for the learner report.
 :::
 
 ## R and Python side-by-side
@@ -79,6 +66,7 @@ The afternoon's worth of examples are in R, but the syntax for Python is just as
 ```{r}
 #| label: fig-pfoa-r
 #| fig-cap: "Serum PFOA by site — R version."
+#| fig-alt: "Boxplots of simulated serum PFOA concentration by monitoring site on a logarithmic vertical axis."
 #| message: false
 
 biomarker_data |>
@@ -93,10 +81,8 @@ biomarker_data |>
 
 ### Python
 
-```{python}
-#| label: fig-pfoa-py
-#| fig-cap: "Serum PFOA by site — Python version."
-#| eval: false
+```{{python}}
+# This is displayed, not executed during the workshop.
 
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -114,7 +100,7 @@ plt.show()
 
 :::
 
-The `::: {.panel-tabset}` block renders as clickable tabs in HTML, sequential sections in Word/PDF. Excellent for mixed-language teams or when you want to show "the same thing, two ways."
+The `::: {.panel-tabset}` block renders as clickable tabs in HTML and as sequential content in non-HTML formats. The Python block above is deliberately displayed without execution so the lesson does not depend on a Python environment.
 
 ## Figures: captions, cross-references, sizes
 
@@ -122,7 +108,8 @@ You met `fig-cap` in the bridge module. A captioned figure with the right label 
 
 ```{r}
 #| label: fig-pfoa-chol
-#| fig-cap: "PFOA serum concentration vs total cholesterol, with linear fit."
+#| fig-cap: "PFOA serum concentration and total cholesterol in the synthetic workshop data."
+#| fig-alt: "Scatterplot of serum PFOA on a logarithmic horizontal axis and total cholesterol on the vertical axis, with an upward-sloping fitted line."
 #| fig-width: 6
 #| fig-height: 4
 #| warning: false
@@ -138,7 +125,7 @@ ggplot(biomarker_data, aes(x = pfoa_serum, y = cholesterol)) +
 
 From prose, refer to it as `@fig-pfoa-chol` → renders as "Figure 1" with a clickable link:
 
-> The relationship is roughly linear after log-transformation (@fig-pfoa-chol).
+> The generated teaching data show a modest positive pattern after log-transformation (@fig-pfoa-chol). This is not evidence about real participants.
 
 ::: {.callout-warning}
 ## Label prefixes matter
@@ -147,7 +134,7 @@ For cross-references to work, labels must start with the right prefix: `fig-` fo
 
 # Tables
 
-This is the biggest section of the module — the tables content migrated from your morning training's Module 03. Everything below works identically in `.Rmd` files, but the chunk-option syntax (`#|` lines) is the Quarto way.
+The required path uses plain `knitr::kable()`. The remaining methods illustrate choices you can revisit after the workshop; they are not dependencies for the learner report.
 
 ## Why default R output isn't enough
 
@@ -177,20 +164,20 @@ biomarker_data |>
     `Mean PFOS (ng/mL)` = round(mean(pfos_serum), 2),
     `Mean Cholesterol (mg/dL)` = round(mean(cholesterol), 1)
   ) |>
-  kable(align = c("l", "r", "r", "r", "r"),
-        caption = "Table 1. Mean biomarker concentrations by monitoring site.")
+  kable(align = c("l", "r", "r", "r", "r"))
 ```
 
-The `caption` argument shows the table caption. The `align` argument controls per-column alignment ("l" = left, "r" = right, "c" = center). The `digits` argument (not shown here) sets default decimal places for all numeric columns.
+The `tbl-cap` chunk option supplies the numbered table caption. The `align` argument controls per-column alignment ("l" = left, "r" = right, "c" = center). The `digits` argument (not shown here) sets default decimal places for all numeric columns.
 
 ## Method 2 — `kableExtra` for publication quality
 
-The `kableExtra` package extends `kable()` with bootstrap styling, conditional formatting, grouped headers, footnotes, and more. It's at its best in HTML output.
+The `kableExtra` package extends `kable()` with format-specific styling. The following code is displayed but not executed in the core course build, so the website does not depend on the package.
 
 ### Styled tables
 
 ```{r}
 #| label: tbl-kableextra-styled
+#| eval: false
 #| tbl-cap: "Same data, styled with kableExtra."
 
 biomarker_data |>
@@ -201,8 +188,7 @@ biomarker_data |>
     `Mean PFOS (ng/mL)` = round(mean(pfos_serum), 2),
     `Mean Cholesterol (mg/dL)` = round(mean(cholesterol), 1)
   ) |>
-  kable(align = c("l", "r", "r", "r", "r"),
-        caption = "Mean biomarker concentrations by monitoring site.") |>
+  kable(align = c("l", "r", "r", "r", "r")) |>
   kable_styling(
     bootstrap_options = c("striped", "hover", "condensed"),
     full_width = FALSE,
@@ -225,6 +211,7 @@ Highlight rows that meet a threshold:
 
 ```{r}
 #| label: tbl-conditional
+#| eval: false
 #| tbl-cap: "Sites with elevated PFOA shown in red."
 #| warning: false
 
@@ -237,8 +224,7 @@ site_summary <- biomarker_data |>
   )
 
 site_summary |>
-  kable(col.names = c("Site", "N", "Mean PFOA", "Max PFOA"),
-        caption = "PFOA summary with conditional highlighting.") |>
+  kable(col.names = c("Site", "N", "Mean PFOA", "Max PFOA")) |>
   kable_styling(bootstrap_options = c("striped", "hover"),
                 full_width = FALSE) |>
   row_spec(which(site_summary$max_pfoa > 15),
@@ -252,6 +238,7 @@ Stack headers above related columns:
 
 ```{r}
 #| label: tbl-grouped-headers
+#| eval: false
 #| tbl-cap: "Serum PFOA and PFOS concentrations by sex, with grouped column headers."
 
 biomarker_data |>
@@ -263,8 +250,7 @@ biomarker_data |>
     pfos_mean = round(mean(pfos_serum), 2),
     pfos_sd = round(sd(pfos_serum), 2)
   ) |>
-  kable(col.names = c("Sex", "N", "Mean", "SD", "Mean", "SD"),
-        caption = "Serum PFAS concentrations by sex.") |>
+  kable(col.names = c("Sex", "N", "Mean", "SD", "Mean", "SD")) |>
   kable_styling(bootstrap_options = c("striped", "hover"),
                 full_width = FALSE) |>
   add_header_above(c(" " = 2, "PFOA (ng/mL)" = 2, "PFOS (ng/mL)" = 2))
@@ -274,10 +260,11 @@ The `add_header_above()` function takes a named vector — names become header t
 
 ## Method 3 — `DT::datatable()` for interactive HTML
 
-For appendices and exploratory data, `DT` provides searchable, sortable, pageable tables:
+For HTML appendices and exploratory data, `DT` provides searchable, sortable, pageable tables. This optional example is displayed without execution:
 
 ```{r}
 #| label: tbl-dt-interactive
+#| eval: false
 #| tbl-cap: "Interactive participant table (searchable, sortable, paginated)."
 
 participants_subset <- biomarker_data |>
@@ -292,15 +279,24 @@ datatable(participants_subset,
 
 ::: {.callout-warning}
 ## `DT` is HTML-only
-`DT::datatable` produces a JavaScript widget. It works only in HTML output. In Word or PDF you'll see a static screenshot. For multi-format reports, fall back to `kable()` or use Quarto's `is_html_output()` to switch behavior (covered in Quarto Module 7).
+`DT::datatable()` produces an HTML widget. Do not assume Word or PDF will create a usable screenshot automatically. For a multi-format report, generate a static table outside HTML:
+
+```r
+if (knitr::is_html_output()) {
+  DT::datatable(participants_subset)
+} else {
+  knitr::kable(participants_subset)
+}
+```
 :::
 
 ## Method 4 — `broom` + `kable` for clean model output
 
-Raw `summary(model)` output is functional but not report-ready. The `broom` package tidies model output into a data frame you can pipe straight into `kable()`.
+Raw `summary(model)` output is functional but not report-ready. The optional `broom` package tidies model output into a data frame. These examples are displayed without execution in the core course build.
 
 ```{r}
 #| label: tbl-model-coefficients
+#| eval: false
 #| tbl-cap: "Linear regression: log(PFOA) ~ age + BMI + sex + site."
 #| message: false
 
@@ -311,21 +307,20 @@ model <- lm(log(pfoa_serum) ~ age + bmi + sex + site, data = biomarker_data)
 tidy(model, conf.int = TRUE) |>
   mutate(across(where(is.numeric), \(x) round(x, 3))) |>
   kable(col.names = c("Term", "Estimate", "SE", "Statistic",
-                       "P-value", "Lower 95%", "Upper 95%"),
-        caption = "Linear regression coefficients with 95% confidence intervals.") |>
+                       "P-value", "Lower 95%", "Upper 95%")) |>
   kable_styling(bootstrap_options = c("striped", "hover"),
                 full_width = FALSE)
 ```
 
 ```{r}
 #| label: tbl-model-fit
+#| eval: false
 #| tbl-cap: "Model fit statistics."
 
 glance(model) |>
   select(r.squared, adj.r.squared, sigma, statistic, p.value, nobs) |>
   mutate(across(where(is.numeric), \(x) round(x, 3))) |>
-  kable(col.names = c("R²", "Adj. R²", "σ", "F", "P-value", "N"),
-        caption = "Goodness-of-fit summary.") |>
+  kable(col.names = c("R²", "Adj. R²", "σ", "F", "P-value", "N")) |>
   kable_styling(bootstrap_options = c("condensed"), full_width = FALSE)
 ```
 
@@ -340,7 +335,7 @@ glance(model) |>
 | `DT::datatable()` | Interactive exploration, appendices | HTML only |
 | `gt` package | Highly-customized publication tables | HTML, PDF |
 
-For most NIEHS scientific reports, `kable()` + `kableExtra` (for HTML) is the right default. Add `DT` only when interactivity is a benefit.
+For a first reproducible report, plain `kable()` is the reliable default. Add format-specific styling or interactivity only when it benefits the intended reader.
 
 ## Chunk options that earn their keep
 
@@ -357,7 +352,7 @@ Five chunk options beyond the basics you'll reach for repeatedly:
 result <- run_expensive_simulation()
 ```
 
-Caches results in `_freeze/`. If the code hasn't changed, the chunk doesn't re-run.
+`cache: true` uses the active execution engine's cache—knitr cache for R or Jupyter cache for Jupyter documents. Quarto project `freeze` is separate and stores completed document results in `_freeze/` for reuse during project renders.
 
 ### `code-fold: true` — collapse code by default
 
@@ -411,25 +406,22 @@ Useful for *teaching about chunks* — that's how this very document shows you w
 | Figure blurry in Word/PDF | Default `dev: png` at 72 dpi | Set `dpi: 300` |
 | Table looks unstyled in Word | `kableExtra` options ignored | Use plain `kable()` for Word; `kableExtra` is HTML-best |
 
-## Exercises
+## Learner exercise — add the required table
 
-### Exercise 2.1 — Tabset
+In `student_work/my_report.qmd`, add a chunk under **Results** that:
 
-Add a third tab to the R/Python panel above titled `### Notes`. Inside, write 2–3 sentences interpreting what the boxplot shows.
+1. Groups the synthetic data by `site`.
+2. Reports `N`, mean PFOA, and mean cholesterol.
+3. Uses `knitr::kable()`.
+4. Has a label beginning `tbl-` and a `tbl-cap` chunk option.
+5. Does **not** manually write “Table 1” in the caption.
 
-### Exercise 2.2 — Publication table
+Render from a restarted R session. When your table works, compare it with `student_work/checkpoints/02_table_complete.qmd`.
 
-Build a single styled table showing, for each combination of sex and site:
-
-- N participants
-- Mean PFOA (ng/mL)
-- Mean PFOS (ng/mL)
-
-Use `kable()` + `kable_styling()` with `bootstrap_options = c("striped", "hover")` and `add_header_above()` to group PFOA and PFOS under a "PFAS Concentrations" super-header.
-
-### Exercise 2.3 — Model output
-
-Fit a model: `lm(cholesterol ~ pfoa_serum + age + sex + bmi, data = biomarker_data)`. Use `broom::tidy()` and `kable()` to display the coefficient table. Add a `tbl-cap`. Cross-reference the table from a paragraph above it using `@tbl-yourlabel`.
+::: {.callout-tip}
+## Optional stretch
+Style a copy with `kableExtra`, tidy a model with `broom`, or display an HTML-only `DT` table. These are not required for the capstone.
+:::
 
 ## What's next
 

@@ -1,0 +1,22 @@
+project:
+  type: default
+  output-dir: _output
+  execute-dir: project
+  render:
+    - my_report.qmd
+    - parameter_demo.qmd
+    - checkpoints/bridge_converted.qmd
+    - checkpoints/01_yaml_complete.qmd
+    - checkpoints/02_table_complete.qmd
+    - checkpoints/03_figure_complete.qmd
+    - checkpoints/04_crossrefs_citations_complete.qmd
+
+format:
+  html:
+    toc: true
+    code-copy: true
+    code-overflow: wrap
+
+execute:
+  warning: false
+  message: false

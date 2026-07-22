@@ -1,6 +1,6 @@
 ---
-title: "Quarto 5 — Revealjs Presentations"
-subtitle: "Slide decks from .qmd"
+title: "Quarto 5 — Revealjs Demonstration"
+subtitle: "One source pattern, a different audience"
 author: "R. Burke Squires"
 institute: "NIEHS"
 date: today
@@ -16,61 +16,49 @@ format:
 
 ## Meta-observation
 
-The deck you are looking at right now is a `.qmd` file rendered to `revealjs`.
+This presentation is a `.qmd` file rendered to `revealjs`.
 
 ::: {.fragment}
-Open `slides/04_presentations.qmd` and look at the source. Same syntax you already know.
+The instructor can open `afternoon_quarto/slides/05_revealjs_presentations.qmd` to show the source.
 :::
 
-# The one rule {.section-divider}
+# The core rule {.section-divider}
 
-## Level-2 headings start new slides
+## Level-two headings begin slides
 
 ```markdown
 ## First slide
 
-Content of the first slide.
+Content.
 
 ## Second slide
 
-Content of the second slide.
+More content.
 ```
 
 ::: {.fragment}
-That's it. The rest is decoration.
+The rest is layout and presentation design.
 :::
 
-# Section dividers {.section-divider}
+# Useful patterns {.section-divider}
 
-## Use a single `#`
+## A section divider
 
 ```markdown
-# Part 1 — Setup
+# Methods {.section-divider}
 ```
 
-Creates a colored full-screen title slide.
-
-# Incremental reveals {.section-divider}
-
-## Wrap a list
+## Incremental reveal
 
 ```markdown
 ::: {.incremental}
-- First bullet (click)
-- Second bullet (click)
-- Third bullet (click)
+- First point
+- Second point
+- Third point
 :::
 ```
 
-::: {.incremental}
-- Like
-- These
-- Bullets
-:::
-
-# Columns {.section-divider}
-
-## Side-by-side content
+## Two columns
 
 ```markdown
 :::: {.columns}
@@ -83,88 +71,40 @@ Right.
 ::::
 ```
 
-# Code highlighting {.section-divider}
-
-## Step through code line by line
-
-````
-```{r}`r ''`
-#| code-line-numbers: "1|2-3|4"
-library(dplyr)
-aq <- read.csv("airquality.csv")
-aq <- na.omit(aq)
-summary(aq)
-```
-````
-
-Each click advances to the next highlighted region.
-
-## Live
-
-```{r}
-#| code-line-numbers: "1|2-3|4"
-#| eval: false
-library(dplyr)
-aq <- read.csv("airquality.csv")
-aq <- na.omit(aq)
-summary(aq)
-```
-
-# Speaker notes {.section-divider}
-
-## Invisible during talk, shown in speaker view
+## Speaker notes
 
 ```markdown
 ::: {.notes}
-Don't forget to mention the funding.
+Reminder visible in speaker view.
 :::
 ```
 
-Press `s` during the talk to open the speaker view in a second window.
+# Design choice {.section-divider}
 
-::: {.notes}
-Like this one. You can't see it on the main projector but you can see it on your laptop.
+## A report is not a slide deck
+
+::: {.incremental}
+- One message per slide.
+- Use less text than a report.
+- Enlarge labels and figures.
+- Move detail to notes or a handout.
+- Test the deck on the presentation computer.
 :::
 
-# Useful YAML options {.section-divider}
+# Safe learner edit {.section-divider}
 
-## The shortlist
+## Work in a copy
 
-```yaml
-format:
-  revealjs:
-    theme: simple
-    slide-number: true
-    chalkboard: true        # press 'b' to draw
-    incremental: false      # default to non-incremental
-    transition: slide
-    code-overflow: wrap
-    logo: niehs-logo.png
-    footer: "Your footer"
-```
-
-# Per-slide modifiers {.section-divider}
-
-## Attach a class to a heading
-
-```markdown
-## A long script {.scrollable}
-
-## A small-text slide {.smaller}
-
-## A section divider {.section-divider}
-```
-
-Useful when one slide needs different behavior.
-
-# Hands-on {.section-divider}
-
-## Open notebook 04
+1. Copy `student_work/my_report.qmd` to `student_work/my_slides.qmd`.
+2. Change `format: html` to `format: revealjs`.
+3. Insert one `##` heading to create another slide.
+4. Render the copy.
+5. Leave `my_report.qmd` unchanged.
 
 ::: {.callout-tip}
-Work through Exercises 4.1 and 4.2 in `afternoon_quarto/05_revealjs_presentations.qmd`.
-
-Aim: convert your Module-1 file into slides.
+This is a single edit, not a second capstone. Return to the cumulative report when the demonstration ends.
 :::
 
-Back in 60 minutes.
+## Next
+
+The instructor demonstrates parameterized reports. The capstone follows that demonstration.

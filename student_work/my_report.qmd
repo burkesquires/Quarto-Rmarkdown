@@ -1,0 +1,66 @@
+---
+title: "My Reproducible Report"
+author: "YOUR NAME"
+date: today
+bibliography: references.bib
+format:
+  html:
+    toc: true
+    code-fold: false
+    link-citations: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+library(dplyr)
+library(ggplot2)
+library(knitr)
+
+biomarker_data <- read.csv("data/workshop_biomarkers.csv")
+stopifnot(nrow(biomarker_data) == 200)
+```
+
+## Readiness check
+
+This learner file is a separate Quarto project. Rendering it should not render the training website or any lesson page.
+
+```{r}
+#| label: readiness-table
+#| echo: false
+
+readiness <- data.frame(
+  check = "Mean of the integers 1 through 10",
+  result = mean(1:10)
+)
+
+kable(readiness)
+```
+
+The synthetic dataset contains `r nrow(biomarker_data)` rows. Replace this sentence with a result that matters to your report later today.
+
+::: {.callout-note}
+## Synthetic data
+These records were generated solely for teaching. They contain no participant data and must not be interpreted as evidence about PFAS exposure or health outcomes.
+:::
+
+## Introduction
+
+<!-- During Quarto 1, replace this comment with 3–5 sentences. Include one bold phrase and one italic phrase. -->
+
+## Methods
+
+The report uses the supplied synthetic workshop dataset. Code is executed from a clean R session when the document renders.
+
+## Results
+
+<!-- During Quarto 2, add a captioned table here. -->
+
+<!-- During Quarto 3, add a captioned figure with fig-alt here. -->
+
+<!-- During Quarto 4, add cross-references and one citation. -->
+
+## Discussion
+
+<!-- During the capstone, write 2–3 restrained sentences interpreting the synthetic results and noting a limitation. -->

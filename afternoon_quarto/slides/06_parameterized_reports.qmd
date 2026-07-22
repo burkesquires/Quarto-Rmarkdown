@@ -1,6 +1,6 @@
 ---
-title: "Quarto 6 — Parameterized Reports"
-subtitle: "Generate many reports from one source"
+title: "Quarto 6 — Parameters Demonstration"
+subtitle: "One trusted source, several controlled variants"
 author: "R. Burke Squires"
 institute: "NIEHS"
 date: today
@@ -14,92 +14,75 @@ format:
     code-overflow: wrap
 ---
 
-## Goals — 25 minutes
+## Goal — 25 minutes
 
-::: {.incremental}
-- Define parameters in YAML
-- Use parameters in code and prose
-- Render the same `.qmd` with different parameters
-- Batch-generate reports across chemicals, sites, years
+Understand when parameters reduce duplication, then change one parameter and observe the result.
+
+::: {.fragment}
+This is a demonstration, not a requirement for minimum workshop success.
 :::
 
 # The problem {.section-divider}
 
-## Six reports, same analysis
+## Same analysis, different case
 
 ::: {.incremental}
-- PFOA at Research Triangle Park, 2024 ✓
-- PFOS at Research Triangle Park, 2024
-- PFOA at Durham, 2024
-- PFOA at Chapel Hill, 2024
-- PFOS at all three sites, 2024
-- PFOA in 2023 (comparison)
+- PFOA or PFOS
+- Three simulated monitoring sites
+- Identical table and figure logic
+- Different title, filter, and teaching threshold
 :::
 
 ::: {.fragment}
-**Six duplicate files** — or **one parameterized template**.
+Avoid six copied files that can drift apart.
 :::
 
-# Defining parameters {.section-divider}
+# Define parameters {.section-divider}
 
-## In the YAML
+## In YAML
 
 ```yaml
----
-title: "Biomonitoring Report"
-format: html
 params:
   chemical: "PFOA"
   threshold: 4.0
-  study_year: 2024
   site: "Research Triangle Park"
----
 ```
 
-::: {.fragment}
-Strings quote, numbers don't, booleans lowercase, `null` is null.
-:::
+## Use them in code and prose
 
-# Using parameters {.section-divider}
-
-## In prose
-
-```markdown
-This report analyzes **`r params$chemical`**
-data from **`r params$study_year`** at
-**`r params$site`** using a threshold of
-**`r params$threshold` ng/mL**.
-```
-
-## In code chunks
-
-```{.r}
-exposure_data |>
-  filter(site == params$site) |>
-  summarise(
-    n_above = sum(concentration > params$threshold),
-    pct = round(n_above / n() * 100, 1)
+```r
+selected <- dat |>
+  dplyr::filter(
+    params$site == "All" | site == params$site
   )
 ```
 
-## Dynamic captions
+```markdown
+This report summarizes **`r knitr::inline_expr('params$chemical')`**.
+```
+
+# Dynamic output {.section-divider}
+
+## Captions can use parameter values
 
 ```yaml
-#| fig-cap: !expr paste("Distribution of",
-#|   params$chemical, "at", params$site)
+#| fig-cap: !expr paste(
+#|   "Distribution of", params$chemical,
+#|   "at", params$site
+#| )
 ```
 
 ::: {.fragment}
-`!expr` evaluates R at render time. Caption updates with parameters.
+Validate allowed parameter values before using them to select columns or files.
 :::
 
-# Re-rendering {.section-divider}
+# Re-render {.section-divider}
 
-## From R
+## One controlled variant
 
-```{.r}
+```r
 quarto::quarto_render(
-  "06_parameterized_reports.qmd",
+  "afternoon_quarto/06_parameterized_reports.qmd",
   execute_params = list(
     chemical = "PFOS",
     threshold = 6.0,
@@ -109,94 +92,25 @@ quarto::quarto_render(
 )
 ```
 
-## From the command line
-
-```bash
-quarto render 06_parameterized_reports.qmd \
-  -P chemical:PFOS \
-  -P threshold:6.0 \
-  -P site:Durham
-```
-
 ::: {.fragment}
-The `-P` flag is the Quarto improvement over R Markdown — much more scriptable.
+Batch rendering is bonus material. Start by proving one variant works.
 :::
 
-## "Render with Parameters" button
+# Scientific boundary {.section-divider}
 
-In RStudio/Posit Cloud's IDE:
+## Thresholds are teaching inputs
 
-::: {.incremental}
-- Click the dropdown arrow next to **Render**
-- Select **"Render with Parameters..."**
-- Fill in values interactively
-- Useful for one-off renders without writing code
+The data and thresholds in this demonstration are synthetic and arbitrary. They do not represent a regulatory or clinical decision rule.
+
+# Learner edit {.section-divider}
+
+## Change one value
+
+1. Open `student_work/parameter_demo.qmd`.
+2. Change one parameter: chemical, site, or threshold.
+3. Predict which prose, caption, axis label, and threshold line should change.
+4. Render once and compare the result with your prediction.
+
+::: {.callout-important}
+Next: return to `student_work/my_report.qmd` for the cumulative capstone.
 :::
-
-# Batch generation {.section-divider}
-
-## The pattern
-
-```{.r}
-chemicals <- c("PFOA", "PFOS", "PFNA", "BPA")
-sites <- c("RTP", "Durham", "Chapel Hill")
-thresholds <- list(PFOA = 4.0, PFOS = 6.0,
-                   PFNA = 2.0, BPA = 5.0)
-
-for (chem in chemicals) {
-  for (site in sites) {
-    quarto::quarto_render(
-      "06_parameterized_reports.qmd",
-      execute_params = list(
-        chemical = chem,
-        site = site,
-        threshold = thresholds[[chem]]
-      ),
-      output_file = paste0("report_",
-        chem, "_", site, ".html")
-    )
-  }
-}
-```
-
-::: {.fragment}
-**12 reports** from one source. Add a chemical, re-run, get more.
-:::
-
-# When this pattern shines {.section-divider}
-
-## Earns its keep when
-
-::: {.incremental}
-- A **template** applies to many cases
-- Analysis is **identical**; only inputs change
-- Reports regenerate **regularly** as data arrives
-:::
-
-::: {.fragment}
-NIEHS use cases: annual chemical summaries, multi-site monitoring, sub-population analyses, sensitivity sweeps across thresholds.
-:::
-
-# R Markdown vs Quarto {.section-divider}
-
-## Same idea, better plumbing
-
-| Aspect | R Markdown | Quarto |
-|--------|-----------|--------|
-| YAML | `params:` | `params:` |
-| Access | `params$x` | `params$x` |
-| Render R | `rmarkdown::render(params=...)` | `quarto::quarto_render(execute_params=...)` |
-| Render CLI | not native | `quarto render -P key:value` |
-| Dynamic captions | `fig.cap = paste(...)` | `!expr paste(...)` |
-
-# Hands-on {.section-divider}
-
-## Notebook Quarto 6
-
-::: {.callout-tip}
-Open `afternoon_quarto/06_parameterized_reports.qmd`. Change YAML parameters, re-render, observe.
-
-Exercises 6.1 and 6.2.
-:::
-
-25 min. Then projects + themes + publishing.

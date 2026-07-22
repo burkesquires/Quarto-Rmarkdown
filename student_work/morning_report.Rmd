@@ -1,0 +1,43 @@
+---
+title: "My Morning R Markdown Report"
+author: "Your name"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  fig.width = 7,
+  fig.height = 4
+)
+
+dat <- read.csv("data/workshop_biomarkers.csv")
+n_records <- nrow(dat)
+median_pfoa <- median(dat$pfoa_serum)
+```
+
+# Purpose
+
+This is my editable R Markdown report. The workshop lesson pages are read-only.
+
+# Data preview
+
+```{r data-preview, echo=TRUE}
+head(dat)
+```
+
+# Dynamic summary
+
+The synthetic teaching dataset contains `r n_records` records. The median simulated serum PFOA concentration is `r round(median_pfoa, 2)`.
+
+# Notes
+
+- Add one learning goal here.
+- Add another learning goal here.

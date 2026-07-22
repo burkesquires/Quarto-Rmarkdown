@@ -1,244 +1,252 @@
-# R Markdown + Quarto for Reproducible Science — NIEHS Training
+# R Markdown + Quarto for Reproducible Science — Instructor Edition
 
-A one-day, hands-on workshop combining **R Markdown** and **Quarto** for NIEHS scientists. Designed to run on [Posit Cloud](https://posit.cloud) with zero local installation.
+Start with [`INSTRUCTOR_START_HERE.md`](INSTRUCTOR_START_HERE.md). A detailed change record is in [`REVISION_NOTES.md`](REVISION_NOTES.md).
 
-This is the **instructor edition** README. The student-facing landing page is `index.qmd`.
+Classroom-ready project for the NIEHS one-day workshop. The revised design keeps the training website read-only and gives every participant a separate cumulative Quarto project in `student_work/`.
 
-## Why this workshop is structured the way it is
+## Delivery target
 
-R Markdown is in maintenance mode; Quarto is the modern, actively-developed successor. The skills transfer almost wholesale — same YAML/markdown/chunk model, same R packages (`ggplot2`, `kableExtra`, `DT`, `broom`, `patchwork`, `plotly`), nearly identical citation and equation syntax.
+**Wednesday, July 22, 2026, 9:00 AM–5:00 PM**
 
-So the workshop teaches the foundation (R Markdown morning) and then dives deep into Quarto's distinctive features (afternoon), using a **25-minute explicit bridge** between them so students understand the migration path. Features that work identically in both tools (tables, figures, equations) are taught **once** — in Quarto, the modern tool — using NIEHS-flavored examples (PFOA biomonitoring, PFAS thresholds) that anchor the content in the audience's actual work.
+The most important learning outcome is not coverage of every Quarto feature. It is that each participant can render a report from a clean session containing narrative, an inline result, a table, a figure, a caption, a cross-reference, and a citation.
 
-**Time split: R Markdown ~80 min, Quarto ~3:55, capstone + wrap ~50 min.** Heavily Quarto-weighted because that's where development is happening, and because the morning's R Markdown skills are sufficient to read and maintain existing `.Rmd` files — the more important investment is in `.qmd`.
+## Why the project is structured this way
 
-## Workshop schedule
+Quarto websites manage a collection of documents as one project. A student who edits a lesson page inside that website can encounter a failure in another project page during preview. The revised project avoids that failure mode:
 
-| Time | Block | File | Duration |
-|------|-------|------|---------|
-| 09:00 – 09:05 | Posit Cloud verification | `00_setup.qmd` | 5 min |
-| 09:05 – 09:30 | **R Markdown basics** | `morning_rmarkdown/01_rmarkdown_basics.Rmd` | 25 min |
-| 09:30 – 10:00 | **Code chunks + inline code** | `morning_rmarkdown/02_code_chunks.Rmd` | 30 min |
-| 10:00 – 10:15 | Break | | 15 min |
-| 10:15 – 10:40 | **Bridge: R Markdown → Quarto** | `bridge/rmd_to_quarto_bridge.qmd` | 25 min |
-| 10:40 – 11:10 | Quarto 1 — your first `.qmd` | `afternoon_quarto/01_first_document.qmd` | 30 min |
-| 11:10 – 12:10 | Quarto 2 — code chunks + tables | `afternoon_quarto/02_code_chunks_and_tables.qmd` | 60 min |
-| 12:10 – 13:10 | Lunch | | 60 min |
-| 13:10 – 13:55 | Quarto 3 — figures & visualizations | `afternoon_quarto/03_figures_and_visualizations.qmd` | 45 min |
-| 13:55 – 14:40 | Quarto 4 — equations, cross-refs, citations | `afternoon_quarto/04_equations_crossrefs_citations.qmd` | 45 min |
-| 14:40 – 14:55 | Break | | 15 min |
-| 14:55 – 15:25 | Quarto 5 — revealjs presentations | `afternoon_quarto/05_revealjs_presentations.qmd` | 30 min |
-| 15:25 – 15:50 | Quarto 6 — parameterized reports | `afternoon_quarto/06_parameterized_reports.qmd` | 25 min |
-| 15:50 – 16:10 | Quarto 7 — projects + themes + publishing | `afternoon_quarto/07_projects_themes_publishing.qmd` | 20 min |
-| 16:10 – 16:35 | Capstone | `capstone.qmd` | 25 min |
-| 16:35 – 17:00 | Wrap-up + next steps | `next_steps.qmd` | 25 min |
+- `index.qmd`, lesson notebooks, and slide sources are instructor/course materials.
+- `student_work/` is a standalone Quarto project with its own `_quarto.yml`.
+- The Quarto slide directories are also small nested projects, so previewing a deck does not invoke the course website.
+- Students edit `student_work/morning_report.Rmd` in the morning and `student_work/my_report.qmd` after the bridge.
+- Morning, bridge, and four cumulative Quarto checkpoints provide rapid recovery.
+- `capstone.qmd` tells learners to finish the report they already built rather than starting over.
 
-Total: 6 hours of contact + 30 min breaks + 60 min lunch.
+R Markdown is presented as mature and supported, not as deprecated. Quarto is introduced as an additional, multi-language publishing option with useful built-in features.
+
+## Revised schedule
+
+| Time | Focus | Delivery |
+|---|---|---|
+| 09:00–09:15 | Setup and student workspace | Everyone renders `student_work/my_report.qmd` |
+| 09:15–10:00 | R Markdown anatomy, clean render, chunks, inline code | One cumulative exercise |
+| 10:00–10:15 | Break | |
+| 10:15–10:35 | R Markdown → Quarto bridge | Convert one small file |
+| 10:35–11:10 | First Quarto report | YAML, callout, code folding |
+| 11:10–12:10 | Code options and tables | Everyone builds one `kable()` table; advanced tables are demonstrations |
+| 12:10–13:10 | Lunch | |
+| 13:10–13:55 | Figures | One ggplot, caption, alt text, and label |
+| 13:55–14:40 | Cross-references and citations | Equations are a brief demonstration |
+| 14:40–14:55 | Break | |
+| 14:55–15:20 | Revealjs | Instructor demo plus one learner edit |
+| 15:20–15:45 | Parameters | Instructor demo plus one parameter change |
+| 15:45–16:20 | Cumulative capstone | Polish the report already built |
+| 16:20–16:40 | Projects and safe sharing | No live theme-editing exercise |
+| 16:40–17:00 | Debrief, troubleshooting, exit ticket | Export work and state one next action |
+
+Contact time is 6 hours 30 minutes, plus two 15-minute breaks and a 60-minute lunch.
+
+## Learning tiers
+
+### Everyone does
+
+- Render from a clean R session.
+- Edit YAML.
+- Use a setup chunk and an inline result.
+- Produce one `knitr::kable()` table.
+- Produce one `ggplot2` figure.
+- Add captions, a figure label, alt text, and a cross-reference.
+- Add one citation.
+
+### Instructor demonstrates
+
+- Revealjs.
+- Parameters.
+- DOCX output.
+- Project configuration.
+- Standalone HTML versus a complete website.
+- Safe internal versus public publishing.
+
+### Bonus/reference
+
+- Python and `reticulate`.
+- `DT`, `plotly`, `patchwork`, `broom`, and deep `kableExtra` styling.
+- PDF/LaTeX.
+- SCSS customization.
+- Batch rendering and public publishing.
+- Citation automation tools that depend on external services (optional archive material).
 
 ## File structure
 
-```
+```text
 rmarkdown_quarto_niehs/
-├── README.md                                  ← This file (instructor edition)
-├── _quarto.yml                                ← Quarto website project config
-├── index.qmd                                  ← Student-facing landing page
-├── 00_setup.qmd                               ← Posit Cloud verification
-├── capstone.qmd                               ← End-of-day capstone exercise
-├── next_steps.qmd                             ← Post-workshop local-install guide
-├── styles.scss                                ← Site theme layer (NIEHS palette overlay)
-├── references.bib                             ← Sample bibliography
-├── nature.csl                                 ← Local citation style (avoids render-time network fetch)
-├── rmarkdown_quarto_training.Rproj            ← Posit Cloud / RStudio project marker
-│
-├── morning_rmarkdown/                         ← R Markdown training (Burke's existing materials)
-│   ├── 01_rmarkdown_basics.Rmd
-│   ├── 02_code_chunks.Rmd
-│   ├── quick_reference.Rmd
-│   └── slides/
-│       ├── slides_01_welcome_and_basics.Rmd   ← ioslides
-│       ├── slides_02_code_chunks.Rmd          ← ioslides
-│       └── rmd_slides_style.css
-│
+├── README.md
+├── INSTRUCTOR_START_HERE.md
+├── REVISION_NOTES.md
+├── _quarto.yml
+├── index.qmd
+├── 00_setup.qmd
+├── capstone.qmd
+├── next_steps.qmd
+├── data/
+│   ├── workshop_biomarkers.csv
+│   └── README.md
+├── student_work/
+│   ├── _quarto.yml
+│   ├── README.md
+│   ├── morning_report.Rmd
+│   ├── my_report.qmd
+│   ├── parameter_demo.qmd
+│   ├── references.bib
+│   ├── nature.csl
+│   ├── data/workshop_biomarkers.csv
+│   └── checkpoints/
+│       ├── morning_report_complete.Rmd
+│       ├── bridge_converted.qmd
+│       ├── 01_yaml_complete.qmd
+│       ├── 02_table_complete.qmd
+│       ├── 03_figure_complete.qmd
+│       └── 04_crossrefs_citations_complete.qmd
+├── morning_rmarkdown/
 ├── bridge/
-│   ├── rmd_to_quarto_bridge.qmd               ← 25-min bridge module
-│   └── slides/
-│       └── bridge_deck.qmd                    ← revealjs
-│
-├── afternoon_quarto/                          ← Quarto modules
-│   ├── 01_first_document.qmd
-│   ├── 02_code_chunks_and_tables.qmd          ← Tables migrated from old Module 03
-│   ├── 03_figures_and_visualizations.qmd      ← NEW from old Module 04
-│   ├── 04_equations_crossrefs_citations.qmd   ← Equations from old Module 05
-│   ├── 05_revealjs_presentations.qmd
-│   ├── 06_parameterized_reports.qmd           ← NEW from old Module 05
-│   ├── 07_projects_themes_publishing.qmd      ← Themes/CSS from old Module 06
-│   ├── quartobot_bonus.qmd                    ← Optional bonus
-│   └── slides/                                ← revealjs decks (01–07)
-│       └── niehs-theme.scss
-│
+├── afternoon_quarto/
 ├── instructor/
-│   └── exercise_solutions.Rmd                 ← Reference solutions, students don't see
-│
-├── optional/
-│   └── rmarkdown_capstone_homework.Rmd        ← Take-home R Markdown capstone
-│
-├── data/                                      ← (empty; for student uploads if needed)
-└── images/                                    ← (drop niehs-logo.png here before delivery)
+│   ├── run_of_show.md
+│   ├── preflight_checklist.md
+│   ├── validation_report.md
+│   └── exercise_solutions.qmd
+└── optional/
 ```
 
-## Pre-workshop checklist
+## Data
 
-### 1 week before
+`data/workshop_biomarkers.csv` is synthetic and generated with a fixed seed. It contains 200 records with age, sex, site, serum PFOA, serum PFOS, BMI, and cholesterol. The generator intentionally creates a modest positive PFOA–cholesterol relationship so a trend is visible in class.
 
-- [ ] **Create a Posit Cloud workspace** ([posit.cloud](https://posit.cloud)) and a project from this folder. Pin it as the workshop template.
-- [ ] **Render the entire project once** on the Posit Cloud workspace to make sure every notebook compiles and there are no missing packages. (See "Validation" below.)
-- [ ] **Drop the NIEHS logo** at `images/niehs-logo.png` (referenced by every afternoon slide deck). A 200×200 transparent PNG is fine.
-- [ ] **Test the firewall** if you plan to demo `quartobot` — it hits Crossref / PubMed / arXiv at render time. NIEHS federal firewalls may block. Mitigation: pre-resolve references and ship a cached `references.json` if needed.
-- [ ] **Confirm Quarto version** ≥ 1.9 on Posit Cloud (`quarto --version` in a terminal). Quarto 1.8+ is the minimum for the publishing module's content; 1.9 was current stable as of March 2026.
-- [ ] **Pre-register attendees** in the workspace if Posit Cloud's free tier doesn't fit (paid Posit Cloud Workspaces handle group enrollment).
+Every page that uses the data should explicitly state:
 
-### Day of
+> These data are simulated solely for teaching. Generated relationships must not be interpreted as evidence about PFAS exposure or health outcomes.
 
-- [ ] Open the Posit Cloud project in the browser ~15 min before start to warm up the container.
-- [ ] Have backup laptop ready in case projector / screen-sharing fails.
-- [ ] Pre-load `index.qmd` rendered (use Posit Cloud's preview pane).
+## Pre-workshop requirements
 
-## Pre-workshop email to students
+### Before class
 
-Suggested template:
+- Create the managed Posit Cloud assignment/template.
+- Require participants to create accounts and complete MFA before Wednesday.
+- Ensure each participant receives a writable copy rather than the instructor source project.
+- Preinstall the core packages: `rmarkdown`, `knitr`, `dplyr`, and `ggplot2`.
+- Preinstall demonstration packages only if you plan to execute those demonstrations: `kableExtra`, `DT`, `broom`, `patchwork`, `plotly`, and `quarto`.
+- Do not make Python, TinyTeX, or a system LaTeX installation prerequisites for the core class.
+- Confirm the supplied NIEHS logo renders in every slide deck.
+- Render the website and every slide deck from the exact student template.
+- Test from a non-instructor account.
 
-> **Subject:** Tomorrow's workshop — please complete in advance
->
-> Hi everyone,
->
-> A few things to do before tomorrow's 9 AM workshop:
->
-> 1. **Create a free [Posit Cloud](https://posit.cloud) account** if you don't have one. The free tier is enough for today.
-> 2. **Confirm you can log in** at [posit.cloud](https://posit.cloud) and see the dashboard.
-> 3. **(Optional) Create a free [GitHub](https://github.com) account** — useful for the publishing module but not required.
->
-> You don't need to install anything on your laptop. Everything runs in your browser. We start at 9 AM sharp in **\[room\]**. Bring a laptop (any OS, any browser) and a notepad.
->
-> See you tomorrow,
-> \[Instructor name\]
+### Day of class
 
-## Instructor teaching notes — module by module
+- Open the workspace before participants arrive.
+- Keep `instructor/run_of_show.md` open.
+- Project the lesson notebook or a verified slide deck; do not improvise from stale output.
+- Have `student_work/checkpoints/` visible in the Files pane.
+- Keep one untouched participant copy for troubleshooting.
+- Have a local copy of the final ZIP available in case a cloud assignment must be recreated.
 
-### Morning (R Markdown)
+## First 15 minutes
 
-**00 Setup (5 min) —** Have everyone open `00_setup.qmd` and click **Render**. If anyone gets a package error, that's the first signal they didn't pre-install — point them at the package install command in the notebook and have them re-render.
+Do not begin lecture content until participants can all answer yes to these:
 
-**01 R Markdown basics (25 min) —** Live-demo: open `01_rmarkdown_basics.Rmd`, scroll through, knit. Then have students edit YAML (change author to their name), re-knit. Cover: YAML header, markdown text, clean-session reproducibility (this is the most important takeaway — many R users don't realize knit runs in a fresh R session).
+1. I am in my own writable project copy.
+2. `quarto --version` prints a version.
+3. `student_work/my_report.qmd` renders.
+4. The four core R packages are installed.
 
-**02 Code chunks + inline code (30 min) —** Walk through chunk options live. The inline code example with simulated PFOA biomarker data is the *aha* moment for many — emphasize that every number in the example paragraph is from R code. Exercise 2.2 (the BPA dynamic paragraph) is the one to make sure everyone completes.
+Avoid live package installation for the entire room. Move a participant to a known-good copy or pair them with a neighbor while an assistant troubleshoots.
 
-### Break (15 min)
+## Teaching notes
 
-### Bridge (25 min)
+### Morning
 
-The bridge module is intentionally compact and visual. It shows the four side-by-side differences between R Markdown and Quarto: file extension, YAML `output:` → `format:`, chunk options syntax, and how to run a conversion. Have students keep their existing `02_code_chunks.Rmd` open and look at the equivalent `.qmd` version side by side.
+The morning lesson pages are read-only. Learners edit one cumulative file, `student_work/morning_report.Rmd`, because they need to recognize and maintain existing `.Rmd` content. Keep the message neutral: R Markdown remains supported; Quarto is a strong option for new work and for built-in cross-references, projects, and multi-language publishing.
 
-If anyone is panicking that everything they know is changing, this is the place to reassure them: **same R code, same `library()` calls, same packages, same outputs**. Only the document syntax changes.
+### Bridge
 
-### Afternoon (Quarto)
+Use `student_work/morning_report.Rmd` as the safe conversion source. Make only three syntax changes memorable:
 
-**Quarto 1 — first .qmd (30 min) —** Move fast. The bridge already covered the migration. This module focuses on what's *new* in Quarto: callouts, panel tabsets, expanded YAML. Have everyone create a new `.qmd` from scratch in Posit Cloud (**File → New File → Quarto Document**) and add a callout.
+1. `.Rmd` → `.qmd`
+2. `output:` → `format:`
+3. Chunk options move to `#|` lines
 
-**Quarto 2 — code chunks + tables (60 min) —** This is the longest module. The tables content (`kable`, `kableExtra`, `DT`, `broom`) is migrated from the old Module 03 — same content, `.qmd` syntax. The R/Python tabset is worth demoing live if you have any Python users in the audience.
+Everything else should be framed as transfer, not relearning.
 
-**Lunch (60 min) — at 12:10 PM.**
+### Tables
 
-**Quarto 3 — figures (45 min) —** Migrated from the old Module 04. Heavy on `ggplot2`. The patchwork section is where most students learn something new. The plotly example reliably gets a "wow" — demo it live with a hover. The `fig.width` → `fig-width` naming gotcha is worth pausing on — it bites people copying R Markdown chunks into Quarto.
+Require only `knitr::kable()`. Demonstrate `kableExtra`, `DT`, and `broom` after everyone has a working table. Do not require interactive widgets for multi-format reports.
 
-**Quarto 4 — equations, cross-refs, citations (45 min) —** The equations content is migrated from the old Module 05. NIEHS-relevant equations (Hill model, HQ, LADD) ground the abstract LaTeX in real toxicology/exposure work. Cross-references are where Quarto genuinely improves on R Markdown (no `bookdown` dependency) — emphasize this. The citation section is short because it works the same as R Markdown.
+### Figures
 
-**Break (15 min)**
+Require an informative caption and `fig-alt`. Use shape as well as color when groups are distinguished. Remind learners that synthetic relationships are teaching devices.
 
-**Quarto 5 — revealjs (30 min) —** The slide deck content is one of the most fun parts to teach because students see immediate results. Walk through the slides themselves as the demo — these slides are revealjs `.qmd` files.
+### Cross-references and citations
 
-**Quarto 6 — parameterized reports (25 min) —** This is the highest-ROI module for anyone doing recurring NIEHS reports. The PFOA/PFOS-by-site batch example shows what 12 reports from one source looks like. Even if students don't write parameterized reports tomorrow, plant the seed.
+Use author-date output for the explanation because learners can see the difference between narrative and parenthetical citation syntax. Demonstrate that a CSL file changes formatting after the basic citation works.
 
-**Quarto 7 — projects + themes + publishing (20 min) —** Pace fast. Three sub-topics ≈ 7 min each. Projects → themes → publishing. The big point of publishing: **`quarto render` and email the HTML** is often enough for internal NIEHS work; don't oversell GitHub Pages / Quarto Pub if the audience is on a federal network with restricted external publishing.
+### Presentations and parameters
 
-**Capstone (25 min) —** Hand off — "build something of your own from scratch." Walk around, troubleshoot, encourage. The capstone template offers `biomarker_data`, `airquality`, `penguins`, or bring-your-own.
+These are demonstrations with one small learner edit. They are not additional capstones.
 
-**Wrap-up + next steps (25 min) —** Walk through `next_steps.qmd` live: local Quarto install for Mac and Windows, VS Code / Positron / RStudio comparison, when to come back to the workshop materials. Hand out (or email post-workshop) the optional R Markdown capstone homework — `optional/rmarkdown_capstone_homework.Rmd`.
+### Capstone
 
-## What this workshop does NOT cover
+Students continue `my_report.qmd`. The minimum-success callout is the completion standard. Stretch goals are optional.
 
-Be explicit with students up-front about scope. We don't cover:
+## Publishing and data safety
 
-- **Shiny + Quarto** — interactive documents backed by a live R server.
-- **Quarto Dashboards** — fluid-layout interactive dashboards (Quarto 1.4+).
-- **Quarto Extensions** — community shortcodes, filters, custom formats.
-- **Custom Pandoc filters / Lua filters** — when you need to bend the rendering pipeline.
-- **Quarto Manuscripts deep dive** — the project type is mentioned but not used.
-- **Deep Word/PDF customization** — `reference.docx` files, custom LaTeX templates.
-- **Targets / drake integration** — pipelining `.qmd` renders inside larger reproducible workflows.
-- **Bookdown migration** — for users who have multi-chapter `bookdown` projects, Quarto books are similar but the migration has its own quirks.
+Public services are for content approved for public release. Do not imply that a private external repository is automatically approved for agency information. Do not advise participants to disable endpoint protection, restore quarantined files, or move work to personal devices.
 
-All of the above are linked from `next_steps.qmd` for follow-up.
+Teach three distinct sharing cases:
 
-## Customizing for a non-NIEHS audience
+1. A website is shared as the complete `_site/` directory.
+2. A single portable report uses `embed-resources: true`.
+3. Internal controlled sharing uses an institutionally approved platform and authorization process.
 
-If you want to deliver this workshop at another institution:
+## Validation commands
 
-1. **Search-and-replace `NIEHS`** across the project — most occurrences are in titles, footers, and prose framing.
-2. **Change the brand color** `#205C40` (NIEHS forest green) in:
-   - `styles.scss`
-   - `afternoon_quarto/slides/niehs-theme.scss`
-   - Inline references in slide decks
-3. **Replace `biomarker_data`** with a domain-appropriate dataset. The dataset definition appears in:
-   - `afternoon_quarto/02_code_chunks_and_tables.qmd` (setup chunk — the canonical definition)
-   - `afternoon_quarto/03_figures_and_visualizations.qmd`
-   - `afternoon_quarto/04_equations_crossrefs_citations.qmd`
-   - `afternoon_quarto/01_first_document.qmd` (mentioned)
-   - `capstone.qmd` (as the primary default option)
-4. **Swap the NIEHS-specific equations** (Hill model, HQ, LADD) in `04_equations_crossrefs_citations.qmd` for domain-relevant formulas — biostatistics regression equations, pharmacokinetic equations, whatever fits.
-5. **Update the logo** at `images/niehs-logo.png`.
-
-## Quartobot caveat (if you use it)
-
-`quartobot_bonus.qmd` introduces Sean Davis's [`quartobot`](https://seandavi.github.io/quartobot/) — a community tool that lets you write `@doi:10.21105/joss.01686` directly in prose, with no hand-curated BibTeX entry needed. It's marked as optional / bonus for three reasons:
-
-1. **Maturity** — community-maintained, not Quarto-core. APIs may change.
-2. **Network dependency** — hits Crossref/PubMed/arXiv at render time. NIEHS federal firewalls may block these calls and your render fails.
-3. **Mitigation overhead** — you can pre-resolve references and ship a cached `references.json`, but that adds workflow complexity.
-
-If you want to teach it, **test it on a Posit Cloud instance behind your institution's firewall before the workshop**.
-
-## Validation before delivery
-
-Before running the workshop, render every notebook end-to-end. From the project root on Posit Cloud:
+Run these from the project root in the delivery environment:
 
 ```bash
 quarto render
 ```
 
-This compiles every `.qmd` file in the project (the morning `.Rmd` files are excluded via the `_quarto.yml` `render:` block; render those separately with R Markdown's Knit button to confirm).
+Then render both editable learner files and the standalone learner project:
 
-Common issues to watch for:
+```bash
+Rscript -e 'rmarkdown::render("student_work/morning_report.Rmd")'
+Rscript -e 'rmarkdown::render("student_work/checkpoints/morning_report_complete.Rmd")'
+cd student_work
+quarto render my_report.qmd --to html
+quarto render parameter_demo.qmd --to html
+quarto render checkpoints/bridge_converted.qmd --to html
+quarto render checkpoints/01_yaml_complete.qmd --to html
+quarto render checkpoints/02_table_complete.qmd --to html
+quarto render checkpoints/03_figure_complete.qmd --to html
+quarto render checkpoints/04_crossrefs_citations_complete.qmd --to html
+cd ..
+```
 
-- **Missing packages** — install all listed in `00_setup.qmd` before rendering.
-- **Cross-reference resolution** — if `@fig-foo` renders as `?@fig-foo`, the label is missing or misspelled.
-- **Bibliography misses** — if `[@key]` renders as `[@key]` (un-resolved), the entry is missing from `references.bib`.
-- **Image paths** — slide decks reference `../../images/niehs-logo.png`; make sure that file exists.
+Render slide decks explicitly:
 
-I did NOT validate by rendering in this build because the sandbox doesn't have Quarto CLI available. **Render the project on Posit Cloud before delivery and fix anything that breaks.**
+```bash
+quarto render bridge/slides/bridge_deck.qmd
+for f in afternoon_quarto/slides/[0-9]*.qmd; do quarto render "$f"; done
+Rscript -e 'rmarkdown::render("morning_rmarkdown/slides/slides_01_welcome_and_basics.Rmd")'
+Rscript -e 'rmarkdown::render("morning_rmarkdown/slides/slides_02_code_chunks.Rmd")'
+```
 
-## Author's caveats
+Knit the two morning R Markdown files in RStudio or run:
 
-A few things I want to flag honestly:
+```r
+rmarkdown::render("morning_rmarkdown/01_rmarkdown_basics.Rmd")
+rmarkdown::render("morning_rmarkdown/02_code_chunks.Rmd")
+```
 
-- **The morning slides are ioslides; the afternoon slides are revealjs.** This is intentional (Burke's existing slides are ioslides; revealjs is Quarto-native) but the visual style will shift after the bridge module. Mention this to students once and move on — it's not worth re-doing the morning slides.
-- **The R Markdown capstone (`optional/rmarkdown_capstone_homework.Rmd`) was originally a 20-min in-workshop exercise.** It's been re-purposed as homework with no other modification. The framing in its own README still assumes in-workshop delivery. Either edit it or just brief students on the new framing when handing it out.
-- **`biomarker_data` is the canonical dataset for the Quarto afternoon**, but the airquality and penguins datasets remain as alternatives in the capstone. If you want a fully unified dataset experience, edit the capstone to drop those alternatives.
-- **Posit Cloud free-tier hours are limited** (~25 hr/month at the free tier as of early 2026; verify current pricing at [posit.cloud/plans](https://posit.cloud/plans)). For a single day of workshop, this is fine for everyone, but heavy follow-up use may exhaust the tier.
+Finally, restart R and render `student_work/my_report.qmd` without running any chunks manually.
 
-## License
+## Known environment limitation of this package build
 
-CC BY 4.0 — reuse with attribution. The R Markdown materials (modules 01, 02, capstone, exercise solutions, quick reference) are by R. Burke Squires. The Quarto materials are co-authored by Burke and Claude (Anthropic).
-
-## Contact
-
-R. Burke Squires — burke.squires@nih.gov
+The project was statically checked for YAML, paths, stale references, duplicate labels, and unsafe inline R examples. The package still requires a final smoke test in the actual Posit Cloud template because this build environment does not contain R or the Quarto CLI.

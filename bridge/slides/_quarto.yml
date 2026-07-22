@@ -1,0 +1,8 @@
+project:
+  type: default
+  output-dir: _output
+  execute-dir: project
+
+execute:
+  warning: false
+  message: false

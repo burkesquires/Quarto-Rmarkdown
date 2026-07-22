@@ -1,6 +1,6 @@
 ---
-title: "Quarto 4 — Equations, Cross-Refs, Citations"
-subtitle: "The grammar of scientific writing"
+title: "Quarto 4 — Cross-References and Citations"
+subtitle: "Connect claims to outputs and sources"
 author: "R. Burke Squires"
 institute: "NIEHS"
 date: today
@@ -14,156 +14,105 @@ format:
     code-overflow: wrap
 ---
 
-## Goals — 45 minutes
+## The required outcome — 45 minutes
 
-::: {.incremental}
-- LaTeX equations (inline, display, NIEHS examples)
-- Cross-references for figs, tables, equations, sections
-- BibTeX + CSL citation styles
-- Same syntax as R Markdown; Quarto improves cross-refs
+> Reference the report's table and figure from prose, then add one citation from `student_work/references.bib`.
+
+Equations are a brief demonstration.
+
+# Cross-references {.section-divider}
+
+## Labels carry type information
+
+| Prefix | Output |
+|---|---|
+| `fig-` | Figure |
+| `tbl-` | Table |
+| `eq-` | Equation |
+| `sec-` | Section |
+| `lst-` | Listing |
+
+## Reference from prose
+
+```markdown
+The site summary appears in @tbl-site-summary.
+
+The generated relationship is shown in @fig-pfoa-cholesterol.
+```
+
+::: {.fragment}
+Quarto supplies the number and link. Do not hard-code “Table 1” or “Figure 1.”
 :::
 
 # Equations {.section-divider}
 
-## Inline vs display
-
-::: {.columns}
-::: {.column width="50%"}
-**Inline**
-
-`$\alpha = 0.05$`
-
-renders as $\alpha = 0.05$
-:::
-::: {.column width="50%"}
-**Display**
-
-`$$Y = \beta_0 + \beta_1 X$$`
-
-$$Y = \beta_0 + \beta_1 X$$
-:::
-::::
-
-## NIEHS examples
-
-Hill model:
-
-$$\text{Response} = \frac{E_{\max} \cdot C^n}{EC_{50}^n + C^n}$$
-
-::: {.fragment}
-Hazard quotient:
-
-$$\text{HQ} = \frac{\text{CDI}}{\text{RfD}}$$
-:::
-
-## LADD
-
-$$\text{LADD} = \frac{C \times IR \times EF \times ED}{BW \times AT}$$
-
-::: {.fragment}
-Where $C$ is concentration, $IR$ intake rate, $EF$ exposure frequency, $ED$ exposure duration, $BW$ body weight, $AT$ averaging time.
-:::
-
-## Equation cross-references
+## Inline and numbered display math
 
 ```markdown
+The model uses an error term $\varepsilon_i$.
+
 $$
 Y_i = \beta_0 + \beta_1 X_i + \varepsilon_i
 $$ {#eq-linear}
+
+See @eq-linear.
 ```
 
-::: {.incremental}
-- Label goes **right after `$$`**, on the same line or next
-- Reference with `@eq-linear` → "Equation 1"
-- Built into Quarto (R Markdown needs `bookdown`)
-:::
-
-# Cross-references {.section-divider}
-
-## Two requirements
-
-::: {.incremental}
-1. **Label with the right prefix**
-2. **A caption** (figs and tables)
-:::
-
-| Prefix | What it labels |
-|--------|----------------|
-| `fig-` | Figures |
-| `tbl-` | Tables |
-| `eq-` | Equations |
-| `sec-` | Sections (need `number-sections: true`) |
-| `lst-` | Code listings |
-
-## The R Markdown gap
-
-| Feature | R Markdown | Quarto |
-|---------|-----------|--------|
-| Figure cross-refs | Need `bookdown` | Built in |
-| Table cross-refs | Need `bookdown` | Built in |
-| Equation cross-refs | `bookdown` + `(\#eq:foo)` | `{#eq-foo}` |
-| Section cross-refs | Manual anchors | `@sec-name` |
-
 ::: {.fragment}
-Same end result; less plumbing.
+Use equations only when they help the audience understand the method.
 :::
 
 # Citations {.section-divider}
 
-## Setup
+## Local bibliography
 
 ```yaml
----
 bibliography: references.bib
-csl: nature.csl
----
 ```
 
-Or load CSL by URL:
+```markdown
+Narrative citation: @wilson2017good
 
-```yaml
-csl: https://www.zotero.org/styles/jama
+Parenthetical citation: [@wilson2017good]
 ```
 
-## Citing in prose
-
-| You write | You get |
-|-----------|--------|
-| `@nrc2009` | NRC (2009) |
-| `[@nrc2009]` | (NRC 2009) |
-| `[@nrc2009, p. 47]` | (NRC 2009, p. 47) |
-| `[-@nrc2009]` | (2009) |
-| `[@a; @b]` | (A; B) |
-
-## Where bibliography entries come from
-
-::: {.incremental}
-- **Zotero** — collection → BibTeX
-- **Google Scholar** — quote icon → BibTeX
-- **PubMed** — `doi2bib.org`
-- **Citation managers** — most export BibTeX
-- **Or use quartobot** to skip the .bib altogether (optional bonus)
+::: {.fragment}
+The exact rendered punctuation and numbering depend on the citation style.
 :::
 
-# Format survival {.section-divider}
+## Style comes after a working citation
 
-## What works where
+A local CSL file can change citation and bibliography formatting:
 
-| Feature | HTML | Word | PDF |
-|---------|------|------|-----|
-| Cross-refs | ✓ | ✓ | ✓ |
-| Citations | ✓ | ✓ | ✓ |
-| Equations | MathJax | Office math | LaTeX native |
-| Callouts | styled | paragraph | framed |
-| Tabsets | interactive | sequential | sequential |
-| `DT::datatable` | interactive | screenshot | screenshot |
+```yaml
+bibliography: references.bib
+csl: nature.csl
+```
+
+::: {.callout-tip}
+Teach citation syntax with an easy-to-read author–date result first. Demonstrate the CSL change afterward.
+:::
+
+# Format portability {.section-divider}
+
+## Test the target output
+
+::: {.incremental}
+- Cross-references, citations, and equations can render across HTML, DOCX, and PDF.
+- HTML widgets are not automatically portable.
+- For `DT`, use an HTML branch and a static-table fallback.
+- PDF remains optional in this workshop because it adds a typesetting dependency.
+:::
 
 # Hands-on {.section-divider}
 
-## Notebook Quarto 4
+## Connect the cumulative report
 
-::: {.callout-tip}
-Open `afternoon_quarto/04_equations_crossrefs_citations.qmd`. Exercises 4.1, 4.2, 4.3.
-:::
+In `student_work/my_report.qmd`:
 
-45 minutes. Then slides.
+1. Refer to `@tbl-site-summary`.
+2. Refer to `@fig-pfoa-cholesterol`.
+3. Cite `@wilson2017good`.
+4. Render and confirm all links and the bibliography work.
+
+Recovery: `student_work/checkpoints/04_crossrefs_citations_complete.qmd`.

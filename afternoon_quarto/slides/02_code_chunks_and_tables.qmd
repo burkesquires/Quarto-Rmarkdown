@@ -1,6 +1,6 @@
 ---
-title: "Quarto 2 — Code Chunks & Tables"
-subtitle: "Deeper chunks, publication-quality tables"
+title: "Quarto 2 — Code Options and Tables"
+subtitle: "One reliable table first; advanced methods second"
 author: "R. Burke Squires"
 institute: "NIEHS"
 date: today
@@ -14,152 +14,96 @@ format:
     code-overflow: wrap
 ---
 
-## Goals — 60 minutes
+## The required outcome — 60 minutes
 
-::: {.incremental}
-- Full range of chunk options
-- Publication tables: `kable`, `kableExtra`, `DT`
-- Clean model output with `broom`
-- R + Python side-by-side via tabsets
-:::
-
-# Engines, briefly {.section-divider}
-
-## Two, mostly invisible
-
-| Engine | When |
-|--------|------|
-| `knitr` | `{r}` chunks (and mixed R+Python) |
-| `jupyter` | `{python}`, `{julia}`, `{ojs}` alone |
+> Add one captioned `knitr::kable()` table to `student_work/my_report.qmd` and render it from a clean session.
 
 ::: {.fragment}
-Override only if needed: `engine: knitr` or `engine: jupyter` in YAML.
+`kableExtra`, `DT`, `broom`, and mixed R/Python are demonstrations or bonus material.
+:::
+
+# Execution options {.section-divider}
+
+## Quarto form
+
+```` markdown
+```{r}`r ''`
+#| label: tbl-site-summary
+#| echo: false
+#| message: false
+#| warning: false
+#| tbl-cap: "Synthetic biomarker summary by site."
+
+# code
+```
+````
+
+::: {.fragment}
+Use unique labels. A table label begins `tbl-`.
+:::
+
+## Cache and freeze are different
+
+::: {.incremental}
+- `cache: true` uses the active execution engine's cache.
+- Project `freeze` reuses completed document execution results during project renders.
+- Neither replaces a final clean-session validation.
 :::
 
 # Tables {.section-divider}
 
-## Why we don't just print
+## The portable baseline
 
-```{.r}
-head(biomarker_data, 5)
+```r
+site_summary |>
+  knitr::kable(
+    digits = 2,
+    col.names = c("Site", "N", "Mean PFOA")
+  )
 ```
 
 ::: {.fragment}
-Functional. Ugly. Not for reports.
+Put the cross-reference caption in `#| tbl-cap`, not in both places.
 :::
 
-## kable — the baseline
+## Advanced choices
 
-```{.r}
-biomarker_data |>
-  group_by(site) |>
-  summarise(
-    N = n(),
-    mean_pfoa = mean(pfoa_serum)
-  ) |>
-  kable(caption = "Mean PFOA by site")
+| Method | Use | Portability |
+|---|---|---|
+| `kable()` | Simple report table | Strong |
+| `kableExtra` | Format-specific styling | Test every output |
+| `DT` | Searchable HTML table | HTML only; provide a static fallback |
+| `broom` | Model objects → data frames | Pair with a table method |
+
+## HTML widget fallback
+
+```r
+if (knitr::is_html_output()) {
+  DT::datatable(my_data)
+} else {
+  knitr::kable(my_data)
+}
 ```
 
-Works in HTML, Word, PDF. Simple, reliable.
+# Mixed language {.section-divider}
 
-## kableExtra — publication quality
+## Demonstration only
 
-```{.r}
-... |>
-  kable() |>
-  kable_styling(
-    bootstrap_options = c("striped", "hover"),
-    full_width = FALSE
-  ) |>
-  row_spec(elevated_rows,
-           bold = TRUE, color = "#DC2626") |>
-  add_header_above(c(" " = 1, "PFAS" = 2, "Other" = 2)) |>
-  footnote(general = "...")
-```
+A document containing R and Python uses knitr with `reticulate` for the Python chunks. That adds an environment dependency.
 
-::: {.fragment}
-Conditional row formatting, grouped headers, footnotes — all available.
-:::
-
-## DT — interactive HTML
-
-```{.r}
-DT::datatable(participants,
-              filter = "top",
-              options = list(pageLength = 10))
-```
-
-::: {.incremental}
-- Searchable, sortable, paginated
-- **HTML only** — falls back in Word/PDF
-:::
-
-## broom — clean model output
-
-```{.r}
-model <- lm(log(pfoa_serum) ~ age + bmi + sex, data = biomarker_data)
-
-tidy(model, conf.int = TRUE) |>
-  kable() |>
-  kable_styling()
-```
-
-::: {.fragment}
-`tidy()` for coefficients. `glance()` for fit statistics. Both data frames — pipe directly into `kable()`.
-:::
-
-## When to use which
-
-| Method | Best for | Formats |
-|--------|----------|---------|
-| `kable()` | Simple, reliable | HTML/Word/PDF |
-| `kableExtra` | Publication quality | HTML (best) |
-| `DT` | Interactive | HTML only |
-| `gt` | Highly customized | HTML/PDF |
-
-# Quarto-distinctive chunk options {.section-divider}
-
-## Five that earn their keep
-
-::: {.incremental}
-- `cache: true` — skip slow code when unchanged
-- `code-fold: true` — collapse code behind a click
-- `output: asis` — let output write markdown
-- `dev: svg` — vector figures
-- `echo: fenced` — show the chunk header (teaching docs)
-:::
-
-# Mixed R + Python {.section-divider}
-
-## Tabsets
-
-````markdown
-::: {.panel-tabset}
-
-### R
-```{r}`r ''`
-ggplot(biomarker_data, aes(pfoa_serum, cholesterol)) +
-  geom_point()
-```
-
-### Python
-```{python}`r ''`
-sns.scatterplot(data=r.biomarker_data, x="pfoa_serum", y="cholesterol")
-```
-
-:::
-````
-
-::: {.fragment}
-Tabs in HTML; sequential in Word/PDF. Excellent for mixed-language teams.
+::: {.callout-warning}
+Do not make Python setup a prerequisite for the core workshop.
 :::
 
 # Hands-on {.section-divider}
 
-## Notebook Quarto 2
+## Add the required table
 
-::: {.callout-tip}
-Open `afternoon_quarto/02_code_chunks_and_tables.qmd`. Exercises 2.1, 2.2, 2.3.
-:::
+In `student_work/my_report.qmd`:
 
-Back in 60 min — then figures and visualizations.
+1. Summarize record count and mean PFOA by site.
+2. Display the result with `knitr::kable()`.
+3. Add `tbl-site-summary` and an informative `tbl-cap`.
+4. Render from a restarted R session.
+
+Recovery: `student_work/checkpoints/02_table_complete.qmd`.

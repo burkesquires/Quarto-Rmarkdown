@@ -1,0 +1,73 @@
+---
+title: "Parameterized Synthetic Biomarker Summary"
+author: "Your name"
+date: today
+format:
+  html:
+    toc: true
+params:
+  chemical: "PFOA"
+  site: "Research Triangle Park"
+  threshold: 4.0
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+library(dplyr)
+library(ggplot2)
+
+biomarker_data <- read.csv("data/workshop_biomarkers.csv")
+chemical_columns <- c(PFOA = "pfoa_serum", PFOS = "pfos_serum")
+valid_sites <- c("All", sort(unique(biomarker_data$site)))
+
+if (!params$chemical %in% names(chemical_columns)) {
+  stop("chemical must be PFOA or PFOS")
+}
+if (!params$site %in% valid_sites) {
+  stop("site must be All or one of: ", paste(valid_sites[-1], collapse = ", "))
+}
+if (!is.numeric(params$threshold) || length(params$threshold) != 1 ||
+    is.na(params$threshold) || params$threshold <= 0) {
+  stop("threshold must be one positive number")
+}
+
+selected <- biomarker_data |>
+  filter(params$site == "All" | site == params$site) |>
+  transmute(
+    site,
+    concentration = .data[[chemical_columns[[params$chemical]]]]
+  )
+
+n_above <- sum(selected$concentration > params$threshold)
+pct_above <- 100 * n_above / nrow(selected)
+```
+
+## Current parameter set
+
+This report summarizes **`r params$chemical`** at **`r params$site`**. Of `r nrow(selected)` synthetic records, `r n_above` (`r round(pct_above, 1)`%) exceed the arbitrary teaching threshold of `r params$threshold` ng/mL.
+
+::: {.callout-warning}
+The data and threshold are synthetic teaching inputs. They are not regulatory, clinical, or health-based values.
+:::
+
+```{r}
+#| label: fig-parameter-distribution
+#| fig-cap: !expr paste("Distribution of simulated serum", params$chemical, "at", params$site)
+#| fig-alt: !expr paste("Histogram of simulated serum", params$chemical, "at", params$site, "with a dashed teaching threshold at", params$threshold, "nanograms per milliliter.")
+#| echo: false
+
+ggplot(selected, aes(concentration)) +
+  geom_histogram(bins = 25, boundary = 0) +
+  geom_vline(
+    xintercept = params$threshold,
+    linewidth = 0.9,
+    linetype = "dashed"
+  ) +
+  labs(
+    x = paste("Serum", params$chemical, "(ng/mL)"),
+    y = "Synthetic record count"
+  ) +
+  theme_minimal()
+```

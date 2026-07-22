@@ -1,0 +1,48 @@
+---
+title: "My Morning R Markdown Report"
+author: "Your name"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  fig.width = 7,
+  fig.height = 4
+)
+
+dat <- read.csv("../data/workshop_biomarkers.csv")
+n_records <- nrow(dat)
+mean_age <- mean(dat$age)
+median_pfoa <- median(dat$pfoa_serum)
+```
+
+# Purpose
+
+This **reproducible report** combines *narrative text* with results calculated from a synthetic teaching dataset.
+
+# Data preview
+
+```{r data-preview, echo=FALSE}
+knitr::kable(
+  head(dat),
+  caption = "First six synthetic records."
+)
+```
+
+# Dynamic summary
+
+The synthetic teaching dataset contains `r n_records` records. Mean age is `r round(mean_age, 1)` years, and the median simulated serum PFOA concentration is `r round(median_pfoa, 2)`.
+
+# Learning goals
+
+1. Render a complete document from a clean session.
+2. Control which code and output readers see.
+3. Keep reported values synchronized with the analysis.

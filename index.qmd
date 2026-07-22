@@ -9,74 +9,75 @@ format:
 
 ## About this workshop
 
-A hands-on day covering **R Markdown** and **Quarto** — the two tools the R community uses to weave narrative, code, and code output into a single reproducible document.
+This is a hands-on introduction to **R Markdown** and **Quarto**: tools for combining narrative, code, tables, figures, and citations in a reproducible report.
 
-The morning grounds you in R Markdown (the established tool you probably already have files in). The afternoon moves to Quarto (the modern successor where active development is happening). A deliberate 25-minute bridge module between them makes the migration explicit — you'll leave knowing how to convert your existing `.Rmd` files when you're ready.
+R Markdown remains supported and widely used. Quarto is a newer, multi-language publishing system with additional built-in features. You do not need to abandon existing `.Rmd` files; the bridge module shows how the same mental model carries into `.qmd` files. See the [official Quarto FAQ for R Markdown users](https://quarto.org/docs/faq/rmarkdown.html).
 
-This entire training site is built with Quarto itself.
+::: {.callout-important}
+## The outcome that matters
+By 5 PM, you will be able to render a Quarto HTML report from a clean session containing narrative text, an inline result, a table, a figure, a caption, a cross-reference, and a citation—and explain how an `.Rmd` maps to a `.qmd`.
+:::
+
+## How you will work today
+
+The training website is **read-only course material**. Your editable files live in `student_work/`, separate from the website:
+
+```text
+student_work/morning_report.Rmd
+student_work/my_report.qmd
+```
+
+Use the `.Rmd` file for the two short morning lessons. After the bridge, keep `my_report.qmd` open and add one useful element at each stage. Because `student_work/` has its own `_quarto.yml`, rendering your report will not trigger the course website or unrelated lesson files.
+
+Checkpoint files are available in `student_work/checkpoints/` if you need to recover from an editing problem.
 
 ## Who this is for
 
-- NIEHS scientists, postdocs, and trainees who want a single, reproducible workflow for analysis-plus-writing.
-- People comfortable with R (and ideally a little Python — the afternoon shows R and Python side-by-side via tabsets).
-- People who know what a Markdown bullet list is. **No prior R Markdown or Quarto experience required.**
+- NIEHS scientists, postdocs, and trainees who want a reproducible analysis-and-writing workflow.
+- Participants comfortable reading basic R code.
+- No prior R Markdown or Quarto experience is required.
+- Python is optional and is demonstrated rather than required.
 
-## What you will be able to do by 5 PM
+## Learning priorities
 
-1. Render an `.Rmd` file and read its three-part anatomy.
-2. Convert an `.Rmd` file to `.qmd` and understand what changes.
-3. Author Quarto documents mixing prose, code, figures, and tables.
-4. Render the same `.qmd` to HTML, Word, and PDF without rewriting.
-5. Add cross-references, citations, and equations that survive format changes.
-6. Build slide decks with `revealjs` from a `.qmd` source.
-7. Generate parameterized reports across chemicals, sites, or years.
-8. Continue using Quarto on your own laptop Monday morning.
+| Level | Content |
+|---|---|
+| **Everyone does** | Clean-session render, YAML, chunks, inline values, one `kable()` table, one `ggplot2` figure, captions, figure alt text, cross-references, and one citation |
+| **Instructor demonstrates** | Revealjs, parameters, DOCX output, project configuration, and safe sharing |
+| **Bonus/reference** | Python, `DT`, `plotly`, `patchwork`, `broom`, PDF/LaTeX, deep theming, batch rendering, public publishing, and Quartobot |
 
 ## Schedule
 
-| Time          | Block                                          | Duration |
-|---------------|------------------------------------------------|----------|
-| 09:00 – 09:05 | Posit Cloud verification                       | 5 min    |
-| 09:05 – 09:30 | **R Markdown basics** (YAML, markdown, knit)   | 25 min   |
-| 09:30 – 10:00 | **Code chunks + inline code**                  | 30 min   |
-| 10:00 – 10:15 | Break                                          | 15 min   |
-| 10:15 – 10:40 | **Bridge: R Markdown → Quarto**                | 25 min   |
-| 10:40 – 11:10 | Quarto 1 — your first `.qmd`                   | 30 min   |
-| 11:10 – 12:10 | Quarto 2 — code chunks + tables                | 60 min   |
-| 12:10 – 13:10 | Lunch                                          | 60 min   |
-| 13:10 – 13:55 | Quarto 3 — figures & visualizations            | 45 min   |
-| 13:55 – 14:40 | Quarto 4 — equations, cross-refs, citations    | 45 min   |
-| 14:40 – 14:55 | Break                                          | 15 min   |
-| 14:55 – 15:25 | Quarto 5 — revealjs presentations              | 30 min   |
-| 15:25 – 15:50 | Quarto 6 — parameterized reports               | 25 min   |
-| 15:50 – 16:10 | Quarto 7 — projects, themes, publishing        | 20 min   |
-| 16:10 – 16:35 | Capstone                                       | 25 min   |
-| 16:35 – 17:00 | Wrap-up + next steps                           | 25 min   |
+| Time | Focus | Delivery |
+|---|---|---|
+| 09:00–09:15 | Setup and student workspace | Everyone renders `student_work/my_report.qmd` |
+| 09:15–10:00 | R Markdown anatomy, clean render, chunks, inline code | One cumulative exercise |
+| 10:00–10:15 | Break | |
+| 10:15–10:35 | R Markdown → Quarto bridge | Convert one small file |
+| 10:35–11:10 | First Quarto report | YAML, callout, code folding |
+| 11:10–12:10 | Code options and tables | Everyone builds one `kable()` table; advanced methods are demonstrations |
+| 12:10–13:10 | Lunch | |
+| 13:10–13:55 | Figures | One ggplot, caption, alt text, and label |
+| 13:55–14:40 | Cross-references and citations | Equations are a brief demonstration |
+| 14:40–14:55 | Break | |
+| 14:55–15:20 | Revealjs | Instructor demo plus one learner edit |
+| 15:20–15:45 | Parameters | Instructor demo plus one parameter change |
+| 15:45–16:20 | Cumulative capstone | Polish the report already built |
+| 16:20–16:40 | Projects and safe sharing | No live theme-editing exercise |
+| 16:40–17:00 | Debrief, troubleshooting, exit ticket | Save/export work and state one next action |
 
-Total contact: **6 hours** (plus 30 min of breaks and a 60-min lunch). R Markdown teaching ~80 min, Quarto teaching ~3:55, capstone + wrap-up ~50 min.
+Total contact time is **6 hours 30 minutes**, plus two 15-minute breaks and a 60-minute lunch.
 
-::: {.callout-note}
-## On the time split
-R Markdown is in maintenance mode; Quarto is where active development is. Skills transfer almost wholesale from R Markdown to Quarto, so the morning teaches the foundation, then the afternoon dives deep into Quarto's distinctive features (cross-references, multi-format, parameterized reports, projects) using your existing R Markdown materials as the launching pad. The bridge module makes the migration explicit so students know how to convert their own `.Rmd` files.
-:::
+## Data used in examples
 
-## Prerequisites & setup
+The workshop uses `data/workshop_biomarkers.csv`, a **synthetic teaching dataset** with 200 simulated records. It contains no participant data. Relationships were intentionally generated so figures and models are visible during class; they are not evidence about PFAS exposure or health outcomes.
 
-For the workshop itself: **a free [Posit Cloud](https://posit.cloud) account and a browser**. That's it. Quarto, R, Python, and an IDE are all preinstalled.
+## Before we begin
 
-For continuing on your own laptop after the workshop, see [Next Steps](next_steps.qmd) — full local install for Mac and Windows.
+You need a browser and access to the instructor-provided Posit Cloud project. Account creation and login should be completed before class whenever possible.
 
-::: {.callout-note}
-## On Posit Cloud free-tier limits
-The free tier has a monthly compute-hour cap. For today's workshop you'll be well under it. If you keep using Posit Cloud heavily afterward, you can either upgrade or move to a local install — see [Next Steps](next_steps.qmd).
-:::
+Open [`00_setup.qmd`](00_setup.qmd) when the instructor signals.
 
-Open [`00_setup.qmd`](00_setup.qmd) when your instructor signals.
+## Materials and licensing
 
-## Materials & licensing
-
-All slides, notebooks, and code in this training are released under CC BY 4.0. Reuse with attribution.
-
-## Acknowledgements
-
-This training draws on the Quarto documentation at [quarto.org](https://quarto.org), the R Markdown documentation at [rmarkdown.rstudio.com](https://rmarkdown.rstudio.com), Hadley Wickham and Mine Çetinkaya-Rundel's *R for Data Science* (2e), and simulated NIEHS-relevant data (biomarker, air quality) for the examples.
+Training materials are released under CC BY 4.0 unless otherwise noted. Reuse with attribution.

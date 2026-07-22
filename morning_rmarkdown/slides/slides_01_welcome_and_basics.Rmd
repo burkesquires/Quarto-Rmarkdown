@@ -1,7 +1,7 @@
 ---
-title: "R Markdown for Scientists"
-subtitle: "NIEHS 3-Hour Workshop on Posit Cloud"
-author: "NIEHS Training"
+title: "R Markdown for Reproducible Science"
+subtitle: "Morning block of the NIEHS one-day workshop"
+author: "R. Burke Squires"
 date: "`r Sys.Date()`"
 output:
   ioslides_presentation:
@@ -11,207 +11,112 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,
-                      comment = "", fig.height = 2.8, fig.width = 6)
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  comment = "",
+  fig.height = 2.8,
+  fig.width = 6
+)
 ```
 
-## Workshop Agenda
+## Today's durable outcome
 
-| Module | Topic | Time |
-|--------|-------|------|
-| 0–1 | Welcome + R Markdown Basics | 35 min |
-| 2 | Code Chunks and Inline Code | 30 min |
-| 3 | Tables and Data Display | 25 min |
-| — | **Break** | 10 min |
-| 4 | Visualizations and Figure Control | 25 min |
-| 5 | Scientific Writing: Equations, Citations, Parameters | 20 min |
-| 6 | Output Formats, Themes, Templates | 15 min |
-| 7 | Capstone: Build a Complete Report | 20 min |
+By 5 PM, participants will render a Quarto HTML report from a clean session with narrative, an inline result, a table, a figure, a caption, a cross-reference, and a citation.
 
-<div class="notes">
-Welcome. By the end of this workshop you'll be able to create reproducible
-reports that combine prose, code, and results — all from one file.
-</div>
+::: incremental
+- R Markdown first: understand the model.
+- Bridge: translate a safe copy.
+- Quarto: continue one cumulative learner report.
+:::
 
-## What is R Markdown?
+## Morning schedule
 
-An `.Rmd` file combines three things:
+| Time | Focus |
+|---|---|
+| 09:00–09:15 | Preflight and learner workspace |
+| 09:15–09:35 | YAML, Markdown, and knitting |
+| 09:35–10:00 | Chunks and inline results |
+| 10:00–10:15 | Break |
+| 10:15–10:35 | R Markdown → Quarto bridge |
 
-1. **Narrative text** written in Markdown
-2. **R code** that runs and produces results
-3. **Output** — figures, tables, statistics — embedded in the document
+## Work in the learner directory
 
-When you **knit**, R executes the code and produces a polished report.
+> Edit `student_work/morning_report.Rmd`, not the lesson or slide source.
 
-> Your report IS the analysis. Change the data, re-knit, everything updates.
+The course website is read-only. Checkpoints in `student_work/checkpoints/` provide recovery without changing the instructor materials.
 
-## Why R Markdown for NIEHS Research?
+# R Markdown anatomy {.segue}
 
-| Benefit | How |
-|---------|-----|
-| **Reproducibility** | Report = analysis; anyone can re-run it |
-| **FAIR principles** | Code, data, narrative bundled and shareable |
-| **Efficiency** | Change data → re-knit → report updates automatically |
-| **No copy-paste errors** | Statistics flow directly from code to text |
-| **Collaboration** | Share `.Rmd` via GitHub; full transparency |
+## Three parts
 
-## Before We Start {.build}
+1. **YAML** — metadata and output settings.
+2. **Markdown prose** — the scientific narrative.
+3. **Executable code** — chunks and inline expressions.
 
-Please confirm:
+> The source document records how the output was made.
 
-> - ✅ Posit Cloud account — [posit.cloud](https://posit.cloud)
-> - ✅ Project open in Posit Cloud
-> - ✅ Modern web browser (Chrome, Firefox, Edge)
-
-Run this in the **Console** to install packages:
-
-```r
-install.packages(c("tidyverse", "kableExtra", 
-                    "DT", "plotly", "broom",
-                    "patchwork", "here"))
-```
-
-# Module 1: R Markdown Basics {.segue}
-
-## The Three Parts of an .Rmd File
-
-Every R Markdown document has:
-
-```
----                          ← YAML header (metadata)
-title: "My Report"
-output: html_document
----
-
-# Introduction              ← Markdown text (narrative)
-
-This study examines...
-
-```​{r}                       ← Code chunks (R code)
-mean(c(1, 2, 3))
-```​
-```
-
-<div class="notes">
-Open a new Rmd file live (File → New → R Markdown) and point out each section.
-</div>
-
-## The YAML Header
-
-Lives at the very top between `---` marks:
+## YAML
 
 ```yaml
 ---
-title: "Dose-Response Analysis of PFAS Exposure"
-subtitle: "Supplementary Methods"
-author: "J. Smith, NIEHS"
+title: "My Morning R Markdown Report"
+author: "Your name"
 date: "`r knitr::inline_expr('Sys.Date()')`"
 output:
   html_document:
-    theme: flatly
     toc: true
-    toc_float: true
+    code_folding: show
 ---
 ```
 
-> **YAML is indent-sensitive.** Use spaces (not tabs), exactly 2 per level.
+YAML is indentation-sensitive. Use spaces, not tabs.
 
-## Key YAML Fields
+## Markdown prose
 
-| Field | Purpose | Example |
-|-------|---------|---------|
-| `title` | Document title | `"PM₂.₅ Exposure Report"` |
-| `subtitle` | Secondary title | `"Methods Supplement"` |
-| `author` | Name(s) | `"J. Smith, NIEHS"` |
-| `date` | Date or R expression | `` "`r knitr::inline_expr('Sys.Date()')`" `` |
-| `output` | Format + options | `html_document`, `word_document` |
+| Source | Meaning |
+|---|---|
+| `**important**` | **important** |
+| `*emphasis*` | *emphasis* |
+| `## Methods` | A section heading |
+| `- item` | A bullet |
+| `[NIEHS](https://www.niehs.nih.gov)` | A link |
 
-## Markdown: Text Formatting
-
-| What you type | What you see |
-|---------------|-------------|
-| `**bold**` | **bold** |
-| `*italic*` | *italic* |
-| `***bold italic***` | ***bold italic*** |
-| `` `code` `` | `code` |
-| `~~strikethrough~~` | ~~strikethrough~~ |
-| `superscript^2^` | superscript^2^ |
-| `subscript~2~` | subscript~2~ |
-
-## Markdown: Structure
-
-```markdown
-# Heading 1 (largest)
-## Heading 2
-### Heading 3
-
-- Bullet item
-  - Sub-item (indent 2 spaces)
-
-1. Numbered item
-2. Second item
-
-> Block quote
-
-[Link text](https://www.niehs.nih.gov)
-
----   (horizontal rule)
-```
-
-These headings auto-generate the **table of contents**.
-
-## Markdown: Footnotes
-
-```markdown
-PFAS exposure is a growing concern[^1].
-
-[^1]: See EPA PFAS Strategic Roadmap, 2021.
-```
-
-Renders as:
-
-PFAS exposure is a growing concern[^1].
-
-[^1]: See EPA PFAS Strategic Roadmap, 2021.
+Use headings to represent structure, not merely visual size.
 
 # Knitting {.segue}
 
-## How Knitting Works
+## What happens
 
-```
-.Rmd file
-    ↓
-knitr (runs R code, inserts results)
-    ↓
-.md file (Markdown with output)
-    ↓
-Pandoc (converts to final format)
-    ↓
-.html / .docx / .pdf
+```text
+.Rmd source
+   ↓
+knitr executes R and inserts results
+   ↓
+Pandoc creates HTML, DOCX, or PDF
 ```
 
-**Click Knit** or press `Ctrl+Shift+K` (Cmd+Shift+K on Mac).
+## Clean-session principle
 
-## Knitting Runs in a Clean Session
+When the complete document knits:
 
-When you knit, R starts **fresh**:
+- Required packages were loaded by the source.
+- Required data were read by the source.
+- Required objects were created in document order.
 
-- Objects from the Console are **NOT** available
-- Every package must be loaded with `library()` in the `.Rmd`
-- Every data file must be read inside the `.Rmd`
+> A successful knit supports computational reproducibility; scientific validity still requires review.
 
-> This guarantees **reproducibility**. If it knits, anyone can reproduce it.
+# Hands-on {.segue}
 
-## Exercise 1.1: Your First R Markdown
+## Edit the safe learner file
 
-1. **File → New File → R Markdown...**
-2. Title: "My First R Markdown", your name
-3. Keep default HTML output → OK
-4. Click **Knit** → see the rendered output
-5. Now modify:
-   - Change the title
-   - Add a **bold** sentence and an *italic* one
-   - Add a numbered list of 3 things
-   - Re-knit!
+In `student_work/morning_report.Rmd`:
 
-**Time: 5 minutes**
+1. Change the title and author.
+2. Add bold and italic text.
+3. Replace the placeholder learning goals.
+4. Knit.
+5. Restart R and knit again.
+
+Success: the file knits after restart and shows your edits.

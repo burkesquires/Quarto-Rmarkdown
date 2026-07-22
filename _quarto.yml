@@ -2,22 +2,35 @@ project:
   type: website
   output-dir: _site
   render:
-    - "*.qmd"
-    - "!morning_rmarkdown/"
-    - "!instructor/"
-    - "!optional/"
-    - "!_site/"
+    - index.qmd
+    - 00_setup.qmd
+    - morning_rmarkdown/01_rmarkdown_basics.Rmd
+    - morning_rmarkdown/02_code_chunks.Rmd
+    - morning_rmarkdown/quick_reference.Rmd
+    - bridge/rmd_to_quarto_bridge.qmd
+    - afternoon_quarto/01_first_document.qmd
+    - afternoon_quarto/02_code_chunks_and_tables.qmd
+    - afternoon_quarto/03_figures_and_visualizations.qmd
+    - afternoon_quarto/04_equations_crossrefs_citations.qmd
+    - afternoon_quarto/05_revealjs_presentations.qmd
+    - afternoon_quarto/06_parameterized_reports.qmd
+    - afternoon_quarto/07_projects_themes_publishing.qmd
+    - capstone.qmd
+    - next_steps.qmd
 
 website:
   title: "R Markdown + Quarto for Reproducible Science"
   description: "A one-day NIEHS training combining R Markdown and Quarto"
+  search: true
   navbar:
     background: "#205C40"
     foreground: "#FFFFFF"
     left:
       - href: index.qmd
         text: Home
-      - text: "Morning (R Markdown)"
+      - href: 00_setup.qmd
+        text: Setup
+      - text: "Morning: R Markdown"
         menu:
           - href: morning_rmarkdown/01_rmarkdown_basics.Rmd
             text: "1. R Markdown Basics"
@@ -27,20 +40,28 @@ website:
             text: "Quick Reference"
       - text: "Bridge"
         href: bridge/rmd_to_quarto_bridge.qmd
-      - text: "Afternoon (Quarto)"
+      - text: "Afternoon: Quarto"
         menu:
-          - afternoon_quarto/01_first_document.qmd
-          - afternoon_quarto/02_code_chunks_and_tables.qmd
-          - afternoon_quarto/03_figures_and_visualizations.qmd
-          - afternoon_quarto/04_equations_crossrefs_citations.qmd
-          - afternoon_quarto/05_revealjs_presentations.qmd
-          - afternoon_quarto/06_parameterized_reports.qmd
-          - afternoon_quarto/07_projects_themes_publishing.qmd
-          - afternoon_quarto/quartobot_bonus.qmd
+          - href: afternoon_quarto/01_first_document.qmd
+            text: "1. First Quarto Report"
+          - href: afternoon_quarto/02_code_chunks_and_tables.qmd
+            text: "2. Tables"
+          - href: afternoon_quarto/03_figures_and_visualizations.qmd
+            text: "3. Figures"
+          - href: afternoon_quarto/04_equations_crossrefs_citations.qmd
+            text: "4. Cross-References & Citations"
+          - href: afternoon_quarto/05_revealjs_presentations.qmd
+            text: "5. Revealjs Demo"
+          - href: afternoon_quarto/06_parameterized_reports.qmd
+            text: "6. Parameters Demo"
       - text: "End of Day"
         menu:
-          - capstone.qmd
-          - next_steps.qmd
+          - href: capstone.qmd
+            text: "Capstone"
+          - href: afternoon_quarto/07_projects_themes_publishing.qmd
+            text: "Projects & Safe Sharing"
+          - href: next_steps.qmd
+            text: "Next Steps"
   sidebar:
     style: "docked"
     background: "#F4F1EC"
@@ -48,30 +69,41 @@ website:
       - href: index.qmd
         text: "Welcome"
       - href: 00_setup.qmd
-        text: "Setup (Posit Cloud)"
+        text: "Setup and Student Workspace"
       - section: "Morning — R Markdown"
         contents:
           - href: morning_rmarkdown/01_rmarkdown_basics.Rmd
             text: "1. R Markdown Basics"
           - href: morning_rmarkdown/02_code_chunks.Rmd
             text: "2. Code Chunks"
+          - href: morning_rmarkdown/quick_reference.Rmd
+            text: "Quick Reference"
       - section: "Bridge"
         contents:
-          - bridge/rmd_to_quarto_bridge.qmd
+          - href: bridge/rmd_to_quarto_bridge.qmd
+            text: "R Markdown to Quarto"
       - section: "Afternoon — Quarto"
         contents:
-          - afternoon_quarto/01_first_document.qmd
-          - afternoon_quarto/02_code_chunks_and_tables.qmd
-          - afternoon_quarto/03_figures_and_visualizations.qmd
-          - afternoon_quarto/04_equations_crossrefs_citations.qmd
-          - afternoon_quarto/05_revealjs_presentations.qmd
-          - afternoon_quarto/06_parameterized_reports.qmd
-          - afternoon_quarto/07_projects_themes_publishing.qmd
-          - afternoon_quarto/quartobot_bonus.qmd
-      - section: "End of day"
+          - href: afternoon_quarto/01_first_document.qmd
+            text: "1. First Quarto Report"
+          - href: afternoon_quarto/02_code_chunks_and_tables.qmd
+            text: "2. Tables"
+          - href: afternoon_quarto/03_figures_and_visualizations.qmd
+            text: "3. Figures"
+          - href: afternoon_quarto/04_equations_crossrefs_citations.qmd
+            text: "4. Cross-References & Citations"
+          - href: afternoon_quarto/05_revealjs_presentations.qmd
+            text: "5. Revealjs Demo"
+          - href: afternoon_quarto/06_parameterized_reports.qmd
+            text: "6. Parameters Demo"
+      - section: "End of Day"
         contents:
-          - capstone.qmd
-          - next_steps.qmd
+          - href: capstone.qmd
+            text: "Capstone"
+          - href: afternoon_quarto/07_projects_themes_publishing.qmd
+            text: "Projects & Safe Sharing"
+          - href: next_steps.qmd
+            text: "Next Steps"
 
 format:
   html:
@@ -83,17 +115,11 @@ format:
     code-overflow: wrap
     fig-width: 7
     fig-height: 4.5
-    fig-align: "center"
+    fig-align: center
     df-print: paged
+    link-external-newwindow: true
 
 bibliography: references.bib
-csl: nature.csl
 
 execute:
   freeze: auto
-
-author:
-  - name: R. Burke Squires
-    affiliation: National Institute of Environmental Health Sciences (NIEHS)
-
-date: today

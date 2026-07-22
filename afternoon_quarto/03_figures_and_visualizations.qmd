@@ -11,12 +11,9 @@ format:
 
 ## Goals for this 45-minute block
 
-- Move from a basic `ggplot2` plot to a publication-quality figure.
-- Control figure sizing and resolution with chunk options.
-- Combine multiple plots into one figure with `patchwork`.
-- Add interactive figures with `plotly` (HTML only).
-- Save figures to disk for manuscript submission.
-- Use Quarto's column layout for side-by-side figures.
+**Everyone does:** add one readable `ggplot2` figure to `student_work/my_report.qmd` with a `fig-` label, caption, alt text, and clear axis labels.
+
+**Instructor demonstrations/bonus:** `patchwork`, `plotly`, side-by-side layouts, and manuscript-export settings.
 
 ## Setup
 
@@ -26,23 +23,17 @@ format:
 #| warning: false
 #| include: false
 
-library(tidyverse)
-library(patchwork)
-library(plotly)
+library(dplyr)
+library(ggplot2)
 
-# The workshop biomarker dataset
-set.seed(42)
-n <- 200
-biomarker_data <- data.frame(
-  participant_id = 1:n,
-  age = round(rnorm(n, 48, 14)),
-  sex = sample(c("Female", "Male"), n, replace = TRUE, prob = c(0.55, 0.45)),
-  pfoa_serum = round(rlnorm(n, meanlog = 0.8, sdlog = 0.9), 2),
-  cholesterol = round(rnorm(n, 210, 38)),
-  site = sample(c("Research Triangle Park", "Durham", "Chapel Hill"),
-                n, replace = TRUE)
-)
+# Read the fixed synthetic workshop dataset
+biomarker_data <- read.csv("../data/workshop_biomarkers.csv")
 ```
+
+::: {.callout-warning}
+## Synthetic teaching data
+These records contain no participant data. The generated relationships exist only to make plotting examples visible and must not be interpreted as evidence about PFAS exposure or health outcomes.
+:::
 
 ## From basic to publication-quality
 
@@ -53,6 +44,7 @@ One of Quarto's strengths: figures are generated directly from your code. No sav
 ```{r}
 #| label: fig-basic
 #| fig-cap: "Basic ggplot scatter — functional but unfinished."
+#| fig-alt: "Scatterplot of serum PFOA and total cholesterol using default ggplot styling."
 
 ggplot(biomarker_data, aes(x = pfoa_serum, y = cholesterol)) +
   geom_point() +
@@ -66,20 +58,22 @@ ggplot(biomarker_data, aes(x = pfoa_serum, y = cholesterol)) +
 ```{r}
 #| label: fig-publication
 #| fig-cap: "Publication-quality version: log-scale x, sex-stratified, with regression overlay."
+#| fig-alt: "Scatterplot of serum PFOA on a logarithmic horizontal axis and total cholesterol on the vertical axis. Sex is shown by both color and point shape, with fitted lines and confidence bands."
 #| warning: false
 
-ggplot(biomarker_data, aes(x = pfoa_serum, y = cholesterol, color = sex)) +
+ggplot(biomarker_data, aes(x = pfoa_serum, y = cholesterol, color = sex, shape = sex)) +
   geom_point(alpha = 0.6, size = 2) +
   geom_smooth(method = "lm", se = TRUE, linewidth = 0.8) +
   scale_x_log10() +
   scale_color_manual(values = c("Female" = "#0D9488", "Male" = "#6366F1")) +
   labs(
-    title = "Association Between Serum PFOA and Total Cholesterol",
+    title = "Generated Pattern Between Serum PFOA and Total Cholesterol",
     subtitle = "Stratified by sex, N = 200",
     x = "Serum PFOA (ng/mL, log scale)",
     y = "Total Cholesterol (mg/dL)",
     color = "Sex",
-    caption = "Simulated NIEHS biomonitoring data"
+    shape = "Sex",
+    caption = "Synthetic teaching data"
   ) +
   theme_minimal(base_size = 12) +
   theme(
@@ -108,7 +102,7 @@ In Quarto, figure dimensions are chunk options on `#|` lines:
 | `fig-height` | Height in inches | 5 | `fig-height: 4` |
 | `fig-align` | Alignment | `"default"` | `"center"`, `"left"`, `"right"` |
 | `dpi` | Resolution | 96 | `300` for publication |
-| `fig-cap` | Figure caption | — | `"Figure 1. My caption"` |
+| `fig-cap` | Figure caption | — | `"My caption"` |
 | `out-width` | Rendered width (CSS) | — | `"80%"`, `"500px"` |
 
 ::: {.callout-warning}
@@ -123,6 +117,7 @@ A narrow, tall boxplot:
 ```{r}
 #| label: fig-narrow
 #| fig-cap: "Narrow figure: PFOA by sex (fig-width 4, fig-height 6)."
+#| fig-alt: "Two boxplots compare the distribution of serum PFOA for female and male simulated records on a logarithmic vertical axis."
 #| fig-width: 4
 #| fig-height: 6
 
@@ -140,6 +135,7 @@ A wide, short panel of sites:
 ```{r}
 #| label: fig-wide
 #| fig-cap: "Wide figure: age vs cholesterol faceted by site (fig-width 10, fig-height 3)."
+#| fig-alt: "Three side-by-side scatterplots show age and cholesterol for Chapel Hill, Durham, and Research Triangle Park, each with a smooth fitted curve."
 #| fig-width: 10
 #| fig-height: 3
 #| warning: false
@@ -159,6 +155,7 @@ ggplot(biomarker_data, aes(x = age, y = cholesterol)) +
 ```{r}
 #| label: fig-scaled
 #| fig-cap: "Created at 8×6 inches, displayed at 60% width."
+#| fig-alt: "Histogram showing the right-skewed distribution of serum PFOA on a logarithmic horizontal axis."
 #| fig-width: 8
 #| fig-height: 6
 #| out-width: "60%"
@@ -179,9 +176,13 @@ Two ways to combine plots in one figure: `patchwork` (for unrelated plots) and `
 
 ### `patchwork` — flexible composition
 
+This optional example is displayed without execution so the core course build does not depend on `patchwork`.
+
 ```{r}
 #| label: fig-patchwork
+#| eval: false
 #| fig-cap: "Two-panel figure: distribution (A) and relationship (B)."
+#| fig-alt: "Panel A is a histogram of serum PFOA. Panel B is a scatterplot of serum PFOA and cholesterol with a fitted line."
 #| fig-width: 10
 #| fig-height: 4
 #| warning: false
@@ -218,6 +219,7 @@ The magic is `p1 + p2`. `patchwork` overloads arithmetic operators:
 ```{r}
 #| label: fig-faceted
 #| fig-cap: "Age vs cholesterol faceted by site (columns) and sex (rows)."
+#| fig-alt: "Six small scatterplots show age and cholesterol by sex and monitoring site, each with a fitted line."
 #| fig-width: 8
 #| fig-height: 5
 #| warning: false
@@ -264,14 +266,16 @@ This is **Quarto-only** — R Markdown doesn't support this layout syntax native
 
 ## Interactive figures with `plotly`
 
-For HTML reports, `plotly` turns static ggplots into interactive figures where readers can hover, zoom, and pan:
+For HTML reports, `plotly` can turn a static ggplot into an interactive figure. This optional example is displayed without execution so the core course build does not depend on `plotly`:
 
 ```{r}
 #| label: fig-plotly
+#| eval: false
 #| fig-cap: "Interactive scatter — hover over points to see age."
+#| fig-alt: "Interactive scatterplot of serum PFOA and cholesterol; sex is shown by color and point shape, and tooltips report age and site."
 
 p <- ggplot(biomarker_data,
-            aes(x = pfoa_serum, y = cholesterol, color = sex,
+            aes(x = pfoa_serum, y = cholesterol, color = sex, shape = sex,
                 text = paste("Age:", age, "<br>Site:", site))) +
   geom_point(alpha = 0.6) +
   scale_x_log10() +
@@ -279,12 +283,12 @@ p <- ggplot(biomarker_data,
   labs(x = "PFOA (ng/mL)", y = "Cholesterol (mg/dL)") +
   theme_minimal()
 
-ggplotly(p, tooltip = c("text", "x", "y"))
+plotly::ggplotly(p, tooltip = c("text", "x", "y"))
 ```
 
 ::: {.callout-warning}
 ## `plotly` is HTML-only
-Interactive widgets render as static images (or are dropped entirely) in Word and PDF output. For multi-format reports, use a conditional pattern:
+Interactive widgets are not automatically portable to Word and PDF; they may require screenshot tooling or a separate static fallback. For multi-format reports, use a conditional pattern:
 
 ```r
 if (knitr::is_html_output()) {
@@ -323,35 +327,34 @@ ggsave("output/figures/figure1.svg",
 
 ::: {.callout-tip}
 ## Reproducibility tip
-If your manuscript figures are saved by `ggsave()` calls in your `.qmd` source, your figures and your analysis can never get out of sync. Every render regenerates the figure files. This catches bugs where someone "fixed the data" but forgot to update the figure.
+Saving manuscript figures from code in the `.qmd` source reduces the risk that submitted figure files drift away from the analysis. Test the output paths and confirm the files are regenerated during the final workflow.
 :::
 
 ## Figure cross-references
 
 We've been using labeled figures throughout. From prose, refer to them with `@fig-label`:
 
-> The data show a positive linear association (@fig-publication), consistent across sites (@fig-faceted).
+> The generated teaching data show a modest positive pattern (@fig-publication); related views appear in @fig-faceted.
 
-Quarto generates "Figure 1" and "Figure 5" with clickable links. The numbering is automatic and updates when figures are added or reordered.
+Quarto supplies the figure numbers and clickable links automatically. Do not type figure numbers into captions because the numbering changes when figures are added or reordered.
 
-## Exercises
+## Learner exercise — add the required figure
 
-### Exercise 3.1 — Multi-panel figure
+In `student_work/my_report.qmd`, add a scatterplot of `pfoa_serum` and `cholesterol` under **Results**. It must have:
 
-Using `biomarker_data`, create a `patchwork` figure with two panels side by side:
+1. A label beginning `fig-`.
+2. `fig-cap` with an informative caption that does not begin “Figure 1.”
+3. `fig-alt` that describes the axes, grouping encodings, and visible pattern.
+4. A logarithmic PFOA axis.
+5. Clear units in the axis labels.
+6. More than color alone if you encode groups; the checkpoint uses color for site and shape for sex.
 
-- **Panel A:** Histogram of `cholesterol`
-- **Panel B:** Scatter of `age` vs `cholesterol` colored by `sex`
+Render from a restarted R session. Compare with `student_work/checkpoints/03_figure_complete.qmd` after your version works.
 
-Set `fig-width: 10` and `fig-height: 4`. Add a `fig-cap`. Tag the panels A and B with `plot_annotation(tag_levels = "A")`.
-
-### Exercise 3.2 — Interactive figure
-
-Take your scatter from Exercise 3.1 (panel B) and wrap it in `ggplotly()`. Render. Hover over points. Confirm the tooltip shows useful information.
-
-### Exercise 3.3 — Side-by-side columns
-
-Using the `::: {.columns}` layout, place two histograms side by side: PFOA on the left, cholesterol on the right. Each gets its own caption and label.
+::: {.callout-tip}
+## Optional stretch
+Combine plots with `patchwork`, make an HTML-only `plotly` copy, or save a 300-dpi manuscript file. These are not required for the capstone.
+:::
 
 ## What's next
 

@@ -1,6 +1,6 @@
 ---
-title: "Quarto 1 — Your First .qmd"
-subtitle: "What you already know + Quarto-specific additions"
+title: "Quarto 1 — Your First Report"
+subtitle: "Continue one cumulative learner document"
 author: "R. Burke Squires"
 institute: "NIEHS"
 date: today
@@ -17,155 +17,85 @@ format:
 ## Where we are
 
 ::: {.incremental}
-- Morning: R Markdown essentials ✓
-- Just now: the bridge ✓
-- Now: Quarto fundamentals (this deck)
-- After lunch: tables, figures, equations, slides, projects
+- You knitted one R Markdown report.
+- You translated a safe copy to Quarto.
+- Now continue `student_work/my_report.qmd`.
+- The workshop website remains read-only.
 :::
 
-## You already know
+# The familiar model {.section-divider}
 
-YAML + markdown + chunks. We're swapping:
+## What transfers
+
+YAML + Markdown prose + executable chunks still produce the document.
 
 ::: {.incremental}
-- `output:` → `format:`
-- Chunk options to `#|` lines
-- File extension `.qmd`
+- `.qmd` source
+- `format:` in YAML
+- `#|` chunk-option lines
+- **Render** instead of **Knit**
 :::
 
-# Quarto authoring workflow {.section-divider}
-
-## On Posit Cloud
-
-::: {.incremental}
-- **File → New File → Quarto Document**
-- **Render** button (where Knit used to be)
-- `Ctrl/Cmd+Shift+K` works for both
-- Same four-pane RStudio interface
-:::
-
-# YAML expanded {.section-divider}
-
-## A realistic header
+## A useful HTML header
 
 ```yaml
 ---
-title: "Serum PFOA and Cholesterol"
-subtitle: "Triangle Region Biomonitoring, 2024"
-author:
-  - name: Jane Smith
-    affiliation: NIEHS Biostatistics
-  - name: John Doe
-    affiliation: NIEHS Epidemiology
+title: "Biomarker Summary"
+author: "Your name"
 date: today
 format:
   html:
     toc: true
     code-fold: true
-  docx: default
 ---
 ```
 
-## Notice
-
-::: {.incremental}
-- Multi-author with `name` and `affiliation`
-- `date: today` — no inline R needed
-- Multiple formats stack under `format:`
-- All hyphens, no underscores
+::: {.fragment}
+Start with one reliable format. Demonstrate DOCX later.
 :::
 
-# Callouts — Quarto-only {.section-divider}
+# Quarto additions {.section-divider}
 
-## Five types
+## Callouts
 
 ```markdown
 ::: {.callout-note}
-General info.
-:::
-
-::: {.callout-tip}
-A useful trick.
-:::
-
-::: {.callout-warning}
-Watch out.
+These data are synthetic and are used only for training.
 :::
 ```
 
-::: {.callout-tip}
-## Live example
-Like this one.
+::: {.callout-note}
+Callouts make cautions, assumptions, and decisions visible without custom HTML.
 :::
 
-## R Markdown vs Quarto callouts
+## Chunk options
 
-::: {.columns}
-::: {.column width="50%"}
-**R Markdown**
-
-```html
-<div style="padding: 12px;
-background-color: #F0FDF4;
-border-left: 4px solid #0D9488;
-margin: 16px 0;">
-**Tip:** ...
-</div>
-```
-:::
-::: {.column width="50%"}
-**Quarto**
-
-```markdown
-::: {.callout-tip}
-**Tip:** ...
-:::
-```
-:::
-::::
-
-# Panel tabsets {.section-divider}
-
-## Side-by-side R and Python
-
-````markdown
-::: {.panel-tabset}
-
-### R
+```` markdown
 ```{r}`r ''`
-ggplot(data, aes(x, y)) + geom_point()
-```
+#| label: load-data
+#| include: false
 
-### Python
-```{python}`r ''`
-sns.scatterplot(data=data, x="x", y="y")
+dat <- read.csv("data/workshop_biomarkers.csv")
 ```
-
-:::
 ````
 
 ::: {.fragment}
-Tabs in HTML; sequential sections in Word/PDF.
-:::
-
-# Today's dataset {.section-divider}
-
-## `biomarker_data`
-
-::: {.incremental}
-- Simulated NIEHS biomonitoring data
-- N = 200 participants
-- Variables: age, sex, site, PFOA, PFOS, BMI, cholesterol
-- Same data your morning Module 04 was using
-- Used throughout the afternoon
+Option names use hyphens; YAML-style booleans use lowercase.
 :::
 
 # Hands-on {.section-divider}
 
-## Notebook Quarto 1
+## Add to the cumulative report
 
-::: {.callout-tip}
-Open `afternoon_quarto/01_first_document.qmd`. Work through Exercises 1.1 and 1.2.
+In `student_work/my_report.qmd`:
+
+1. Add your title and name.
+2. Enable a table of contents and code folding.
+3. Customize the synthetic-data callout.
+4. Render from a restarted R session.
+
+Use `student_work/checkpoints/01_yaml_complete.qmd` only for recovery.
+
+::: {.callout-important}
+Success: the learner report renders without involving another course file.
 :::
-
-Back in 30 min — then we dive into chunks and tables.
